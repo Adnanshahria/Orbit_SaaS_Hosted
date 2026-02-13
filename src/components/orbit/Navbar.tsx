@@ -72,7 +72,7 @@ export function Navbar() {
               <img
                 src={orbitLogo}
                 alt="ORBIT SaaS Logo"
-                className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
+                className="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-full"
               />
               <span className="font-display text-foreground text-base sm:text-xl font-bold tracking-wider">ORBIT</span>
             </motion.div>
