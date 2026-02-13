@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import bcrypt from 'bcryptjs';
-import db from './lib/db.js';
-import { translations } from '../src/lib/i18n.js';
+import db from './lib/db';
+import { translations } from '../src/lib/i18n';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
