@@ -1,8 +1,10 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
+import { Rocket, Code, Megaphone } from 'lucide-react';
 
 const colors = ['from-neon-purple to-neon-blue', 'from-neon-cyan to-neon-purple', 'from-neon-pink to-neon-purple'];
+const icons = [Rocket, Code, Megaphone];
 
 export function LeadershipSection() {
   const { t } = useLang();
@@ -32,9 +34,11 @@ export function LeadershipSection() {
               transition={{ duration: 0.6, delay: i * 0.2 }}
               className="glass-effect rounded-2xl p-8 text-center group hover:border-neon-purple/40 gentle-animation"
             >
-              <div className={`w-24 h-24 rounded-full mx-auto mb-6 bg-gradient-to-br ${colors[i]} flex items-center justify-center text-3xl font-bold text-primary-foreground font-display`}>
-                {member.name.charAt(0)}
-              </div>
+              {(() => { const Icon = icons[i]; return (
+                <div className={`w-24 h-24 rounded-full mx-auto mb-6 bg-gradient-to-br ${colors[i]} flex items-center justify-center`}>
+                  <Icon className="w-10 h-10 text-primary-foreground" strokeWidth={1.8} />
+                </div>
+              ); })()}
               <h3 className="font-display text-xl font-semibold text-foreground mb-1">{member.name}</h3>
               <p className="text-neon-cyan text-sm font-medium">{member.role}</p>
             </motion.div>
