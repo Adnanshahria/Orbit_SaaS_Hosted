@@ -82,7 +82,7 @@ function MarqueeRow({
 export function TechStackSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-100px' });
+  const inView = useInView(ref, { once: false, margin: '-100px' });
 
   return (
     <section id="tech-stack" className="py-24 relative overflow-hidden">

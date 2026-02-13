@@ -32,7 +32,7 @@ const itemVariants = {
 export function WhyUsSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const inView = useInView(ref, { once: false, margin: '-80px' });
 
   return (
     <section id="why-us" className="py-16 sm:py-24 px-4 sm:px-6 relative">

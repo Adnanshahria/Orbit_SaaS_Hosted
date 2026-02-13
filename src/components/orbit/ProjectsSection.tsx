@@ -46,7 +46,7 @@ const cardVariants = {
 export function ProjectsSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const inView = useInView(ref, { once: false, margin: '-80px' });
 
   const items = (t as any).projects?.items ?? [];
 

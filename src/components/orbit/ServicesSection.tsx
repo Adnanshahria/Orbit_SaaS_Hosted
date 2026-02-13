@@ -27,7 +27,7 @@ const cardVariants = {
 export function ServicesSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const inView = useInView(ref, { once: false, margin: '-80px' });
 
   return (
     <section id="services" aria-label="Web Development Services" className="py-16 sm:py-24 px-4 sm:px-6 relative">

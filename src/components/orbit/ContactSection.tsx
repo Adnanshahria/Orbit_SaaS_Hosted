@@ -8,7 +8,7 @@ const WHATSAPP_URL = 'https://wa.me/8801853452264';
 export function ContactSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const inView = useInView(ref, { once: false, margin: '-80px' });
 
   return (
     <section id="contact" className="py-12 sm:py-20 px-4 sm:px-6 relative">
