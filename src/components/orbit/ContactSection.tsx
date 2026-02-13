@@ -11,7 +11,7 @@ export function ContactSection() {
   const inView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section id="contact" className="py-20 sm:py-32 px-4 sm:px-6 relative">
+    <section id="contact" className="py-12 sm:py-20 px-4 sm:px-6 relative">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(108,92,231,0.12),transparent_60%)]" />
       <div className="max-w-3xl mx-auto text-center relative" ref={ref}>
         <motion.div
@@ -19,15 +19,15 @@ export function ContactSection() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
         >
-          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6">{t.contact.title}</h2>
-          <p className="text-muted-foreground text-base sm:text-lg mb-8 sm:mb-10">{t.contact.subtitle}</p>
+          <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">{t.contact.title}</h2>
+          <p className="text-muted-foreground text-base sm:text-lg mb-6 sm:mb-8">{t.contact.subtitle}</p>
           <motion.a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-3 px-6 sm:px-10 py-4 sm:py-5 rounded-xl font-bold text-base sm:text-lg text-primary-foreground bg-primary neon-glow pulse-glow cursor-pointer"
+            className="inline-flex items-center gap-3 px-5 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg text-primary-foreground bg-primary neon-glow pulse-glow cursor-pointer"
           >
             {t.contact.cta}
             <ArrowRight className="w-5 h-5" />
