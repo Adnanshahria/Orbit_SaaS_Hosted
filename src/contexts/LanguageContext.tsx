@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { translations, type Lang, type Translations } from '@/lib/i18n';
+import { translations, type Lang } from '@/lib/i18n';
+import { useContent } from './ContentContext';
 
 interface LanguageContextType {
   lang: Lang;
@@ -12,7 +13,16 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>('en');
   const toggleLang = () => setLang(l => (l === 'en' ? 'bn' : 'en'));
-  const t = translations[lang];
+
+  // Try to use dynamic content from API, fallback to i18n.ts
+  let t: any;
+  try {
+    const { content } = useContent();
+    t = content[lang] || translations[lang];
+  } catch {
+    // ContentProvider not available (e.g., during admin-only routes)
+    t = translations[lang];
+  }
 
   return (
     <LanguageContext.Provider value={{ lang, t, toggleLang }}>
