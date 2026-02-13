@@ -3,23 +3,11 @@ import { useRef } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 
-const projects = [
-  {
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop',
-    link: '#',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&h=400&fit=crop',
-    link: '#',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
-    link: '#',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
-    link: '#',
-  },
+const projectImages = [
+  'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
 ];
 
 const cardVariants = {
@@ -72,7 +60,7 @@ export function ProjectsSection() {
           {items.map((item: any, i: number) => (
             <motion.a
               key={i}
-              href={projects[i]?.link ?? '#'}
+              href={item.link || '#'}
               target="_blank"
               rel="noopener noreferrer"
               custom={i}
@@ -89,7 +77,7 @@ export function ProjectsSection() {
             >
               <div className="aspect-video overflow-hidden">
                 <motion.img
-                  src={projects[i]?.image}
+                  src={projectImages[i] || ''}
                   alt={item.title}
                   className="w-full h-full object-cover"
                   whileHover={{ scale: 1.06, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } }}
