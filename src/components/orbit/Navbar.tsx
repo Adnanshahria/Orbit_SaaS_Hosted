@@ -63,9 +63,9 @@ export function Navbar() {
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="fixed top-0 left-0 right-0 w-full z-[110]"
+        className="fixed top-0 left-0 right-0 w-full z-[110] md:px-0 px-3 pt-3 md:pt-0"
       >
-        <div className={`w-full px-4 sm:px-8 lg:px-12 py-3 sm:py-4 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border' : 'bg-transparent'}`}>
+        <div className={`w-full px-4 sm:px-8 lg:px-12 py-3 sm:py-4 transition-all duration-300 rounded-full md:rounded-none ${isScrolled ? 'bg-card/90 md:bg-background/80 backdrop-blur-xl border border-border md:border-0 md:border-b shadow-[0_4px_20px_rgba(0,0,0,0.3)] md:shadow-none' : 'bg-card/70 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border border-border/50 md:border-0'}`}>
           <div className="flex items-center justify-between">
             <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img
