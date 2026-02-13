@@ -8,6 +8,7 @@ export const translations = {
       whyUs: 'Why Us',
       leadership: 'Leadership',
       contact: 'Contact',
+      projects: 'Projects',
       bookCall: 'Book an Appointment',
     },
     hero: {
@@ -37,6 +38,16 @@ export const translations = {
         { title: 'Strategic Partners', desc: 'We align technology decisions with your business goals for maximum ROI.' },
         { title: 'Tech Advisors', desc: 'Expert guidance on architecture, scalability, and emerging technologies.' },
         { title: 'Long-term Maintenance', desc: 'Ongoing support, updates, and optimization to keep your product competitive.' },
+      ],
+    },
+    projects: {
+      title: 'Our Projects',
+      subtitle: 'Real solutions we\'ve built for real businesses.',
+      items: [
+        { title: 'ShopNest eCommerce', desc: 'A full-featured online store with payment integration, inventory management, and real-time analytics.', tags: ['React', 'Node.js', 'Stripe'] },
+        { title: 'EduFlow LMS', desc: 'An interactive learning management system with course creation, progress tracking, and live sessions.', tags: ['Next.js', 'PostgreSQL', 'WebRTC'] },
+        { title: 'DevPortfolio Builder', desc: 'A dynamic portfolio platform for developers with CMS, blog engine, and custom themes.', tags: ['React', 'Tailwind', 'MDX'] },
+        { title: 'Enterprise HR Suite', desc: 'A comprehensive HR management application with attendance, payroll, and performance modules.', tags: ['TypeScript', 'Supabase', 'Charts'] },
       ],
     },
     leadership: {
@@ -70,6 +81,7 @@ export const translations = {
       whyUs: 'কেন আমরা',
       leadership: 'নেতৃত্ব',
       contact: 'যোগাযোগ',
+      projects: 'প্রকল্পসমূহ',
       bookCall: 'অ্যাপয়েন্টমেন্ট বুক করুন',
     },
     hero: {
@@ -99,6 +111,16 @@ export const translations = {
         { title: 'কৌশলগত অংশীদার', desc: 'সর্বোচ্চ ROI-এর জন্য আমরা প্রযুক্তি সিদ্ধান্তকে আপনার ব্যবসায়িক লক্ষ্যের সাথে সামঞ্জস্য করি।' },
         { title: 'টেক উপদেষ্টা', desc: 'আর্কিটেকচার, স্কেলেবিলিটি এবং উদীয়মান প্রযুক্তি সম্পর্কে বিশেষজ্ঞ নির্দেশনা।' },
         { title: 'দীর্ঘমেয়াদী রক্ষণাবেক্ষণ', desc: 'আপনার পণ্যকে প্রতিযোগিতামূলক রাখতে চলমান সহায়তা, আপডেট এবং অপ্টিমাইজেশন।' },
+      ],
+    },
+    projects: {
+      title: 'আমাদের প্রকল্পসমূহ',
+      subtitle: 'বাস্তব ব্যবসার জন্য আমরা তৈরি করেছি বাস্তব সমাধান।',
+      items: [
+        { title: 'ShopNest ই-কমার্স', desc: 'পেমেন্ট ইন্টিগ্রেশন, ইনভেন্টরি ম্যানেজমেন্ট এবং রিয়েল-টাইম অ্যানালিটিক্স সহ একটি পূর্ণ বৈশিষ্ট্যযুক্ত অনলাইন স্টোর।', tags: ['React', 'Node.js', 'Stripe'] },
+        { title: 'EduFlow LMS', desc: 'কোর্স তৈরি, অগ্রগতি ট্র্যাকিং এবং লাইভ সেশন সহ একটি ইন্টারেক্টিভ লার্নিং ম্যানেজমেন্ট সিস্টেম।', tags: ['Next.js', 'PostgreSQL', 'WebRTC'] },
+        { title: 'DevPortfolio Builder', desc: 'CMS, ব্লগ ইঞ্জিন এবং কাস্টম থিম সহ ডেভেলপারদের জন্য একটি ডায়নামিক পোর্টফোলিও প্ল্যাটফর্ম।', tags: ['React', 'Tailwind', 'MDX'] },
+        { title: 'Enterprise HR Suite', desc: 'উপস্থিতি, বেতন এবং কর্মক্ষমতা মডিউল সহ একটি ব্যাপক HR ম্যানেজমেন্ট অ্যাপ্লিকেশন।', tags: ['TypeScript', 'Supabase', 'Charts'] },
       ],
     },
     leadership: {

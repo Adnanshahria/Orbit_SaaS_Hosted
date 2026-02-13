@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, Sun, Moon, Home, Layers, MessageSquare, Trophy, Users, Phone } from 'lucide-react';
+import { Menu, X, Globe, Sun, Moon, Home, Layers, MessageSquare, Trophy, Users, Phone, FolderOpen } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import orbitLogo from '@/assets/orbit-logo.png';
@@ -11,6 +11,7 @@ const mobileNavItems = [
   { href: '#services', icon: Layers, label: 'Services' },
   { href: '#tech-stack', icon: Trophy, label: 'Tech' },
   { href: '#why-us', icon: MessageSquare, label: 'Why Us' },
+  { href: '#projects', icon: FolderOpen, label: 'Projects' },
   { href: '#leadership', icon: Users, label: 'Team' },
   { href: '#contact', icon: Phone, label: 'Contact' },
 ];
@@ -32,7 +33,7 @@ export function Navbar() {
       setIsScrolled(window.scrollY > 50);
 
       // Detect active section
-      const sections = ['hero', 'services', 'tech-stack', 'why-us', 'leadership', 'contact'];
+      const sections = ['hero', 'services', 'tech-stack', 'why-us', 'projects', 'leadership', 'contact'];
       let current = 'hero';
       for (const id of sections) {
         const el = document.getElementById(id);
@@ -53,6 +54,7 @@ export function Navbar() {
     { href: '#services', label: t.nav.services },
     { href: '#tech-stack', label: t.nav.techStack },
     { href: '#why-us', label: t.nav.whyUs },
+    { href: '#projects', label: (t.nav as any).projects ?? 'Projects' },
     { href: '#leadership', label: t.nav.leadership },
     { href: '#contact', label: t.nav.contact },
   ];

@@ -4,6 +4,7 @@ import { HeroSection } from './components/orbit/HeroSection';
 import { ServicesSection } from './components/orbit/ServicesSection';
 import { TechStackSection } from './components/orbit/TechStackSection';
 import { WhyUsSection } from './components/orbit/WhyUsSection';
+import { ProjectsSection } from './components/orbit/ProjectsSection';
 import { LeadershipSection } from './components/orbit/LeadershipSection';
 import { ContactSection } from './components/orbit/ContactSection';
 import { OrbitFooter } from './components/orbit/OrbitFooter';
@@ -19,6 +20,7 @@ export default function App() {
           <ServicesSection />
           <TechStackSection />
           <WhyUsSection />
+          <ProjectsSection />
           <LeadershipSection />
           <ContactSection />
         </main>
