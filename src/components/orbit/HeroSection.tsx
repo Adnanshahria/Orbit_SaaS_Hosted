@@ -1,19 +1,17 @@
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { useLang } from '@/contexts/LanguageContext';
 import { useEffect, useRef } from 'react';
+import { useLang } from '@/contexts/LanguageContext';
 
 const WHATSAPP_URL = 'https://wa.me/8801853452264';
 
+/* ── Particle field ───────────────────────────────────────────── */
 function ParticleField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext('2d')!;
     let animId: number;
     const particles: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = [];
 
@@ -24,14 +22,14 @@ function ParticleField() {
     resize();
     window.addEventListener('resize', resize);
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 50; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        r: Math.random() * 2 + 0.5,
-        o: Math.random() * 0.5 + 0.1,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.8 + 0.4,
+        o: Math.random() * 0.3 + 0.05,
       });
     }
 
@@ -47,20 +45,19 @@ function ParticleField() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = i % 3 === 0 ? `rgba(0, 245, 255, ${p.o})` : i % 3 === 1 ? `rgba(108, 92, 231, ${p.o})` : `rgba(255, 107, 203, ${p.o})`;
+        ctx.fillStyle = `rgba(108, 92, 231, ${p.o})`;
         ctx.fill();
 
-        // Draw lines between close particles
         for (let j = i + 1; j < particles.length; j++) {
           const dx = p.x - particles[j].x;
           const dy = p.y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
+          if (dist < 110) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(108, 92, 231, ${0.1 * (1 - dist / 120)})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(108, 92, 231, ${0.07 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.4;
             ctx.stroke();
           }
         }
@@ -78,77 +75,127 @@ function ParticleField() {
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 
+/* ── Hero component ───────────────────────────────────────────── */
 export function HeroSection() {
   const { t } = useLang();
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const contentY = useTransform(scrollYProgress, [0, 0.5], ['0%', '15%']);
+
+  // Staggered word animation for the subtitle
+  const words = t.hero.subtitle.split(' ');
 
   return (
-    <section id="hero" aria-label="ORBIT SaaS - Full-Stack Web Development Company" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16 sm:pt-0 sm:pb-0">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary to-background" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.15),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.1),transparent_60%)]" />
+    <section
+      ref={sectionRef}
+      id="hero"
+      aria-label="ORBIT SaaS - Full-Stack Web Development Company"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16 sm:pt-0 sm:pb-0"
+    >
+      {/* Parallax background layers */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-background via-secondary to-background" />
+      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.15),transparent_60%)]" />
+      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.1),transparent_60%)]" />
       <ParticleField />
 
-      {/* Content */}
-      <div className="relative z-10 text-center px-5 sm:px-6 max-w-5xl mx-auto">
+      {/* Content with scroll fade */}
+      <motion.div
+        style={{ opacity: contentOpacity, y: contentY }}
+        className="relative z-10 text-center px-5 sm:px-6 max-w-5xl mx-auto"
+      >
+        {/* Badge — slides down with spring */}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
+          className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full glass-effect text-xs sm:text-sm font-medium text-neon-cyan mb-6 sm:mb-8"
+        >
+          <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
+          Full-Stack Web Development Agency
+        </motion.div>
+
+        {/* Title — "ORBIT SaaS" scales up dramatically */}
+        <motion.h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] mb-4 sm:mb-6">
+          <motion.span
+            className="block"
+            initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.4 }}
+          >
+            ORBIT SaaS
+          </motion.span>
+          <motion.span
+            className="block mt-2 sm:mt-3 text-2xl sm:text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.7 }}
+          >
+            {t.hero.title}
+          </motion.span>
+        </motion.h1>
+
+        {/* Subtitle — word-by-word reveal */}
+        <motion.p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed flex flex-wrap justify-center gap-x-[0.3em]">
+          {words.map((word, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.4,
+                delay: 0.9 + i * 0.04,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
+              {word}
+            </motion.span>
+          ))}
+        </motion.p>
+
+        {/* CTA buttons — slide up with spring */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
+          transition={{ type: 'spring', stiffness: 60, damping: 16, delay: 1.6 }}
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0"
         >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full glass-effect text-xs sm:text-sm font-medium text-neon-cyan mb-6 sm:mb-8"
+          <motion.a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.04, boxShadow: '0 8px 30px rgba(108, 92, 231, 0.35)' }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground bg-gradient-to-r from-primary to-neon-blue shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
           >
-            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
-            Full-Stack Web Development Agency
-          </motion.div>
-
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] mb-4 sm:mb-6">
-            <span className="block">ORBIT SaaS</span>
-            <span className="block mt-2 sm:mt-3 text-2xl sm:text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">
-              {t.hero.title}
-            </span>
-          </h1>
-
-          <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2">
-            {t.hero.subtitle}
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0">
-            <motion.a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground bg-gradient-to-r from-primary to-neon-blue neon-glow gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
-            >
-              {t.hero.cta}
-              <ArrowRight className="w-5 h-5" />
-            </motion.a>
-            <motion.a
-              href="#services"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base"
-            >
-              {t.hero.learnMore}
-            </motion.a>
-          </div>
+            {t.hero.cta}
+            <ArrowRight className="w-5 h-5" />
+          </motion.a>
+          <motion.a
+            href="#services"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base"
+          >
+            {t.hero.learnMore}
+          </motion.a>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — gentle bounce */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
+        transition={{ delay: 2.5 }}
         className="absolute bottom-20 sm:bottom-8 left-1/2 -translate-x-1/2"
       >
-        <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
+        <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}>
           <ChevronDown className="w-6 h-6 text-muted-foreground" />
         </motion.div>
       </motion.div>
