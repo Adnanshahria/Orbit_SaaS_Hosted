@@ -105,9 +105,9 @@ export function Navbar() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.8 }}
-        className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[120]"
+        className="md:hidden fixed bottom-5 left-4 right-4 z-[120]"
       >
-        <div className="flex items-center gap-1 px-2.5 py-2.5 rounded-full bg-card/90 backdrop-blur-2xl border border-border shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
+        <div className="flex items-center gap-1 px-2.5 py-2.5 rounded-full bg-card/90 backdrop-blur-2xl border border-border shadow-[0_8px_40px_rgba(0,0,0,0.4)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
           {mobileNavItems.map((item) => {
             const isActive = activeSection === item.href;
             const Icon = item.icon;

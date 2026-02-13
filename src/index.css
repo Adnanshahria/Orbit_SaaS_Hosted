@@ -228,6 +228,14 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--neon-purple);
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer base {
