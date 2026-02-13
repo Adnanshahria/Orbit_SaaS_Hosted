@@ -128,6 +128,16 @@ export function ItemListEditor<T extends Record<string, unknown>>({
         setExpanded(new Set(items.map((_, i) => i)));
     }, [items.length]);
 
+    // Listen for save events to auto-collapse
+    useEffect(() => {
+        const handleSaveSuccess = () => {
+            console.log('[Admin] List auto-collapsing after successful save');
+            setExpanded(new Set());
+        };
+        window.addEventListener('orbit:save-success', handleSaveSuccess as EventListener);
+        return () => window.removeEventListener('orbit:save-success', handleSaveSuccess as EventListener);
+    }, []);
+
     const toggleItem = (index: number) => {
         setExpanded(prev => {
             const next = new Set(prev);
@@ -268,18 +278,24 @@ export function useSectionEditor(sectionName: string) {
     }, [content, lang, sectionName]);
 
     const save = useCallback(async (data: unknown) => {
+        console.log(`[Admin] Saving section: ${sectionName} (${lang})`, data);
         setSaving(true);
         setSaved(false);
         setError('');
         try {
             const ok = await updateSection(sectionName, lang, data);
             if (ok) {
+                console.log(`[Admin] Save successful: ${sectionName}`);
                 setSaved(true);
+                // Trigger collapse for all ItemListEditors
+                window.dispatchEvent(new CustomEvent('orbit:save-success', { detail: { section: sectionName } }));
                 setTimeout(() => setSaved(false), 2000);
             } else {
+                console.error(`[Admin] Save failed (Server rejection): ${sectionName}`);
                 setError('Failed to save. Please try again.');
             }
-        } catch {
+        } catch (err) {
+            console.error(`[Admin] Save error:`, err);
             setError('Server error. Please try again.');
         } finally {
             setSaving(false);

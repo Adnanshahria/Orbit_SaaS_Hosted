@@ -75,8 +75,38 @@ function MultiImageUpload({
         onChange(updated);
     };
 
+    useEffect(() => {
+        const handlePaste = async (e: ClipboardEvent) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+
+            const imageFiles: File[] = [];
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const blob = items[i].getAsFile();
+                    if (blob) imageFiles.push(blob);
+                }
+            }
+
+            if (imageFiles.length > 0) {
+                setUploading(true);
+                try {
+                    const newImages = await Promise.all(imageFiles.map((f) => processImage(f)));
+                    onChange([...images, ...newImages]);
+                    console.log(`Pasted ${imageFiles.length} images successfully`);
+                } catch (err) {
+                    console.error('Failed to process pasted images', err);
+                }
+                setUploading(false);
+            }
+        };
+
+        window.addEventListener('paste', handlePaste);
+        return () => window.removeEventListener('paste', handlePaste);
+    }, [images, onChange]);
+
     return (
-        <div>
+        <div className="outline-none">
             <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Project Images
                 <span className="text-xs font-normal text-muted-foreground ml-2">
@@ -142,11 +172,13 @@ function MultiImageUpload({
             <button
                 onClick={() => inputRef.current?.click()}
                 disabled={uploading}
-                className="w-full max-w-xs h-28 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                className="w-full max-w-xs h-28 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer group"
             >
-                <Upload className="w-5 h-5" />
-                <span className="text-sm">{uploading ? 'Processing...' : 'Add images'}</span>
-                <span className="text-xs">PNG, JPG, WebP — select multiple</span>
+                <div className="flex flex-col items-center gap-1">
+                    <Upload className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="text-sm">{uploading ? 'Processing...' : 'Add images'}</span>
+                    <span className="text-xs text-muted-foreground/60">(or Ctrl+V to paste)</span>
+                </div>
             </button>
 
             <input

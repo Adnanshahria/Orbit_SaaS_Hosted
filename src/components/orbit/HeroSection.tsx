@@ -95,42 +95,42 @@ export function HeroSection() {
       ref={sectionRef}
       id="hero"
       aria-label="ORBIT SaaS - Full-Stack Web Development Company"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16 sm:pt-0 sm:pb-0"
+      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-28 pb-20 sm:pt-0 sm:pb-0"
     >
       {/* Parallax background layers */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-background via-secondary to-background" />
-      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.15),transparent_60%)]" />
-      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.1),transparent_60%)]" />
+      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-background via-secondary/40 to-background" />
+      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.12),transparent_60%)]" />
+      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.08),transparent_60%)]" />
       <ParticleField />
 
       {/* Content with scroll fade */}
       <motion.div
         style={{ opacity: contentOpacity, y: contentY }}
-        className="relative z-10 text-center px-5 sm:px-6 max-w-5xl mx-auto"
+        className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto"
       >
         {/* Badge — slides down with spring */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full glass-effect text-xs sm:text-sm font-medium text-neon-cyan mb-6 sm:mb-8"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold text-neon-cyan mb-6 sm:mb-8 uppercase tracking-[0.2em]"
         >
-          <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
-          Full-Stack Web Development Agency
+          <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_10px_#00F5FF]" />
+          Development Studio
         </motion.div>
 
         {/* Title — "ORBIT SaaS" scales up dramatically */}
-        <motion.h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] mb-4 sm:mb-6">
+        <motion.h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[1] mb-6 sm:mb-8 tracking-tighter">
           <motion.span
             className="block"
             initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
             animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.4 }}
           >
-            ORBIT SaaS
+            ORBIT <span className="text-primary">SaaS</span>
           </motion.span>
           <motion.span
-            className="block mt-2 sm:mt-3 text-2xl sm:text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent"
+            className="block mt-4 sm:mt-6 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent italic"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.7 }}
@@ -140,7 +140,7 @@ export function HeroSection() {
         </motion.h1>
 
         {/* Subtitle — word-by-word reveal */}
-        <motion.p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed flex flex-wrap justify-center gap-x-[0.3em]">
+        <motion.p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.3em] font-medium">
           {words.map((word, i) => (
             <motion.span
               key={i}
