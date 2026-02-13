@@ -44,15 +44,15 @@ export function Navbar() {
         transition={{ duration: 0.8, delay: 0.3 }}
         className="fixed top-0 left-0 right-0 w-full z-[110]"
       >
-        <div className={`w-full px-6 sm:px-8 lg:px-12 py-4 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border' : 'bg-transparent'}`}>
+        <div className={`w-full px-4 sm:px-8 lg:px-12 py-3 sm:py-4 transition-all duration-300 ${isScrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border' : 'bg-transparent'}`}>
           <div className="flex items-center justify-between">
-            <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img
                 src="https://storage.googleapis.com/gpt-engineer-file-uploads/aMjanxrDoUP1QJ5krTWiqhWnSbF3/uploads/1758710472461-logo-icon-BG-circle copy.png"
                 alt="ORBIT SaaS Logo"
-                className="w-9 h-9 rounded-full"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full"
               />
-              <span className="font-display text-foreground text-xl font-bold tracking-wider">ORBIT SaaS</span>
+              <span className="font-display text-foreground text-base sm:text-xl font-bold tracking-wider">ORBIT</span>
             </motion.div>
 
             <div className="hidden md:flex items-center gap-8">
@@ -61,18 +61,18 @@ export function Navbar() {
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
-              <button onClick={toggleTheme} className="glass-effect p-2.5 rounded-full text-foreground hover:bg-foreground/10 gentle-animation cursor-pointer" aria-label="Toggle theme">
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <button onClick={toggleTheme} className="glass-effect p-2 sm:p-2.5 rounded-full text-foreground hover:bg-foreground/10 gentle-animation cursor-pointer" aria-label="Toggle theme">
                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
-              <button onClick={toggleLang} className="glass-effect px-3 py-2 rounded-full text-foreground hover:bg-foreground/10 gentle-animation flex items-center gap-1.5 text-sm font-medium cursor-pointer">
-                <Globe className="w-4 h-4" />
+              <button onClick={toggleLang} className="glass-effect px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full text-foreground hover:bg-foreground/10 gentle-animation flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium cursor-pointer">
+                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {lang === 'en' ? 'বাং' : 'EN'}
               </button>
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-lg font-semibold text-sm text-primary-foreground bg-primary neon-glow hover:opacity-90 gentle-animation cursor-pointer">
                 {t.nav.bookCall}
               </a>
-              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden glass-effect p-2.5 rounded-full text-foreground cursor-pointer">
+              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden glass-effect p-2 sm:p-2.5 rounded-full text-foreground cursor-pointer">
                 {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>

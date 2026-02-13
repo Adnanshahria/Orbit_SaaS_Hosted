@@ -10,17 +10,17 @@ export function LeadershipSection() {
   const inView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section id="leadership" className="py-24 px-4 sm:px-6 relative">
+    <section id="leadership" className="py-16 sm:py-24 px-4 sm:px-6 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/20 to-transparent" />
       <div className="max-w-5xl mx-auto relative" ref={ref}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.leadership.title}</h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t.leadership.subtitle}</p>
+          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4">{t.leadership.title}</h2>
+          <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto">{t.leadership.subtitle}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
