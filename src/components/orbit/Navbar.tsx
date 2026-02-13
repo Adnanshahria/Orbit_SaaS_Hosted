@@ -68,7 +68,7 @@ export function Navbar() {
         transition={{ duration: 0.8, delay: 0.3 }}
         className="fixed top-0 left-0 right-0 w-full z-[110] px-3 sm:px-4 md:px-6 lg:px-10 pt-3"
       >
-        <div className={`w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 transition-all duration-500 ease-in-out rounded-full backdrop-blur-xl ${isScrolled ? 'bg-card/90 border border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'bg-card/70 navbar-gradient-border'} dark:border-neon-purple/30 dark:shadow-[0_0_20px_rgba(139,92,246,0.15)]`}>
+        <div className={`w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 transition-all duration-500 ease-in-out rounded-full backdrop-blur-xl ${isScrolled ? 'bg-card/90 border border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.3)] dark:border-neon-purple/30 dark:shadow-[0_0_20px_rgba(139,92,246,0.15)]' : 'bg-card/70 navbar-gradient-border'}`}>
           <div className="flex items-center justify-between">
             <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <img
@@ -125,8 +125,8 @@ export function Navbar() {
                   layout
                   className={`flex items-center gap-1.5 rounded-full gentle-animation cursor-pointer ${
                     isActive
-                      ? 'bg-primary/15 dark:bg-primary/20 px-4 py-2.5'
-                      : 'px-3 py-2.5 hover:bg-foreground/5'
+                      ? 'bg-primary/15 dark:bg-primary/20 px-4 py-2.5 border border-primary/40 dark:border-neon-purple/50 shadow-[0_0_10px_rgba(139,92,246,0.15)]'
+                      : 'px-3 py-2.5 hover:bg-foreground/5 border border-transparent'
                   }`}
                 >
                   <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
