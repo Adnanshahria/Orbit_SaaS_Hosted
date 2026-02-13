@@ -1,39 +1,30 @@
-import { Hero } from './components/Hero'
-import { Portfolio } from './components/Portfolio'
-import { Awards } from './components/Awards'
-import { About } from './components/About'
-import { Services } from './components/Services'
-import { Team } from './components/Team'
-import { Contact } from './components/Contact'
-import { Footer } from './components/Footer'
+import { LanguageProvider } from './contexts/LanguageContext';
+import { Navbar } from './components/orbit/Navbar';
+import { HeroSection } from './components/orbit/HeroSection';
+import { ServicesSection } from './components/orbit/ServicesSection';
+import { TechStackSection } from './components/orbit/TechStackSection';
+import { WhyUsSection } from './components/orbit/WhyUsSection';
+import { LeadershipSection } from './components/orbit/LeadershipSection';
+import { ContactSection } from './components/orbit/ContactSection';
+import { OrbitFooter } from './components/orbit/OrbitFooter';
+import { Chatbot } from './components/orbit/Chatbot';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground" style={{ overflow: 'visible' }}>
-      <main className="relative" role="main" style={{ overflow: 'visible' }}>
-        <section id="hero" aria-label="Hero section">
-          <Hero />
-        </section>
-        <section id="portfolio" aria-label="Portfolio section">
-          <Portfolio />
-        </section>
-        <section id="awards" aria-label="Awards section">
-          <Awards />
-        </section>
-        <section id="about" aria-label="About section">
-          <About />
-        </section>
-        <section id="services" aria-label="Services section">
-          <Services />
-        </section>
-        <section id="team" aria-label="Team section" style={{ overflow: 'visible', height: 'auto', minHeight: '0', maxHeight: 'none' }}>
-          <Team />
-        </section>
-        <section id="contact" aria-label="Contact section">
-          <Contact />
-        </section>
-      </main>
-      <Footer />
-    </div>
-  )
+    <LanguageProvider>
+      <div className="min-h-screen bg-background text-foreground">
+        <Navbar />
+        <main>
+          <HeroSection />
+          <ServicesSection />
+          <TechStackSection />
+          <WhyUsSection />
+          <LeadershipSection />
+          <ContactSection />
+        </main>
+        <OrbitFooter />
+        <Chatbot />
+      </div>
+    </LanguageProvider>
+  );
 }
