@@ -77,9 +77,9 @@ export function Navbar() {
             </motion.div>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-2">
               {links.map(l => (
-                <a key={l.href} href={l.href} className="text-foreground/80 hover:text-foreground font-medium gentle-animation text-sm">{l.label}</a>
+                <a key={l.href} href={l.href} className="px-4 py-1.5 rounded-full border border-white/30 dark:border-white/20 text-foreground/80 hover:text-foreground hover:border-white/60 hover:bg-white/5 font-medium gentle-animation text-sm">{l.label}</a>
               ))}
             </div>
 
