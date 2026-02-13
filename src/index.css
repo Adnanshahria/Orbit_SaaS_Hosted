@@ -148,6 +148,29 @@
     border-color: rgba(255, 255, 255, 0.2);
   }
 
+  .navbar-gradient-border {
+    border: 1.5px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .navbar-gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    padding: 1.5px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.4), rgba(200, 200, 220, 0.3), rgba(8, 145, 178, 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .dark .navbar-gradient-border::before {
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.3), rgba(255, 255, 255, 0.1), rgba(0, 245, 255, 0.3));
+  }
+
   .neon-glow {
     box-shadow: 0 0 15px rgba(108, 92, 231, 0.4), 0 0 45px rgba(108, 92, 231, 0.1);
   }
