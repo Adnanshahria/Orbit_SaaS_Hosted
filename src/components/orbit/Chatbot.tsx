@@ -26,7 +26,7 @@ export function Chatbot() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-[200] w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center neon-glow cursor-pointer shadow-2xl"
+        className="fixed bottom-6 right-4 sm:right-6 z-[200] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center neon-glow cursor-pointer shadow-2xl"
       >
         {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </motion.button>
@@ -39,7 +39,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-24 right-6 z-[200] w-[340px] max-w-[calc(100vw-2rem)] rounded-2xl overflow-hidden border border-border bg-card shadow-2xl"
+            className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[200] w-[calc(100vw-2rem)] sm:w-[340px] max-w-[340px] rounded-2xl overflow-hidden border border-border bg-card shadow-2xl"
           >
             {/* Header */}
             <div className="px-5 py-4 bg-primary/10 border-b border-border">
