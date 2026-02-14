@@ -454,8 +454,16 @@ export default function AdminProjects() {
             }));
 
             // 3. Save both
-            const enSuccess = await updateSection('projects', 'en', { title: (content.en.projects as any)?.title, subtitle: (content.en.projects as any)?.subtitle, items: enItems });
-            const bnSuccess = await updateSection('projects', 'bn', { title: (content.bn.projects as any)?.title, subtitle: (content.bn.projects as any)?.subtitle, items: bnItems });
+            const enSuccess = await updateSection('projects', 'en', {
+                title: sectionInfo.en.title,
+                subtitle: sectionInfo.en.subtitle,
+                items: enItems
+            });
+            const bnSuccess = await updateSection('projects', 'bn', {
+                title: sectionInfo.bn.title,
+                subtitle: sectionInfo.bn.subtitle,
+                items: bnItems
+            });
 
             if (enSuccess && bnSuccess) {
                 setSaved(true);
