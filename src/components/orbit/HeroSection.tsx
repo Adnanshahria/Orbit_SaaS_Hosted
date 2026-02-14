@@ -165,13 +165,14 @@ export function HeroSection() {
           className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0"
         >
           <motion.a
+            id="hero-book-appointment"
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.04, boxShadow: '0 8px 30px rgba(108, 92, 231, 0.35)' }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground bg-gradient-to-r from-primary to-neon-blue shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
+            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
           >
             {t.hero.cta}
             <ArrowRight className="w-5 h-5" />

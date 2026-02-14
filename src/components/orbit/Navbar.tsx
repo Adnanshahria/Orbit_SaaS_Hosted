@@ -3,6 +3,7 @@ import { Menu, X, Globe, Sun, Moon, Home, Layers, MessageSquare, Trophy, Users, 
 import { useState, useEffect } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import orbitLogo from '@/assets/orbit-logo.png';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const WHATSAPP_URL = 'https://wa.me/8801853452264';
 
@@ -16,10 +17,6 @@ const mobileNavItems = [
   { href: '#contact', icon: Phone, label: 'Contact' },
 ];
 
-import { useNavigate, useLocation } from 'react-router-dom';
-
-// ... (imports)
-
 export function Navbar() {
   const { t, lang, toggleLang } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -27,6 +24,7 @@ export function Navbar() {
   const [activeSection, setActiveSection] = useState('#hero');
   const navigate = useNavigate();
   const location = useLocation();
+  const [showNavbarCTA, setShowNavbarCTA] = useState(false);
 
   const toggleTheme = () => {
     const next = !isDark;
@@ -52,7 +50,7 @@ export function Navbar() {
           const el = document.getElementById(id);
           if (el) {
             const rect = el.getBoundingClientRect();
-            if (rect.top <= window.innerHeight / 3) {
+            if (rect.top <= 150) {
               current = id;
             }
           }
@@ -77,6 +75,27 @@ export function Navbar() {
     }
   }, [location.pathname, location.hash]);
 
+  // Handle CTA visibility based on Hero button position
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroBtn = document.getElementById('hero-book-appointment');
+      if (heroBtn) {
+        const rect = heroBtn.getBoundingClientRect();
+        // Show navbar CTA only when hero CTA is scrolled out of view (top < 0)
+        setShowNavbarCTA(rect.top < -50);
+      } else {
+        // Fallback if on other pages where hero btn might not exist (optional, or hide it)
+        // Let's hidden it on other pages to not distract, OR show it since there's no hero btn to duplicate.
+        // Usually on inner pages you want the CTA visible.
+        setShowNavbarCTA(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Check on mount
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
+
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     if (location.pathname === '/') {
@@ -84,11 +103,9 @@ export function Navbar() {
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
-        // Update URL hash without scroll (optional, but good for history)
         window.history.pushState(null, '', href);
       }
     } else {
-      // Navigate to home with hash
       navigate('/' + href);
     }
   };
@@ -150,9 +167,23 @@ export function Navbar() {
                 <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {lang === 'en' ? 'বাং' : 'EN'}
               </button>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-primary neon-glow hover:opacity-90 gentle-animation cursor-pointer">
-                {t.nav.bookCall}
-              </a>
+
+              <AnimatePresence>
+                {showNavbarCTA && (
+                  <motion.a
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-lg hover:opacity-90 gentle-animation cursor-pointer"
+                  >
+                    {t.nav.bookCall}
+                  </motion.a>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>

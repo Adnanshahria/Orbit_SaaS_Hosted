@@ -238,19 +238,20 @@
   /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--background);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: linear-gradient(to bottom, var(--neon-purple), var(--neon-blue));
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--neon-purple);
+    background: linear-gradient(to bottom, #5b4cc4, #2563eb);
   }
 
   .scrollbar-hide {
