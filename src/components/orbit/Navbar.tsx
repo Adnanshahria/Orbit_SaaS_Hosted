@@ -146,7 +146,11 @@ export function Navbar() {
             </motion.div>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-2">
+            <motion.div
+              layout="position"
+              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              className="hidden md:flex items-center gap-2"
+            >
               {links.map(l => (
                 <a
                   key={l.href}
@@ -157,34 +161,45 @@ export function Navbar() {
                     : 'border-foreground/20 dark:border-white/20 text-foreground/80 hover:text-foreground hover:border-foreground/40 dark:hover:border-white/60 hover:bg-foreground/5 dark:hover:bg-white/5'
                     }`}>{l.label}</a>
               ))}
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-1.5 sm:gap-3">
-              <button onClick={toggleTheme} className="glass-effect p-2 sm:p-2.5 rounded-full text-foreground hover:bg-foreground/10 gentle-animation cursor-pointer" aria-label="Toggle theme">
+            <motion.div layout="position" transition={{ type: "spring", stiffness: 400, damping: 32 }} className="flex items-center gap-1.5 sm:gap-3">
+              <AnimatePresence>
+                {showNavbarCTA && (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.5, x: 10 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, x: 10 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30
+                    }}
+                    className="flex shrink-0"
+                  >
+                    <motion.a
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.96 }}
+                      href={WHATSAPP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu"
+                    >
+                      {t.nav.bookCall}
+                    </motion.a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <button onClick={toggleTheme} className="glass-effect p-2 sm:p-2.5 rounded-full text-foreground hover:bg-foreground/10 gentle-animation cursor-pointer shrink-0" aria-label="Toggle theme">
                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
-              <button onClick={toggleLang} className="glass-effect px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full text-foreground hover:bg-foreground/10 gentle-animation flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium cursor-pointer">
+              <button onClick={toggleLang} className="glass-effect px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full text-foreground hover:bg-foreground/10 gentle-animation flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium cursor-pointer shrink-0">
                 <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {lang === 'en' ? 'বাং' : 'EN'}
               </button>
-
-              <AnimatePresence>
-                {showNavbarCTA && (
-                  <motion.a
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-lg hover:opacity-90 gentle-animation cursor-pointer"
-                  >
-                    {t.nav.bookCall}
-                  </motion.a>
-                )}
-              </AnimatePresence>
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.nav>
