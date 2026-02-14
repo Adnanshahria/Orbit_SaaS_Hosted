@@ -24,9 +24,10 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'favicon.png', 'robots.txt'],
       manifest: {
-        name: 'ORBIT SaaS – Web Development Company',
+        name: 'ORBIT SaaS – Best Website Development Company | Custom Web Solutions',
         short_name: 'ORBIT SaaS',
-        description: 'Full-stack web development agency specializing in custom SaaS, eCommerce, and enterprise applications.',
+        description: 'Top website development company offering custom web solutions, web app development, eCommerce platforms, SaaS products & enterprise software. Build your website today.',
+        lang: 'en',
         theme_color: '#6C5CE7',
         background_color: '#0a0a0f',
         display: 'standalone',

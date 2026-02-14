@@ -1,4 +1,14 @@
+# ORBIT SaaS - Website Development Company
+# https://orbitsaas.com
+
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /admin
+Crawl-delay: 1
 
+# Sitemaps
 Sitemap: https://orbitsaas.com/sitemap.xml
+
+# Host
+Host: https://orbitsaas.com

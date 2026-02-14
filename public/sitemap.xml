@@ -1,14 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
   <url>
     <loc>https://orbitsaas.com/</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2026-02-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Services Section -->
   <url>
-    <loc>https://orbitsaas.com/admin/login</loc>
+    <loc>https://orbitsaas.com/#services</loc>
+    <lastmod>2026-02-15</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.1</priority>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Tech Stack Section -->
+  <url>
+    <loc>https://orbitsaas.com/#tech-stack</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Why Us Section -->
+  <url>
+    <loc>https://orbitsaas.com/#why-us</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Projects Section -->
+  <url>
+    <loc>https://orbitsaas.com/#projects</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Leadership Section -->
+  <url>
+    <loc>https://orbitsaas.com/#leadership</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Contact Section -->
+  <url>
+    <loc>https://orbitsaas.com/#contact</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

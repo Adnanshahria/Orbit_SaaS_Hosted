@@ -197,7 +197,8 @@ export default function ProjectDetail() {
     const plainDesc = stripHtml(project.desc || '');
     const seoDesc = project.seo?.description || (plainDesc.length > 160 ? plainDesc.substring(0, 157) + '...' : plainDesc);
     const seoKeywords = project.seo?.keywords?.join(', ') || project.tags?.join(', ') || 'SaaS, Portfolio, Case Study';
-    const ogImage = allImages[0] || '';
+    const ogImage = allImages[0] ? ensureAbsoluteUrl(allImages[0]) : 'https://orbitsaas.com/og-banner.png';
+    const currentUrl = `https://orbitsaas.com/project/${id}`;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -205,18 +206,22 @@ export default function ProjectDetail() {
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDesc} />
                 <meta name="keywords" content={seoKeywords} />
+                <link rel="canonical" href={currentUrl} />
 
                 {/* OpenGraph / Facebook */}
                 <meta property="og:type" content="article" />
                 <meta property="og:title" content={seoTitle} />
                 <meta property="og:description" content={seoDesc} />
                 <meta property="og:image" content={ogImage} />
+                <meta property="og:url" content={currentUrl} />
+                <meta property="og:site_name" content="ORBIT SaaS" />
 
                 {/* Twitter */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={seoTitle} />
                 <meta name="twitter:description" content={seoDesc} />
                 <meta name="twitter:image" content={ogImage} />
+                <meta name="twitter:image:alt" content={seoTitle} />
             </Helmet>
             <Navbar />
             <main className="pt-20">
