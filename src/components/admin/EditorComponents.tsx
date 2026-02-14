@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useContent } from '@/contexts/ContentContext';
+import { toast } from 'sonner';
 import { Save, Check, AlertCircle, Plus, Trash2, GripVertical, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 /* ─── Language Toggle ─── */
@@ -265,6 +266,8 @@ export function ItemListEditor<T extends Record<string, unknown>>({
     );
 }
 
+// ... (removed)
+
 /* ─── useSectionEditor hook ─── */
 export function useSectionEditor(sectionName: string) {
     const { content, updateSection } = useContent();
@@ -282,21 +285,26 @@ export function useSectionEditor(sectionName: string) {
         setSaving(true);
         setSaved(false);
         setError('');
+        const toastId = toast.loading('Saving changes...');
+
         try {
             const ok = await updateSection(sectionName, lang, data);
             if (ok) {
                 console.log(`[Admin] Save successful: ${sectionName}`);
                 setSaved(true);
+                toast.success('Changes saved successfully', { id: toastId });
                 // Trigger collapse for all ItemListEditors
                 window.dispatchEvent(new CustomEvent('orbit:save-success', { detail: { section: sectionName } }));
                 setTimeout(() => setSaved(false), 2000);
             } else {
                 console.error(`[Admin] Save failed (Server rejection): ${sectionName}`);
                 setError('Failed to save. Please try again.');
+                toast.error('Failed to save changes', { id: toastId });
             }
         } catch (err) {
             console.error(`[Admin] Save error:`, err);
             setError('Server error. Please try again.');
+            toast.error('Server error occurred', { id: toastId });
         } finally {
             setSaving(false);
         }

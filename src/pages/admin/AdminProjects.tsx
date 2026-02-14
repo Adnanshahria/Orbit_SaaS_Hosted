@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle } from '@/components/admin/EditorComponents';
 import { Upload, Trash2, X, Plus } from 'lucide-react';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
@@ -97,7 +98,7 @@ function MultiImageUpload({ images, onChange, title }: { images: string[]; onCha
                 {title} <span className="text-xs font-normal text-muted-foreground ml-2">({images.length} — first is cover)</span>
             </label>
             {images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-3">
                     {images.map((img, i) => (
                         <div key={i} className={`relative rounded-lg overflow-hidden border group ${i === 0 ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`}>
                             <img src={img} alt="" className="w-full h-32 object-cover" />
@@ -421,6 +422,7 @@ export default function AdminProjects() {
         setSaving(true);
         setError('');
         setSaved(false);
+        const toastId = toast.loading('Saving projects...');
 
         try {
             // 1. Construct EN payload
@@ -467,6 +469,7 @@ export default function AdminProjects() {
 
             if (enSuccess && bnSuccess) {
                 setSaved(true);
+                toast.success('Projects saved successfully', { id: toastId });
                 window.dispatchEvent(new CustomEvent('orbit:save-success', { detail: { section: 'projects' } }));
 
                 // Refresh content to ensure context is in sync
@@ -475,11 +478,13 @@ export default function AdminProjects() {
                 setTimeout(() => setSaved(false), 2000);
             } else {
                 setError('Error saving projects. Please try again.');
+                toast.error('Error saving projects', { id: toastId });
             }
 
         } catch (err) {
             console.error(err);
             setError('Failed to save projects. Please try again.');
+            toast.error('Failed to save projects', { id: toastId });
         } finally {
             setSaving(false);
         }
