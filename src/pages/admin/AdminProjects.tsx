@@ -386,7 +386,7 @@ export default function AdminProjects() {
     }, [content]);
 
     useEffect(() => {
-        if (loading) return;
+        if (!content.en || !content.bn) return;
 
         const enItems = (content.en.projects as any)?.items || [];
         const bnItems = (content.bn.projects as any)?.items || [];
