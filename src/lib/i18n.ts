@@ -44,10 +44,7 @@ export const translations = {
       title: 'Our Projects',
       subtitle: 'Real solutions we\'ve built for real businesses.',
       items: [
-        { title: 'ShopNest eCommerce', desc: 'A full-featured online store with payment integration, inventory management, and real-time analytics.', tags: ['React', 'Node.js', 'Stripe'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop' },
-        { title: 'EduFlow LMS', desc: 'An interactive learning management system with course creation, progress tracking, and live sessions.', tags: ['Next.js', 'PostgreSQL', 'WebRTC'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&h=400&fit=crop' },
-        { title: 'DevPortfolio Builder', desc: 'A dynamic portfolio platform for developers with CMS, blog engine, and custom themes.', tags: ['React', 'Tailwind', 'MDX'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop' },
-        { title: 'Enterprise HR Suite', desc: 'A comprehensive HR management application with attendance, payroll, and performance modules.', tags: ['TypeScript', 'Supabase', 'Charts'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop' },
+        // { title: 'Example Project', desc: 'Description...', tags: ['Tag'], link: 'https://example.com', image: '...' },
       ],
     },
     leadership: {
@@ -117,10 +114,7 @@ export const translations = {
       title: 'আমাদের প্রকল্পসমূহ',
       subtitle: 'বাস্তব ব্যবসার জন্য আমরা তৈরি করেছি বাস্তব সমাধান।',
       items: [
-        { title: 'ShopNest ই-কমার্স', desc: 'পেমেন্ট ইন্টিগ্রেশন, ইনভেন্টরি ম্যানেজমেন্ট এবং রিয়েল-টাইম অ্যানালিটিক্স সহ একটি পূর্ণ বৈশিষ্ট্যযুক্ত অনলাইন স্টোর।', tags: ['React', 'Node.js', 'Stripe'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop' },
-        { title: 'EduFlow LMS', desc: 'কোর্স তৈরি, অগ্রগতি ট্র্যাকিং এবং লাইভ সেশন সহ একটি ইন্টারেক্টিভ লার্নিং ম্যানেজমেন্ট সিস্টেম।', tags: ['Next.js', 'PostgreSQL', 'WebRTC'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&h=400&fit=crop' },
-        { title: 'DevPortfolio Builder', desc: 'CMS, ব্লগ ইঞ্জিন এবং কাস্টম থিম সহ ডেভেলপারদের জন্য একটি ডায়নামিক পোর্টফোলিও প্ল্যাটফর্ম।', tags: ['React', 'Tailwind', 'MDX'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop' },
-        { title: 'Enterprise HR Suite', desc: 'উপস্থিতি, বেতন এবং কর্মক্ষমতা মডিউল সহ একটি ব্যাপক HR ম্যানেজমেন্ট অ্যাপ্লিকেশন।', tags: ['TypeScript', 'Supabase', 'Charts'], link: 'https://www.orbitsaas.cloud', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop' },
+        // { title: 'Example Project', desc: 'Description...', tags: ['Tag'], link: 'https://example.com', image: '...' },
       ],
     },
     leadership: {

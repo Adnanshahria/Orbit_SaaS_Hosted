@@ -16,11 +16,17 @@ const mobileNavItems = [
   { href: '#contact', icon: Phone, label: 'Contact' },
 ];
 
+import { useNavigate, useLocation } from 'react-router-dom';
+
+// ... (imports)
+
 export function Navbar() {
   const { t, lang, toggleLang } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const [activeSection, setActiveSection] = useState('#hero');
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleTheme = () => {
     const next = !isDark;
@@ -28,6 +34,7 @@ export function Navbar() {
     document.documentElement.classList.toggle('dark', next);
   };
 
+  // Handle scroll spy
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -57,6 +64,35 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Handle hash scrolling on mount or when location changes (for cross-page nav)
+  useEffect(() => {
+    if (location.pathname === '/' && location.hash) {
+      const id = location.hash.substring(1);
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }, 100); // Small delay to ensure render
+      }
+    }
+  }, [location.pathname, location.hash]);
+
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      const id = href.substring(1);
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        // Update URL hash without scroll (optional, but good for history)
+        window.history.pushState(null, '', href);
+      }
+    } else {
+      // Navigate to home with hash
+      navigate('/' + href);
+    }
+  };
+
   const links = [
     { href: '#services', label: t.nav.services },
     { href: '#tech-stack', label: t.nav.techStack },
@@ -77,7 +113,13 @@ export function Navbar() {
       >
         <div className={`w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 transition-all duration-500 ease-in-out rounded-full backdrop-blur-xl ${isScrolled ? 'bg-card/90 border border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.3)] dark:border-neon-purple/30 dark:shadow-[0_0_20px_rgba(139,92,246,0.15)]' : 'bg-card/70 navbar-gradient-border'}`}>
           <div className="flex items-center justify-between">
-            <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => {
+              if (location.pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                navigate('/');
+              }
+            }}>
               <img
                 src={orbitLogo}
                 alt="ORBIT SaaS Logo"
@@ -89,10 +131,14 @@ export function Navbar() {
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-2">
               {links.map(l => (
-                <a key={l.href} href={l.href} className={`px-4 py-1.5 rounded-full border font-medium gentle-animation text-sm ${activeSection === l.href
-                  ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(108,92,231,0.3)]'
-                  : 'border-foreground/20 dark:border-white/20 text-foreground/80 hover:text-foreground hover:border-foreground/40 dark:hover:border-white/60 hover:bg-foreground/5 dark:hover:bg-white/5'
-                  }`}>{l.label}</a>
+                <a
+                  key={l.href}
+                  href={l.href}
+                  onClick={(e) => scrollToSection(e, l.href)}
+                  className={`px-4 py-1.5 rounded-full border font-medium gentle-animation text-sm ${activeSection === l.href
+                    ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(108,92,231,0.3)]'
+                    : 'border-foreground/20 dark:border-white/20 text-foreground/80 hover:text-foreground hover:border-foreground/40 dark:hover:border-white/60 hover:bg-foreground/5 dark:hover:bg-white/5'
+                    }`}>{l.label}</a>
               ))}
             </div>
 
@@ -128,7 +174,11 @@ export function Navbar() {
               <a
                 key={item.href}
                 href={item.href}
-                onClick={() => setActiveSection(item.href)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(e, item.href);
+                  setActiveSection(item.href);
+                }}
                 className="relative"
               >
                 <motion.div
