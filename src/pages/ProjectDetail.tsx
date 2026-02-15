@@ -5,6 +5,7 @@ import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
 import { Navbar } from '@/components/orbit/Navbar';
 import { OrbitFooter } from '@/components/orbit/OrbitFooter';
+import { Chatbot } from '@/components/orbit/Chatbot';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ensureAbsoluteUrl } from '@/lib/utils';
@@ -360,6 +361,7 @@ export default function ProjectDetail() {
                 </div>
             </main>
             <OrbitFooter />
+            <Chatbot />
         </div>
     );
 }
