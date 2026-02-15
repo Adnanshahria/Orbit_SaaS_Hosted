@@ -21,6 +21,20 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
     const openLightbox = () => setLightboxOpen(true);
     const closeLightbox = () => setLightboxOpen(false);
 
+    const swipePower = (offset: number, velocity: number) => {
+        return Math.abs(offset) * velocity;
+    };
+
+    const handleDragEnd = (e: any, { offset, velocity }: any) => {
+        const swipe = swipePower(offset.x, velocity.x);
+
+        if (swipe < -10000) {
+            nextSlide();
+        } else if (swipe > 10000) {
+            prevSlide();
+        }
+    };
+
     return (
         <>
             {/* Main Carousel */}
@@ -32,17 +46,21 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
             >
                 <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/5 group">
                     {/* Main Image */}
-                    <div className="cursor-pointer" onClick={openLightbox}>
+                    <div className="cursor-pointer overflow-hidden relative" onClick={openLightbox}>
                         <AnimatePresence mode='wait'>
                             <motion.img
                                 key={currentIndex}
                                 src={images[currentIndex]}
                                 alt={`${title} - slide ${currentIndex + 1}`}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.3 }}
-                                className="w-full h-auto max-h-[600px] object-contain bg-black/5"
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={1}
+                                onDragEnd={handleDragEnd}
+                                className="w-full h-auto max-h-[600px] object-contain bg-black/5 touch-pan-y"
                             />
                         </AnimatePresence>
                     </div>
@@ -52,19 +70,19 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
                         <>
                             <button
                                 onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 transform hover:scale-110"
+                                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transform hover:scale-110 z-10"
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 transform hover:scale-110"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transform hover:scale-110 z-10"
                             >
                                 <ChevronRight className="w-6 h-6" />
                             </button>
 
                             {/* Dots Indicator */}
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                                 {images.map((_, idx) => (
                                     <button
                                         key={idx}
@@ -101,13 +119,13 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
                             <>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-                                    className="absolute left-4 md:left-8 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                                    className="absolute left-4 md:left-8 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors opacity-100 sm:opacity-70 sm:hover:opacity-100"
                                 >
                                     <ChevronLeft className="w-10 h-10" />
                                 </button>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-                                    className="absolute right-4 md:right-8 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                                    className="absolute right-4 md:right-8 z-20 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors opacity-100 sm:opacity-70 sm:hover:opacity-100"
                                 >
                                     <ChevronRight className="w-10 h-10" />
                                 </button>
@@ -122,7 +140,11 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
                             transition={{ duration: 0.3 }}
                             src={images[currentIndex]}
                             alt="Fullscreen view"
-                            className="max-w-full max-h-full md:max-w-[85vw] md:max-h-[85vh] object-contain select-none shadow-2xl"
+                            drag="x"
+                            dragConstraints={{ left: 0, right: 0 }}
+                            dragElastic={1}
+                            onDragEnd={handleDragEnd}
+                            className="max-w-full max-h-full md:max-w-[85vw] md:max-h-[85vh] object-contain select-none shadow-2xl touch-pan-y"
                             onClick={(e) => e.stopPropagation()}
                         />
 

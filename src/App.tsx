@@ -12,6 +12,7 @@ import { ContactSection } from './components/orbit/ContactSection';
 import { OrbitFooter } from './components/orbit/OrbitFooter';
 import { Chatbot } from './components/orbit/Chatbot';
 import { StructuredData } from './components/seo/StructuredData';
+import ScrollToTop from './components/ScrollToTop';
 
 import { lazy, Suspense } from 'react';
 
@@ -86,6 +87,7 @@ export default function App() {
         <ContentProvider>
           <LanguageProvider>
             <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <ScrollToTop />
               <SEOHead />
               <Suspense fallback={<AdminLoading />}>
                 <Routes>

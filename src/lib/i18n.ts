@@ -69,6 +69,8 @@ export const translations = {
       title: 'ORBIT AI Assistant',
       placeholder: 'Ask me anything about our services...',
       greeting: 'Hi! 👋 I\'m the ORBIT SaaS assistant. How can I help you today?',
+      systemPrompt: '',
+      qaPairs: [] as { question: string; answer: string }[],
     },
   },
   bn: {
@@ -139,6 +141,8 @@ export const translations = {
       title: 'ORBIT AI সহকারী',
       placeholder: 'আমাদের সেবা সম্পর্কে যেকোনো কিছু জিজ্ঞাসা করুন...',
       greeting: 'হ্যালো! 👋 আমি ORBIT SaaS সহকারী। আজ আপনাকে কীভাবে সাহায্য করতে পারি?',
+      systemPrompt: '',
+      qaPairs: [] as { question: string; answer: string }[],
     },
   },
 } as const;

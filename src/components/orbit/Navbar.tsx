@@ -190,7 +190,7 @@ export function Navbar() {
                       href={WHATSAPP_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"
+                      className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"
                     >
                       {t.nav.bookCall}
                     </motion.a>
@@ -236,11 +236,11 @@ export function Navbar() {
                 <motion.div
                   layout
                   className={`flex items-center gap-2 rounded-full gentle-animation cursor-pointer ${isActive
-                    ? 'bg-primary/20 px-4 py-2.5 border border-primary/50 shadow-[0_0_12px_rgba(108,92,231,0.3)]'
-                    : 'px-3 py-2.5 hover:bg-foreground/5 border border-transparent'
+                    ? 'bg-primary/20 px-3 py-2 border border-primary/50 shadow-[0_0_12px_rgba(108,92,231,0.3)]'
+                    : 'px-2 py-2 hover:bg-foreground/5 border border-transparent'
                     }`}
                 >
-                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                   <AnimatePresence>
                     {isActive && (
                       <motion.span
