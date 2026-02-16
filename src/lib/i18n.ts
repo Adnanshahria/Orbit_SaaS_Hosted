@@ -13,6 +13,7 @@ export const translations = {
     },
     hero: {
       title: 'Your Web Development Partner',
+      tagline: 'Launch at Zero. Scale to Orbit',
       subtitle: 'ORBIT SaaS is a full-stack web development company that builds custom SaaS products, eCommerce platforms, and enterprise web applications using React, Node.js, and modern cloud technologies.',
       cta: 'Book an Appointment',
       learnMore: 'Explore Services',
@@ -85,6 +86,7 @@ export const translations = {
     },
     hero: {
       title: 'আপনার ডিজিটাল উপস্থিতি উন্নত করুন',
+      tagline: 'শূন্য থেকে শুরু। অসীমে পাড়ি।',
       subtitle: 'আমরা ফুল-স্ট্যাক SaaS পণ্য, ই-কমার্স প্ল্যাটফর্ম এবং এন্টারপ্রাইজ ওয়েব অ্যাপ্লিকেশন তৈরি করি যা আপনার উচ্চাকাঙ্ক্ষার সাথে স্কেল করে।',
       cta: 'অ্যাপয়েন্টমেন্ট বুক করুন',
       learnMore: 'সেবাসমূহ দেখুন',

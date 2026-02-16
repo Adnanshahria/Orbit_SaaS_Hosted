@@ -116,7 +116,7 @@ export function HeroSection() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold text-neon-cyan mb-6 sm:mb-8 uppercase tracking-[0.2em]"
         >
           <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_10px_#00F5FF]" />
-          Development Studio
+          {t.hero.tagline}
         </motion.div>
 
         {/* Title — "ORBIT SaaS" scales up dramatically */}
