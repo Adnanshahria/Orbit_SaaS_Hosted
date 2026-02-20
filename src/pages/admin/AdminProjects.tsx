@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle } from '@/components/admin/EditorComponents';
+import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle, JsonPanel } from '@/components/admin/EditorComponents';
 import { Upload, Trash2, X, Plus } from 'lucide-react';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { useContent } from '@/contexts/ContentContext';
@@ -542,6 +542,79 @@ export default function AdminProjects() {
             </div>
 
             <SaveButton onClick={handleSave} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    data={{
+                        en: {
+                            title: sectionInfo.en.title,
+                            subtitle: sectionInfo.en.subtitle,
+                            items: projects.map(p => ({
+                                title: p.en.title,
+                                desc: p.en.description,
+                                tags: p.tags,
+                                seo: p.seo,
+                                images: p.images,
+                                link: p.link,
+                                category: p.category,
+                                featured: p.featured,
+                                videoPreview: p.videoPreview
+                            }))
+                        },
+                        bn: {
+                            title: sectionInfo.bn.title,
+                            subtitle: sectionInfo.bn.subtitle,
+                            items: projects.map(p => ({
+                                title: p.bn.title,
+                                desc: p.bn.description,
+                                tags: p.tags,
+                                seo: p.seo,
+                                images: p.images,
+                                link: p.link,
+                                category: p.category,
+                                featured: p.featured,
+                                videoPreview: p.videoPreview
+                            }))
+                        }
+                    }}
+                    onImport={(parsed) => {
+                        if (!parsed.en || !parsed.bn) {
+                            toast.error('JSON must have "en" and "bn" keys');
+                            return;
+                        }
+                        setSectionInfo({
+                            en: { title: parsed.en.title || '', subtitle: parsed.en.subtitle || '' },
+                            bn: { title: parsed.bn.title || '', subtitle: parsed.bn.subtitle || '' }
+                        });
+                        const enItems = parsed.en.items || [];
+                        const bnItems = parsed.bn.items || [];
+                        const maxLen = Math.max(enItems.length, bnItems.length);
+                        const merged: UnifiedProject[] = [];
+                        for (let i = 0; i < maxLen; i++) {
+                            const en = enItems[i] || {};
+                            const bn = bnItems[i] || {};
+                            merged.push({
+                                images: en.images || bn.images || [],
+                                link: en.link || bn.link || '',
+                                category: en.category || bn.category || 'SaaS',
+                                featured: en.featured ?? bn.featured ?? false,
+                                videoPreview: en.videoPreview || bn.videoPreview || '',
+                                tags: en.tags || bn.tags || [],
+                                seo: en.seo || bn.seo || { title: '', description: '', keywords: [] },
+                                en: {
+                                    title: en.title || '',
+                                    description: en.desc || ''
+                                },
+                                bn: {
+                                    title: bn.title || '',
+                                    description: bn.desc || ''
+                                }
+                            });
+                        }
+                        setProjects(merged);
+                    }}
+                />
+            </div>
         </div>
     );
 }

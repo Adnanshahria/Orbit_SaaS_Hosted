@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor } from '@/components/admin/EditorComponents';
+import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor, JsonPanel } from '@/components/admin/EditorComponents';
 
 export default function AdminNavbar() {
     const { lang, setLang, saving, saved, error, getData, save } = useSectionEditor('nav');
@@ -41,6 +41,22 @@ export default function AdminNavbar() {
                 <TextField label="Book Call Button Text" value={bookCall} onChange={setBookCall} lang={lang} />
             </div>
             <SaveButton onClick={() => save({ services, techStack, whyUs, leadership, contact, projects, bookCall })} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    title={`JSON Import / Export (${lang.toUpperCase()})`}
+                    data={{ services, techStack, whyUs, leadership, contact, projects, bookCall }}
+                    onImport={(parsed) => {
+                        setServices(parsed.services || '');
+                        setTechStack(parsed.techStack || '');
+                        setWhyUs(parsed.whyUs || '');
+                        setLeadership(parsed.leadership || '');
+                        setContact(parsed.contact || '');
+                        setProjects(parsed.projects || '');
+                        setBookCall(parsed.bookCall || '');
+                    }}
+                />
+            </div>
         </div>
     );
 }

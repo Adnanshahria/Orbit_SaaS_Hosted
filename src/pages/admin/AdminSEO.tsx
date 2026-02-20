@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SectionHeader, SaveButton, TextField, ErrorAlert, useSectionEditor } from '@/components/admin/EditorComponents';
+import { SectionHeader, SaveButton, TextField, ErrorAlert, useSectionEditor, JsonPanel } from '@/components/admin/EditorComponents';
 
 export default function AdminSEO() {
     const { lang, saving, saved, error, getData, save } = useSectionEditor('seo');
@@ -26,6 +26,18 @@ export default function AdminSEO() {
                 <TextField label="Keywords (comma-separated)" value={seoKeywords} onChange={setSeoKeywords} lang="en" />
             </div>
             <SaveButton onClick={() => save({ title: seoTitle, description: seoDesc, keywords: seoKeywords })} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    title={`SEO JSON (${lang.toUpperCase()})`}
+                    data={{ title: seoTitle, description: seoDesc, keywords: seoKeywords }}
+                    onImport={(parsed) => {
+                        setSeoTitle(parsed.title || '');
+                        setSeoDesc(parsed.description || '');
+                        setSeoKeywords(parsed.keywords || '');
+                    }}
+                />
+            </div>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor, ItemListEditor } from '@/components/admin/EditorComponents';
+import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor, ItemListEditor, JsonPanel } from '@/components/admin/EditorComponents';
 
 export default function AdminChatbot() {
     const { lang, setLang, saving, saved, error, getData, save } = useSectionEditor('chatbot');
@@ -80,6 +80,20 @@ export default function AdminChatbot() {
             </div>
 
             <SaveButton onClick={() => save({ title, placeholder, greeting, systemPrompt, qaPairs })} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    title={`Chatbot JSON (${lang.toUpperCase()})`}
+                    data={{ title, placeholder, greeting, systemPrompt, qaPairs }}
+                    onImport={(parsed) => {
+                        setTitle(parsed.title || '');
+                        setPlaceholder(parsed.placeholder || '');
+                        setGreeting(parsed.greeting || '');
+                        setSystemPrompt(parsed.systemPrompt || '');
+                        setQaPairs(parsed.qaPairs || []);
+                    }}
+                />
+            </div>
         </div>
     );
 }

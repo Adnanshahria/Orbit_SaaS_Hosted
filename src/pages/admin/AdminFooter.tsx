@@ -5,6 +5,7 @@ import {
     SaveButton,
     TextField,
     ErrorAlert,
+    JsonPanel,
 } from '@/components/admin/EditorComponents';
 import { useContent } from '@/contexts/ContentContext';
 import {
@@ -273,6 +274,39 @@ export default function AdminFooter() {
             </div>
 
             <SaveButton onClick={handleSave} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    data={{
+                        en: {
+                            rights: sectionInfo.en.rights,
+                            tagline: sectionInfo.en.tagline,
+                            socials,
+                        },
+                        bn: {
+                            rights: sectionInfo.bn.rights,
+                            tagline: sectionInfo.bn.tagline,
+                            socials,
+                        },
+                    }}
+                    onImport={(parsed) => {
+                        if (!parsed.en || !parsed.bn) {
+                            toast.error('JSON must have "en" and "bn" keys');
+                            return;
+                        }
+                        setSectionInfo({
+                            en: { rights: parsed.en.rights || '', tagline: parsed.en.tagline || '' },
+                            bn: { rights: parsed.bn.rights || '', tagline: parsed.bn.tagline || '' },
+                        });
+                        // Socials are usually shared, so we take from EN if present
+                        if (parsed.en.socials) {
+                            setSocials(parsed.en.socials);
+                        } else if (parsed.bn.socials) {
+                            setSocials(parsed.bn.socials);
+                        }
+                    }}
+                />
+            </div>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor } from '@/components/admin/EditorComponents';
+import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor, JsonPanel } from '@/components/admin/EditorComponents';
 import { useContent } from '@/contexts/ContentContext';
 
 export default function AdminContact() {
@@ -45,6 +45,19 @@ export default function AdminContact() {
                 </div>
             </div>
             <SaveButton onClick={() => save({ title, subtitle, cta, whatsapp })} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    title={`JSON Import / Export (${lang.toUpperCase()})`}
+                    data={{ title, subtitle, cta, whatsapp }}
+                    onImport={(parsed) => {
+                        setTitle(parsed.title || '');
+                        setSubtitle(parsed.subtitle || '');
+                        setCta(parsed.cta || '');
+                        setWhatsapp(parsed.whatsapp || '');
+                    }}
+                />
+            </div>
         </div>
     );
 }
