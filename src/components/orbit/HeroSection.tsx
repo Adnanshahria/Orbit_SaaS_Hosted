@@ -13,25 +13,44 @@ function ParticleField() {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
     let animId: number;
-    const particles: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = [];
+    let particles: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = [];
+
+    const initParticles = (width: number, height: number) => {
+      particles = [];
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          r: Math.random() * 1.8 + 0.4,
+          o: Math.random() * 0.3 + 0.05,
+        });
+      }
+    };
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const oldWidth = canvas.width;
+      const oldHeight = canvas.height;
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      if (particles.length === 0) {
+        initParticles(newWidth, newHeight);
+      } else {
+        // Shift particles proportionally to avoid "clumping" on resize
+        particles.forEach(p => {
+          p.x = (p.x / oldWidth) * newWidth;
+          p.y = (p.y / oldHeight) * newHeight;
+        });
+      }
     };
+
     resize();
     window.addEventListener('resize', resize);
-
-    for (let i = 0; i < 50; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 1.8 + 0.4,
-        o: Math.random() * 0.3 + 0.05,
-      });
-    }
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -105,7 +124,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-28 pb-20 sm:pt-0 sm:pb-0"
+      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-32 pb-24 sm:pt-0 sm:pb-0"
     >
       {/* Parallax background layers */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-background via-secondary/40 to-background" />
@@ -124,7 +143,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold mb-6 sm:mb-8 uppercase tracking-[0.2em]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold mb-8 sm:mb-10 uppercase tracking-[0.2em]"
             style={{ color: taglineColor }}
           >
             <span
@@ -136,7 +155,7 @@ export function HeroSection() {
         )}
 
         {/* Title — "ORBIT SaaS" scales up dramatically */}
-        <motion.h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[1] mb-8 sm:mb-10 tracking-tighter">
+        <motion.h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[1] mb-10 sm:mb-14 tracking-tighter">
           <motion.span
             className="block"
             initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
@@ -146,8 +165,8 @@ export function HeroSection() {
             ORBIT <span className="text-primary">SaaS</span>
           </motion.span>
           <motion.span
-            className="block mt-3 sm:mt-5 text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold italic leading-snug"
-            style={{ fontFamily: "'Lobster Two', cursive", color: titleColor }}
+            className="block mt-4 sm:mt-8 text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-black italic leading-tight"
+            style={{ color: titleColor }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.7 }}
@@ -157,7 +176,7 @@ export function HeroSection() {
         </motion.h1>
 
         {/* Subtitle — word-by-word reveal */}
-        <motion.p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.3em] font-medium">
+        <motion.p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-12 sm:mb-16 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
           {words.map((word, i) => (
             <motion.span
               key={i}
@@ -179,7 +198,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 60, damping: 16, delay: 1.6 }}
-          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0"
+          className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4 sm:px-0"
         >
           <motion.a
             id="hero-book-appointment"
@@ -189,18 +208,18 @@ export function HeroSection() {
             whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
+            className="inline-flex items-center gap-2 px-8 sm:px-10 py-4.5 sm:py-5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base sm:text-lg"
             style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
           >
             {t.hero.cta}
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 ml-1" />
           </motion.a>
           <motion.a
             href="#services"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base"
+            className="inline-flex items-center gap-2 px-8 sm:px-10 py-4.5 sm:py-5 rounded-full font-bold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base sm:text-lg"
           >
             {t.hero.learnMore}
           </motion.a>
@@ -212,10 +231,10 @@ export function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.5 }}
-        className="absolute bottom-20 sm:bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-12 sm:bottom-10 left-1/2 -translate-x-1/2"
       >
         <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}>
-          <ChevronDown className="w-6 h-6 text-muted-foreground" />
+          <ChevronDown className="w-6 h-6 text-muted-foreground opacity-50" />
         </motion.div>
       </motion.div>
     </section>
