@@ -128,7 +128,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-36 pb-24 sm:pt-0 sm:pb-0"
+      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-24 pb-20 sm:pt-0 sm:pb-0"
     >
       {/* Parallax background layers */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-background via-secondary/40 to-background" />
@@ -158,9 +158,9 @@ export function HeroSection() {
         )}
 
         {/* Title — "ORBIT SaaS" scales up dramatically */}
-        <motion.h1 className="text-foreground leading-[1] mb-12 sm:mb-16">
+        <motion.h1 className="text-foreground leading-[1] mb-10 sm:mb-16">
           <motion.span
-            className="block text-4xl sm:text-6xl md:text-7xl lg:text-[6.5rem] font-poppins font-black tracking-tight"
+            className="block text-[3.5rem] leading-[1.1] sm:text-6xl md:text-7xl lg:text-[6.5rem] font-poppins font-black tracking-tight"
             initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
             animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.4 }}
@@ -168,7 +168,7 @@ export function HeroSection() {
             ORBIT <span className="text-primary">SaaS</span>
           </motion.span>
           <motion.span
-            className="block mt-6 sm:mt-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-lobster leading-snug tracking-normal px-4"
+            className="block mt-4 sm:mt-10 text-[2rem] leading-[1.2] sm:text-4xl md:text-5xl lg:text-6xl font-lobster tracking-normal px-2 sm:px-4"
             style={{ color: titleColor }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -201,7 +201,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 60, damping: 16, delay: baseDelay + 1.6 }}
-          className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center px-4 sm:px-0"
+          className="flex flex-col sm:flex-row gap-3.5 sm:gap-6 justify-center items-center px-2 sm:px-0"
         >
           <motion.a
             id="hero-book-appointment"
@@ -211,7 +211,7 @@ export function HeroSection() {
             whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-2 px-8 sm:px-10 py-4.5 sm:py-5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base sm:text-lg"
+            className="inline-flex items-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 rounded-[1.5rem] sm:rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-lg sm:text-lg"
             style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
           >
             {t.hero.cta}
@@ -222,7 +222,7 @@ export function HeroSection() {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-2 px-8 sm:px-10 py-4.5 sm:py-5 rounded-full font-bold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base sm:text-lg"
+            className="inline-flex items-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 rounded-[1.5rem] sm:rounded-full font-bold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base sm:text-lg"
           >
             {t.hero.learnMore}
           </motion.a>

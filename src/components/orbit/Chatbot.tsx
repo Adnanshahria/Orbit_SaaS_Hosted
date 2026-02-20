@@ -237,6 +237,19 @@ export function Chatbot() {
 
   return (
     <>
+      {/* Backdrop for mobile */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-[190] bg-background/40 backdrop-blur-sm md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Toggle button */}
       <motion.button
         whileHover={{ scale: 1.1 }}
@@ -255,7 +268,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-40 md:bottom-24 right-4 sm:right-6 z-[200] w-[calc(100vw-2rem)] sm:w-[400px] max-w-[400px] rounded-2xl overflow-hidden border border-border bg-card shadow-2xl flex flex-col"
+            className="fixed bottom-0 md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] rounded-t-3xl md:rounded-2xl overflow-hidden border-t md:border border-border bg-card shadow-2xl flex flex-col h-[85svh] md:h-auto"
           >
             {/* Header */}
             <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">
@@ -338,7 +351,7 @@ export function Chatbot() {
             </div>
 
             {/* Messages */}
-            <div className="h-[360px] overflow-y-auto p-4 space-y-3 bg-card/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-card/50 md:h-[360px] md:flex-none">
               {/* Initial Selection Flow */}
               {messages.length === 0 && !isLoading && (
                 <div className="space-y-4 py-2">
@@ -430,7 +443,9 @@ export function Chatbot() {
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
                 placeholder={chatContent.placeholder}
                 disabled={isLoading}
-                className="flex-1 bg-secondary rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                // Prevent auto-focus on open to stop keyboard jumping
+                autoFocus={false}
+                className="flex-1 bg-secondary rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-shadow"
               />
               <button
                 onClick={handleSend}
