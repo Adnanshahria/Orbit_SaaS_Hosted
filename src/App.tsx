@@ -39,14 +39,27 @@ function PublicSite() {
   // Mobile UX: Scroll to hide address bar
   useEffect(() => {
     const hideAddressBar = () => {
-      if (document.documentElement.scrollHeight > window.innerHeight) {
-        setTimeout(() => window.scrollTo(0, 1), 100);
-      }
+      window.scrollTo({
+        top: 1,
+        behavior: 'smooth'
+      });
     };
 
-    hideAddressBar();
+    // Try multiple times to ensure it works across different browsers/loading speeds
+    setTimeout(hideAddressBar, 0);
+    setTimeout(hideAddressBar, 100);
+    setTimeout(hideAddressBar, 500);
+    setTimeout(hideAddressBar, 1000);
+
     window.addEventListener('load', hideAddressBar);
-    return () => window.removeEventListener('load', hideAddressBar);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(hideAddressBar, 100);
+    });
+
+    return () => {
+      window.removeEventListener('load', hideAddressBar);
+      window.removeEventListener('orientationchange', hideAddressBar);
+    };
   }, []);
 
   return (
