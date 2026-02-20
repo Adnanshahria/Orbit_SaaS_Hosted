@@ -6,6 +6,7 @@ import {
     TextField,
     ErrorAlert,
     ItemListEditor,
+    JsonPanel,
 } from '@/components/admin/EditorComponents';
 import { Upload, Trash2, User } from 'lucide-react';
 import { uploadToImgBB } from '@/lib/imgbb';
@@ -404,6 +405,58 @@ export default function AdminLeadership() {
                     )}
                 />
             </div>
+
+            {/* ── Inline JSON Import / Export ── */}
+            <JsonPanel
+                data={{
+                    en: {
+                        title: sectionInfo.en.title,
+                        subtitle: sectionInfo.en.subtitle,
+                        members: members.map(m => ({
+                            name: m.en.name,
+                            role: m.en.role,
+                            image: m.image,
+                            order: m.order,
+                        })),
+                    },
+                    bn: {
+                        title: sectionInfo.bn.title,
+                        subtitle: sectionInfo.bn.subtitle,
+                        members: members.map(m => ({
+                            name: m.bn.name,
+                            role: m.bn.role,
+                            image: m.image,
+                            order: m.order,
+                        })),
+                    },
+                }}
+                onImport={(parsed) => {
+                    if (!parsed.en || !parsed.bn) {
+                        toast.error('JSON must have "en" and "bn" keys');
+                        return;
+                    }
+                    const newInfo = {
+                        en: { title: parsed.en.title || '', subtitle: parsed.en.subtitle || '' },
+                        bn: { title: parsed.bn.title || '', subtitle: parsed.bn.subtitle || '' },
+                    };
+                    const enMembers = parsed.en.members || [];
+                    const bnMembers = parsed.bn.members || [];
+                    const maxLen = Math.max(enMembers.length, bnMembers.length);
+                    const merged: UnifiedMember[] = [];
+                    for (let i = 0; i < maxLen; i++) {
+                        const en = enMembers[i] || {};
+                        const bn = bnMembers[i] || {};
+                        merged.push({
+                            image: en.image || bn.image || '',
+                            order: en.order ?? bn.order ?? i + 1,
+                            en: { name: en.name || '', role: en.role || '' },
+                            bn: { name: bn.name || '', role: bn.role || '' },
+                        });
+                    }
+                    setSectionInfo(newInfo);
+                    setMembers(merged);
+                }}
+            />
 
             <SaveButton onClick={handleSave} saving={saving} saved={saved} />
         </div>

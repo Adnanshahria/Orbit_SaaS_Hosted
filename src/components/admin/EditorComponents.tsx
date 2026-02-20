@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useContent } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
-import { Save, Check, AlertCircle, Plus, Trash2, ChevronDown, ChevronsUpDown, Sparkles, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
+import {
+    Save, Check, AlertCircle, Plus, Trash2, ChevronDown, ChevronUp,
+    ChevronsUpDown, Sparkles, Loader2, ArrowUp, ArrowDown,
+    Braces, Copy, ClipboardPaste
+} from 'lucide-react';
 
 /* ─── Language Toggle ─── */
 export function LangToggle({ lang, setLang }: { lang: string; setLang: (l: string) => void }) {
@@ -47,6 +51,116 @@ export function SaveButton({ onClick, saving, saved, className = '' }: { onClick
                 </>
             )}
         </button>
+    );
+}
+
+/* ─── Inline JSON Panel ─── */
+export function JsonPanel({
+    data,
+    onImport,
+    title = "JSON Import / Export",
+    description = "Export current form data as JSON or paste JSON below to import.",
+}: {
+    data: any;
+    onImport: (parsed: any) => void;
+    title?: string;
+    description?: string;
+}) {
+    const [open, setOpen] = useState(false);
+    const [jsonText, setJsonText] = useState('');
+    const [parseError, setParseError] = useState('');
+    const [copied, setCopied] = useState(false);
+
+    const handleExport = () => {
+        const json = JSON.stringify(data, null, 2);
+        setJsonText(json);
+        setParseError('');
+    };
+
+    const handleCopy = async () => {
+        try {
+            const json = jsonText || JSON.stringify(data, null, 2);
+            await navigator.clipboard.writeText(json);
+            setCopied(true);
+            toast.success('JSON copied to clipboard!');
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            toast.error('Failed to copy');
+        }
+    };
+
+    const handleImport = () => {
+        setParseError('');
+        try {
+            const parsed = JSON.parse(jsonText);
+            onImport(parsed);
+            toast.success('JSON imported into form! Click "Save Changes" to persist.');
+        } catch (err: any) {
+            setParseError(`Invalid JSON: ${err.message}`);
+        }
+    };
+
+    return (
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <button
+                onClick={() => { setOpen(!open); if (!open) handleExport(); }}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-secondary/30 transition-colors cursor-pointer"
+            >
+                <div className="flex items-center gap-2.5">
+                    <Braces className="w-5 h-5 text-primary" />
+                    <span className="font-semibold text-foreground">{title}</span>
+                    <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">Power Tool</span>
+                </div>
+                {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            </button>
+
+            {open && (
+                <div className="px-6 pb-6 space-y-4 border-t border-border pt-4">
+                    <p className="text-xs text-muted-foreground">
+                        {description} <b>Importing fills the form</b> — you still need to click <b>"Save Changes"</b> to persist.
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            onClick={handleExport}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-foreground text-xs font-medium hover:bg-secondary/80 transition-colors cursor-pointer"
+                        >
+                            <Braces className="w-3.5 h-3.5" /> Export Current
+                        </button>
+                        <button
+                            onClick={handleCopy}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-foreground text-xs font-medium hover:bg-secondary/80 transition-colors cursor-pointer"
+                        >
+                            {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copied ? 'Copied!' : 'Copy'}
+                        </button>
+                        <button
+                            onClick={handleImport}
+                            disabled={!jsonText.trim()}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-all cursor-pointer disabled:opacity-40"
+                        >
+                            <ClipboardPaste className="w-3.5 h-3.5" /> Import into Form
+                        </button>
+                    </div>
+
+                    {parseError && (
+                        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-xs">
+                            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                            <span>{parseError}</span>
+                        </div>
+                    )}
+
+                    <textarea
+                        value={jsonText}
+                        onChange={(e) => { setJsonText(e.target.value); setParseError(''); }}
+                        placeholder='Paste your JSON here...'
+                        rows={16}
+                        className="w-full rounded-lg bg-background border border-border p-4 text-sm font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y"
+                        spellCheck={false}
+                    />
+                </div>
+            )}
+        </div>
     );
 }
 

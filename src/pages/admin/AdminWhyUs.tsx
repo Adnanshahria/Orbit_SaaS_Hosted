@@ -6,6 +6,7 @@ import {
     TextField,
     ErrorAlert,
     ItemListEditor,
+    JsonPanel,
 } from '@/components/admin/EditorComponents';
 import { useContent } from '@/contexts/ContentContext';
 
@@ -290,6 +291,52 @@ export default function AdminWhyUs() {
                     )}
                 />
             </div>
+
+            {/* ── Inline JSON Import / Export ── */}
+            <JsonPanel
+                data={{
+                    en: {
+                        title: sectionInfo.en.title,
+                        subtitle: sectionInfo.en.subtitle,
+                        items: items.map(m => ({
+                            title: m.en.title,
+                            desc: m.en.desc,
+                        })),
+                    },
+                    bn: {
+                        title: sectionInfo.bn.title,
+                        subtitle: sectionInfo.bn.subtitle,
+                        items: items.map(m => ({
+                            title: m.bn.title,
+                            desc: m.bn.desc,
+                        })),
+                    },
+                }}
+                onImport={(parsed) => {
+                    if (!parsed.en || !parsed.bn) {
+                        toast.error('JSON must have "en" and "bn" keys');
+                        return;
+                    }
+                    const newInfo = {
+                        en: { title: parsed.en.title || '', subtitle: parsed.en.subtitle || '' },
+                        bn: { title: parsed.bn.title || '', subtitle: parsed.bn.subtitle || '' },
+                    };
+                    const enItems = parsed.en.items || [];
+                    const bnItems = parsed.bn.items || [];
+                    const maxLen = Math.max(enItems.length, bnItems.length);
+                    const merged: UnifiedUSP[] = [];
+                    for (let i = 0; i < maxLen; i++) {
+                        const en = enItems[i] || {};
+                        const bn = bnItems[i] || {};
+                        merged.push({
+                            en: { title: en.title || '', desc: en.desc || '' },
+                            bn: { title: bn.title || '', desc: bn.desc || '' },
+                        });
+                    }
+                    setSectionInfo(newInfo);
+                    setItems(merged);
+                }}
+            />
 
             <SaveButton onClick={handleSave} saving={saving} saved={saved} />
         </div>
