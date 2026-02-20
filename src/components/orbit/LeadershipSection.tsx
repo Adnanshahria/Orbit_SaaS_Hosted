@@ -74,20 +74,20 @@ export function LeadershipSection() {
                 variants={memberVariants}
                 whileHover={{
                   y: -8,
-                  boxShadow: '0 20px 40px rgba(108, 92, 231, 0.12)',
+                  boxShadow: '0 20px 40px rgba(108, 92, 231, 0.15)',
                   transition: { type: 'spring', stiffness: 300, damping: 20 },
                 }}
-                className="glass-effect rounded-2xl p-8 text-center group hover:border-primary/40 transition-colors duration-300"
+                className="glass-effect rounded-[2.5rem] p-8 text-center group hover:border-primary/40 transition-colors duration-300"
               >
-                {/* Large photo or fallback icon */}
+                {/* Circular photo or fallback icon */}
                 <motion.div
-                  className="w-48 h-48 sm:w-72 sm:h-72 rounded-3xl mx-auto mb-8 overflow-hidden flex items-center justify-center bg-secondary/30 border border-border/50"
+                  className="w-44 h-44 sm:w-56 sm:h-56 rounded-full mx-auto mb-8 overflow-hidden flex items-center justify-center bg-secondary/30 border-4 border-background shadow-2xl relative"
                   style={
                     hasImage
                       ? { boxShadow: style.shadow }
                       : { background: style.gradient, boxShadow: style.shadow }
                   }
-                  whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 300, damping: 15 } }}
+                  whileHover={{ scale: 1.08, transition: { type: 'spring', stiffness: 300, damping: 15 } }}
                 >
                   {hasImage ? (
                     <img
@@ -96,11 +96,12 @@ export function LeadershipSection() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-20 h-20 text-white" strokeWidth={1} />
+                    <User className="w-16 h-16 text-white" strokeWidth={1} />
                   )}
+                  <div className="absolute inset-0 rounded-full border border-white/10 pointer-events-none" />
                 </motion.div>
-                <h3 className="font-display text-2xl font-bold text-foreground mb-1.5">{member.name}</h3>
-                <p className="text-neon-cyan text-base font-semibold">{member.role}</p>
+                <h3 className="font-display text-2xl font-bold text-foreground mb-1.5 leading-tight">{member.name}</h3>
+                <p className="text-neon-cyan text-sm sm:text-base font-bold tracking-wide uppercase">{member.role}</p>
               </motion.div>
             );
           })}
