@@ -1,9 +1,9 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
-import { Cpu, Crown, Target } from 'lucide-react';
+import { Cpu, Crown, Target, User } from 'lucide-react';
 
-const memberStyles = [
+const fallbackStyles = [
   { icon: Cpu, gradient: 'linear-gradient(135deg, #6c5ce7, #3b82f6)', shadow: '0 8px 30px rgba(108, 92, 231, 0.35)' },
   { icon: Crown, gradient: 'linear-gradient(135deg, #0891b2, #6c5ce7)', shadow: '0 8px 30px rgba(8, 145, 178, 0.35)' },
   { icon: Target, gradient: 'linear-gradient(135deg, #d946a8, #6c5ce7)', shadow: '0 8px 30px rgba(217, 70, 168, 0.35)' },
@@ -38,6 +38,11 @@ export function LeadershipSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: '-80px' });
 
+  // Sort members by order field (if present), then by original index
+  const sortedMembers = [...t.leadership.members].sort(
+    (a: any, b: any) => (a.order ?? 999) - (b.order ?? 999)
+  );
+
   return (
     <section id="leadership" className="py-16 sm:py-24 px-4 sm:px-6 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/20 to-transparent" />
@@ -58,8 +63,10 @@ export function LeadershipSection() {
           animate={inView ? 'visible' : 'hidden'}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
         >
-          {t.leadership.members.map((member, i) => {
-            const { icon: Icon, gradient, shadow } = memberStyles[i];
+          {sortedMembers.map((member: any, i: number) => {
+            const style = fallbackStyles[i % fallbackStyles.length];
+            const hasImage = !!member.image;
+
             return (
               <motion.div
                 key={i}
@@ -71,12 +78,25 @@ export function LeadershipSection() {
                 }}
                 className="glass-effect rounded-2xl p-8 text-center group hover:border-primary/40 transition-colors duration-300"
               >
+                {/* Circular photo or fallback icon */}
                 <motion.div
-                  className="w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center"
-                  style={{ background: gradient, boxShadow: shadow }}
-                  whileHover={{ scale: 1.1, rotate: 5, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
+                  className="w-24 h-24 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center"
+                  style={
+                    hasImage
+                      ? { boxShadow: style.shadow }
+                      : { background: style.gradient, boxShadow: style.shadow }
+                  }
+                  whileHover={{ scale: 1.1, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
                 >
-                  <Icon className="w-9 h-9 text-white" strokeWidth={1.5} />
+                  {hasImage ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-10 h-10 text-white" strokeWidth={1.5} />
+                  )}
                 </motion.div>
                 <h3 className="font-display text-xl font-semibold text-foreground mb-1">{member.name}</h3>
                 <p className="text-neon-cyan text-sm font-medium">{member.role}</p>

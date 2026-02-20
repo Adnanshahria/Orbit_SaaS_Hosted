@@ -4,25 +4,9 @@ import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangT
 import { Upload, Trash2, X, Plus } from 'lucide-react';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { useContent } from '@/contexts/ContentContext';
+import { uploadToImgBB } from '@/lib/imgbb';
 
 // --- Shared Helper Components ---
-
-// --- ImgBB Config ---
-const IMGBB_API_KEY = 'b98cf36f5342d5f1e8036109c33d1c09';
-
-async function uploadToImgBB(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData,
-    });
-
-    if (!res.ok) throw new Error('ImgBB upload failed');
-    const data = await res.json();
-    return data.data.url;
-}
 
 function MultiImageUpload({ images, onChange, title }: { images: string[]; onChange: (imgs: string[]) => void; title: string; }) {
     const [uploading, setUploading] = useState(false);
