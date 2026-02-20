@@ -136,7 +136,7 @@ export function HeroSection() {
             ORBIT <span className="text-primary">SaaS</span>
           </motion.span>
           <motion.span
-            className="block mt-4 sm:mt-6 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent italic"
+            className="block mt-4 sm:mt-6 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary italic"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.7 }}
