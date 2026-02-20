@@ -88,7 +88,8 @@ export function HeroSection() {
   const contentY = useTransform(scrollYProgress, [0, 0.5], ['0%', '15%']);
 
   // Staggered word animation for the subtitle
-  const words = t.hero.subtitle.split(' ');
+  const subtitle = t.hero.subtitle || '';
+  const words = subtitle.split(' ');
 
   // Dynamic WhatsApp URL from admin settings
   const whatsappNumber = (t.contact as any).whatsapp || '8801853452264';

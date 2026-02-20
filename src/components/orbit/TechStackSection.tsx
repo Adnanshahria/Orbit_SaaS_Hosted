@@ -17,7 +17,8 @@ function MarqueeRow({
   reverse?: boolean;
 }) {
   // Triple the items for a seamless infinite loop
-  const tripled = [...category.items, ...category.items, ...category.items];
+  const itemsList = category.items || [];
+  const tripled = [...itemsList, ...itemsList, ...itemsList];
   const items = reverse ? [...tripled].reverse() : tripled;
 
   return (

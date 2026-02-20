@@ -39,7 +39,8 @@ export function LeadershipSection() {
   const inView = useInView(ref, { once: false, margin: '-80px' });
 
   // Sort members by order field (if present), then by original index
-  const sortedMembers = [...t.leadership.members].sort(
+  const members = t.leadership.members || [];
+  const sortedMembers = [...members].sort(
     (a: any, b: any) => (a.order ?? 999) - (b.order ?? 999)
   );
 

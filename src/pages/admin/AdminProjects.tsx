@@ -334,6 +334,7 @@ function ProjectEditor({ item, update }: { item: UnifiedProject; update: (i: Uni
                         label={tab === 'en' ? "Description" : "বিবরণ"}
                         value={item[tab].description || ''}
                         onChange={v => updateLoc(tab, 'description', v)}
+                        lang={tab}
                     />
                 </div>
             </div>

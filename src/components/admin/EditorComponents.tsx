@@ -68,7 +68,7 @@ export function AIEnhanceButton({
         const toastId = toast.loading('Enhancing with AI...');
 
         try {
-            const token = localStorage.getItem('orbit_admin_token');
+            const token = localStorage.getItem('admin_token');
             const response = await fetch('/api/enhance', {
                 method: 'POST',
                 headers: {
