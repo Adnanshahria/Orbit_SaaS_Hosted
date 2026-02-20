@@ -1,6 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import bcrypt from 'bcryptjs';
-import db from './lib/db.js';
 import { signToken } from './lib/auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -14,30 +12,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password required' });
+        const { code } = req.body;
+        console.log('Login attempt with code:', code ? 'Provided' : 'Missing');
+
+        const secretCode = process.env.ADMIN_ACCESS_CODE || 'orbit2025';
+
+        if (!code) {
+            return res.status(400).json({ error: 'Access code required' });
         }
 
-        const result = await db.execute({
-            sql: 'SELECT * FROM admin_users WHERE email = ?',
-            args: [email],
-        });
-
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+        if (code !== secretCode) {
+            return res.status(401).json({ error: 'Invalid access code' });
         }
 
-        const user = result.rows[0];
-        const valid = await bcrypt.compare(password, user.password_hash as string);
-        if (!valid) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        const token = signToken({ id: user.id, email: user.email });
+        const token = signToken({ id: 'admin', email: 'admin@orbitsaas.com' });
         return res.status(200).json({ success: true, token });
     } catch (error) {
         console.error('Login error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({
+            error: 'Internal server error',
+            details: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined
+        });
     }
 }

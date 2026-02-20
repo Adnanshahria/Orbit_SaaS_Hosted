@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import {
     LayoutDashboard, Type, ShoppingCart, Users, FolderOpen,
     MessageCircle, Globe, Shield, LogOut, Menu, X,
-    Lightbulb, Phone, FileText, Cpu
+    Lightbulb, Phone, FileText, Cpu, CloudUpload, Loader2, Link as LinkIcon
 } from 'lucide-react';
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
     { label: 'Contact', path: '/admin/contact', icon: Phone },
     { label: 'Footer', path: '/admin/footer', icon: FileText },
     { label: 'Chatbot', path: '/admin/chatbot', icon: MessageCircle },
+    { label: 'Links', path: '/admin/links', icon: LinkIcon },
     { label: 'Navbar', path: '/admin/navbar', icon: Globe },
     { label: 'SEO', path: '/admin/seo', icon: Shield },
 ];
@@ -25,6 +27,31 @@ const navItems = [
 export default function AdminLayout() {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [publishing, setPublishing] = useState(false);
+
+    const handlePublishCache = async () => {
+        setPublishing(true);
+        const toastId = toast.loading('Publishing cache...');
+        try {
+            const token = localStorage.getItem('admin_token');
+            const API_BASE = import.meta.env.VITE_API_URL || '';
+            const res = await fetch(`${API_BASE}/api/cache`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) throw new Error('Cache publish failed');
+            const data = await res.json();
+            toast.success(`Cache published! ${data.cachedAt ? new Date(data.cachedAt).toLocaleTimeString() : ''}`, { id: toastId });
+        } catch (err) {
+            console.error(err);
+            toast.error('Failed to publish cache', { id: toastId });
+        } finally {
+            setPublishing(false);
+        }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('admin_token');
@@ -79,6 +106,14 @@ export default function AdminLayout() {
                 </nav>
 
                 <div className="p-3 border-t border-border space-y-1">
+                    <button
+                        onClick={handlePublishCache}
+                        disabled={publishing}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-500 hover:bg-emerald-500/10 transition-colors w-full cursor-pointer disabled:opacity-50"
+                    >
+                        {publishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloudUpload className="w-4 h-4" />}
+                        {publishing ? 'Publishing...' : 'Publish Cache'}
+                    </button>
                     <a
                         href="/"
                         target="_blank"

@@ -23,7 +23,7 @@ export default function AdminLogin() {
             const res = await fetch(`${API_BASE}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ code: password }),
             });
 
             const data = await res.json();
@@ -31,7 +31,10 @@ export default function AdminLogin() {
                 localStorage.setItem('admin_token', data.token);
                 navigate('/admin');
             } else {
-                setError(data.error || 'Invalid credentials');
+                if (data.details) {
+                    localStorage.setItem('last_error_details', `${data.details}\n${data.stack || ''}`);
+                }
+                setError(data.error || 'Invalid access code');
             }
         } catch {
             setError('Server unavailable. Please try again.');
@@ -57,28 +60,13 @@ export default function AdminLogin() {
                         <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                             <Lock className="w-7 h-7 text-primary" />
                         </div>
-                        <h1 className="font-display text-2xl font-bold text-foreground">Admin Panel</h1>
-                        <p className="text-muted-foreground text-sm mt-1">Sign in to manage your website content</p>
+                        <h1 className="font-display text-2xl font-bold text-foreground">Admin Access</h1>
+                        <p className="text-muted-foreground text-sm mt-1">Enter your secret access code to manage content</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={e => setEmail(e.target.value)}
-                                    required
-                                    className="w-full bg-secondary rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 border border-border"
-                                    placeholder="admin@orbitsaas.com"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
+                            <label className="text-sm font-medium text-foreground mb-1.5 block">Admin Access Code</label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <input
@@ -86,8 +74,9 @@ export default function AdminLogin() {
                                     value={password}
                                     onChange={e => setPassword(e.target.value)}
                                     required
+                                    autoFocus
                                     className="w-full bg-secondary rounded-lg pl-10 pr-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 border border-border"
-                                    placeholder="••••••••"
+                                    placeholder="Enter your access code..."
                                 />
                                 <button
                                     type="button"
@@ -100,13 +89,20 @@ export default function AdminLogin() {
                         </div>
 
                         {error && (
-                            <motion.p
+                            <motion.div
                                 initial={{ opacity: 0, y: -5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-red-500 text-sm text-center"
+                                className="space-y-2"
                             >
-                                {error}
-                            </motion.p>
+                                <p className="text-red-500 text-sm text-center font-semibold">
+                                    {error}
+                                </p>
+                                {error.includes('Server unavailable') ? null : (
+                                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-[10px] text-red-400 font-mono overflow-auto max-h-32 whitespace-pre-wrap">
+                                        {localStorage.getItem('last_error_details') || 'Check console for details'}
+                                    </div>
+                                )}
+                            </motion.div>
                         )}
 
                         <button

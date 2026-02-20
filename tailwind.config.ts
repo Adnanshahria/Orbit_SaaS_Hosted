@@ -10,7 +10,7 @@ export default {
       padding: 'calc(var(--spacing) * 4)', // 1rem with 14px base = 14px padding
       screens: {
         sm: '40rem',
-        md: '48rem', 
+        md: '48rem',
         lg: '64rem',
         xl: '80rem',
         '2xl': '96rem',
@@ -19,6 +19,9 @@ export default {
     extend: {
       fontFamily: {
         bagel: ['Bagel Fat One', 'cursive'],
+        poppins: ['Poppins', 'sans-serif'],
+        lobster: ['"Lobster Two"', 'cursive'],
+        playfair: ['"Playfair Display"', 'serif'],
       },
       colors: {
         border: "var(--border)",

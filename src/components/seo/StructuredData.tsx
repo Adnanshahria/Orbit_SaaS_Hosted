@@ -1,4 +1,13 @@
+import { useLang } from '@/contexts/LanguageContext';
+
 export function StructuredData() {
+    const { t } = useLang();
+
+    // Dynamic WhatsApp info from admin settings
+    const whatsappRaw = (t.contact as any).whatsapp || '+8801853452264';
+    const whatsappClean = whatsappRaw.replace(/[^0-9]/g, '');
+    const whatsappUrl = `https://wa.me/${whatsappClean}`;
+
     const organizationSchema = {
         "@context": "https://schema.org",
         "@type": "Organization",
@@ -34,8 +43,8 @@ export function StructuredData() {
         "contactPoint": {
             "@type": "ContactPoint",
             "contactType": "sales",
-            "url": "https://wa.me/8801853452264",
-            "telephone": "+8801853452264",
+            "url": whatsappUrl,
+            "telephone": whatsappRaw,
             "availableLanguage": ["English", "Bengali"]
         },
         "knowsAbout": [
@@ -86,7 +95,7 @@ export function StructuredData() {
             "@type": "PostalAddress",
             "addressCountry": "BD"
         },
-        "telephone": "+8801853452264",
+        "telephone": whatsappRaw,
         "areaServed": [
             {
                 "@type": "Country",
@@ -257,7 +266,7 @@ export function StructuredData() {
                 "name": "How can I hire ORBIT SaaS to build my website?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "You can hire ORBIT SaaS for your website development project by booking a free consultation through WhatsApp at +8801853452264 or visiting our website. We work with businesses of all sizes — from startups to enterprises — to deliver custom web solutions that scale with your growth."
+                    "text": `You can hire ORBIT SaaS for your website development project by booking a free consultation through WhatsApp at ${whatsappRaw} or visiting our website. We work with businesses of all sizes — from startups to enterprises — to deliver custom web solutions that scale with your growth.`
                 }
             },
             {

@@ -14,7 +14,7 @@ import { Chatbot } from './components/orbit/Chatbot';
 import { StructuredData } from './components/seo/StructuredData';
 import ScrollToTop from './components/ScrollToTop';
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 
 // Lazy load admin pages
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -28,13 +28,43 @@ const AdminLeadership = lazy(() => import('./pages/admin/AdminLeadership'));
 const AdminContact = lazy(() => import('./pages/admin/AdminContact'));
 const AdminFooter = lazy(() => import('./pages/admin/AdminFooter'));
 const AdminChatbot = lazy(() => import('./pages/admin/AdminChatbot'));
+const AdminLinks = lazy(() => import('./pages/admin/AdminLinks'));
 const AdminNavbar = lazy(() => import('./pages/admin/AdminNavbar'));
 const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 
+import { InitialLoader } from './components/orbit/InitialLoader';
+
 function PublicSite() {
+  // Mobile UX: Scroll to hide address bar
+  useEffect(() => {
+    const hideAddressBar = () => {
+      window.scrollTo({
+        top: 1,
+        behavior: 'smooth'
+      });
+    };
+
+    // Try multiple times to ensure it works across different browsers/loading speeds
+    setTimeout(hideAddressBar, 0);
+    setTimeout(hideAddressBar, 100);
+    setTimeout(hideAddressBar, 500);
+    setTimeout(hideAddressBar, 1000);
+
+    window.addEventListener('load', hideAddressBar);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(hideAddressBar, 100);
+    });
+
+    return () => {
+      window.removeEventListener('load', hideAddressBar);
+      window.removeEventListener('orientationchange', hideAddressBar);
+    };
+  }, []);
+
   return (
     <>
+      <InitialLoader />
       <StructuredData />
       <div className="min-h-screen bg-background text-foreground">
         <Navbar />
@@ -105,8 +135,10 @@ export default function App() {
                     <Route path="contact" element={<AdminContact />} />
                     <Route path="footer" element={<AdminFooter />} />
                     <Route path="chatbot" element={<AdminChatbot />} />
+                    <Route path="links" element={<AdminLinks />} />
                     <Route path="navbar" element={<AdminNavbar />} />
                     <Route path="seo" element={<AdminSEO />} />
+
                   </Route>
                 </Routes>
               </Suspense>

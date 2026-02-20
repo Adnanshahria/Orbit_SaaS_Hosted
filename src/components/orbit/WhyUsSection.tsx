@@ -55,7 +55,7 @@ export function WhyUsSection() {
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
         >
           {t.whyUs.items.map((item, i) => {
-            const Icon = icons[i];
+            const Icon = icons[i % icons.length];
             return (
               <motion.div
                 key={i}

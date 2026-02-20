@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useContent } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
-import { Save, Check, AlertCircle, Plus, Trash2, GripVertical, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import {
+    Save, Check, AlertCircle, Plus, Trash2, ChevronDown, ChevronUp,
+    ChevronsUpDown, Sparkles, Loader2, ArrowUp, ArrowDown,
+    Braces, Copy, ClipboardPaste
+} from 'lucide-react';
 
 /* ─── Language Toggle ─── */
 export function LangToggle({ lang, setLang }: { lang: string; setLang: (l: string) => void }) {
@@ -22,12 +26,12 @@ export function LangToggle({ lang, setLang }: { lang: string; setLang: (l: strin
 }
 
 /* ─── Save Button ─── */
-export function SaveButton({ onClick, saving, saved }: { onClick: () => void; saving: boolean; saved: boolean }) {
+export function SaveButton({ onClick, saving, saved, className = '' }: { onClick: () => void; saving: boolean; saved: boolean; className?: string }) {
     return (
         <button
             onClick={onClick}
             disabled={saving}
-            className={`px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all cursor-pointer ${saved
+            className={`px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all cursor-pointer ${className} ${saved
                 ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                 : 'bg-primary text-primary-foreground hover:opacity-90'
                 } disabled:opacity-50`}
@@ -50,21 +54,198 @@ export function SaveButton({ onClick, saving, saved }: { onClick: () => void; sa
     );
 }
 
+/* ─── Inline JSON Panel ─── */
+export function JsonPanel({
+    data,
+    onImport,
+    title = "JSON Import / Export",
+    description = "Export current form data as JSON or paste JSON below to import.",
+}: {
+    data: any;
+    onImport: (parsed: any) => void;
+    title?: string;
+    description?: string;
+}) {
+    const [open, setOpen] = useState(false);
+    const [jsonText, setJsonText] = useState('');
+    const [parseError, setParseError] = useState('');
+    const [copied, setCopied] = useState(false);
+
+    const handleExport = () => {
+        const json = JSON.stringify(data, null, 2);
+        setJsonText(json);
+        setParseError('');
+    };
+
+    const handleCopy = async () => {
+        try {
+            const json = jsonText || JSON.stringify(data, null, 2);
+            await navigator.clipboard.writeText(json);
+            setCopied(true);
+            toast.success('JSON copied to clipboard!');
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            toast.error('Failed to copy');
+        }
+    };
+
+    const handleImport = () => {
+        setParseError('');
+        try {
+            const parsed = JSON.parse(jsonText);
+            onImport(parsed);
+            toast.success('JSON imported into form! Click "Save Changes" to persist.');
+        } catch (err: any) {
+            setParseError(`Invalid JSON: ${err.message}`);
+        }
+    };
+
+    return (
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <button
+                onClick={() => { setOpen(!open); if (!open) handleExport(); }}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-secondary/30 transition-colors cursor-pointer"
+            >
+                <div className="flex items-center gap-2.5">
+                    <Braces className="w-5 h-5 text-primary" />
+                    <span className="font-semibold text-foreground">{title}</span>
+                    <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">Power Tool</span>
+                </div>
+                {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            </button>
+
+            {open && (
+                <div className="px-6 pb-6 space-y-4 border-t border-border pt-4">
+                    <p className="text-xs text-muted-foreground">
+                        {description} <b>Importing fills the form</b> — you still need to click <b>"Save Changes"</b> to persist.
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            onClick={handleExport}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-foreground text-xs font-medium hover:bg-secondary/80 transition-colors cursor-pointer"
+                        >
+                            <Braces className="w-3.5 h-3.5" /> Export Current
+                        </button>
+                        <button
+                            onClick={handleCopy}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-foreground text-xs font-medium hover:bg-secondary/80 transition-colors cursor-pointer"
+                        >
+                            {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copied ? 'Copied!' : 'Copy'}
+                        </button>
+                        <button
+                            onClick={handleImport}
+                            disabled={!jsonText.trim()}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 transition-all cursor-pointer disabled:opacity-40"
+                        >
+                            <ClipboardPaste className="w-3.5 h-3.5" /> Import into Form
+                        </button>
+                    </div>
+
+                    {parseError && (
+                        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-xs">
+                            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                            <span>{parseError}</span>
+                        </div>
+                    )}
+
+                    <textarea
+                        value={jsonText}
+                        onChange={(e) => { setJsonText(e.target.value); setParseError(''); }}
+                        placeholder='Paste your JSON here...'
+                        rows={16}
+                        className="w-full rounded-lg bg-background border border-border p-4 text-sm font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y"
+                        spellCheck={false}
+                    />
+                </div>
+            )}
+        </div>
+    );
+}
+
+/* ─── AI Enhance Button ─── */
+export function AIEnhanceButton({
+    text,
+    lang,
+    onEnhanced,
+}: {
+    text: string;
+    lang: string;
+    onEnhanced: (enhanced: string) => void;
+}) {
+    const [loading, setLoading] = useState(false);
+
+    const handleEnhance = async () => {
+        if (!text.trim() || loading) return;
+        setLoading(true);
+        const toastId = toast.loading('Enhancing with AI...');
+
+        try {
+            const token = localStorage.getItem('admin_token');
+            const API_BASE = import.meta.env.VITE_API_URL || '';
+            const response = await fetch(`${API_BASE}/api/enhance`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ text, lang }),
+            });
+
+            if (!response.ok) throw new Error('Failed to enhance');
+            const data = await response.json();
+            if (data.enhancedText) {
+                onEnhanced(data.enhancedText);
+                toast.success('Content enhanced!', { id: toastId });
+            }
+        } catch (err) {
+            console.error('AI Enhance error:', err);
+            toast.error('AI enhancement failed', { id: toastId });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <button
+            onClick={handleEnhance}
+            disabled={loading || !text.trim()}
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary hover:text-primary/80 disabled:opacity-50 transition-colors cursor-pointer"
+            title="Enhance with AI"
+        >
+            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            Enhance
+        </button>
+    );
+}
+
 /* ─── Text Field ─── */
 export function TextField({
     label,
     value,
     onChange,
     multiline = false,
+    lang,
 }: {
     label: string;
     value: string;
     onChange: (v: string) => void;
     multiline?: boolean;
+    lang?: string;
 }) {
     return (
         <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">{label}</label>
+            <div className="flex items-center justify-between mb-1.5">
+                <label className="text-sm font-medium text-foreground block">{label}</label>
+                {lang && (
+                    <AIEnhanceButton
+                        text={value}
+                        lang={lang}
+                        onEnhanced={onChange}
+                    />
+                )}
+            </div>
             {multiline ? (
                 <textarea
                     value={value}
@@ -80,6 +261,49 @@ export function TextField({
                     className="w-full bg-secondary rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 border border-border"
                 />
             )}
+        </div>
+    );
+}
+
+/* ─── Color Field ─── */
+export function ColorField({
+    label,
+    value,
+    onChange,
+}: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+}) {
+    return (
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+            <label className="text-sm font-medium text-foreground block">{label}</label>
+            <div className="flex items-center gap-2 bg-secondary rounded-lg px-3 py-2 border border-border">
+                <div
+                    className="w-6 h-6 rounded border border-border flex-shrink-0"
+                    style={{ backgroundColor: value }}
+                />
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="flex-1 bg-transparent text-xs font-mono text-foreground outline-none"
+                    placeholder="#RRGGBB"
+                />
+                <input
+                    type="color"
+                    value={value.startsWith('#') && value.length === 7 ? value : '#6c5ce7'}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-0 h-0 opacity-0 absolute pointer-events-none"
+                    id={`color-${label.replace(/\s+/g, '-').toLowerCase()}`}
+                />
+                <label
+                    htmlFor={`color-${label.replace(/\s+/g, '-').toLowerCase()}`}
+                    className="cursor-pointer text-xs font-bold text-primary hover:text-primary/80"
+                >
+                    Pick
+                </label>
+            </div>
         </div>
     );
 }
@@ -182,6 +406,24 @@ export function ItemListEditor<T extends Record<string, unknown>>({
         setExpanded(prev => new Set(prev).add(newIndex));
     };
 
+    const moveItem = (index: number, direction: 'up' | 'down') => {
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= items.length) return;
+        const copy = [...items];
+        [copy[index], copy[newIndex]] = [copy[newIndex], copy[index]];
+        // Update expanded state to follow moved items
+        setExpanded(prev => {
+            const next = new Set<number>();
+            prev.forEach(idx => {
+                if (idx === index) next.add(newIndex);
+                else if (idx === newIndex) next.add(index);
+                else next.add(idx);
+            });
+            return next;
+        });
+        setItems(copy);
+    };
+
     const defaultLabel = (item: T, i: number): string => {
         // Try common title fields
         const title = item.title || item.name || item.label;
@@ -212,8 +454,23 @@ export function ItemListEditor<T extends Record<string, unknown>>({
 
                 return (
                     <div key={i} className="flex gap-3 items-start">
-                        <div className="mt-3 text-muted-foreground">
-                            <GripVertical className="w-4 h-4" />
+                        <div className="flex flex-col gap-0.5 mt-2">
+                            <button
+                                onClick={() => moveItem(i, 'up')}
+                                disabled={i === 0}
+                                className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                title="Move up"
+                            >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                                onClick={() => moveItem(i, 'down')}
+                                disabled={i === items.length - 1}
+                                className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                title="Move down"
+                            >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
                         </div>
                         <div className="flex-1 bg-secondary/50 rounded-xl border border-border overflow-hidden">
                             {/* Collapsible Header */}

@@ -15,6 +15,25 @@ const ContentContext = createContext<ContentContextValue | null>(null);
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
+// Deep merge utility to combine defaults with API data
+function deepMerge(target: any, source: any) {
+    const output = { ...target };
+    if (source && typeof source === 'object' && !Array.isArray(source)) {
+        Object.keys(source).forEach(key => {
+            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                if (!(key in target)) {
+                    Object.assign(output, { [key]: source[key] });
+                } else {
+                    output[key] = deepMerge(target[key], source[key]);
+                }
+            } else {
+                Object.assign(output, { [key]: source[key] });
+            }
+        });
+    }
+    return output;
+}
+
 async function fetchContentData(lang: string) {
     const res = await fetch(`${API_BASE}/api/content?lang=${lang}`);
     if (!res.ok) throw new Error('API Error');
@@ -30,17 +49,17 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
 
     const results = useQueries({
         queries: [
-            { queryKey: ['content', 'en'], queryFn: () => fetchContentData('en') },
-            { queryKey: ['content', 'bn'], queryFn: () => fetchContentData('bn') },
+            { queryKey: ['content', 'en'], queryFn: () => fetchContentData('en'), staleTime: 0, gcTime: 0 },
+            { queryKey: ['content', 'bn'], queryFn: () => fetchContentData('bn'), staleTime: 0, gcTime: 0 },
         ],
     });
 
     const [enQuery, bnQuery] = results;
 
-    // Derived state from queries
+    // Derived state from queries using deepMerge
     const content = {
-        en: { ...translations.en, ...(enQuery.data || {}) },
-        bn: { ...translations.bn, ...(bnQuery.data || {}) },
+        en: deepMerge(translations.en, enQuery.data || {}),
+        bn: deepMerge(translations.bn, bnQuery.data || {}),
     };
 
     const loading = enQuery.isLoading || bnQuery.isLoading;
@@ -69,15 +88,17 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
                     ...old,
                     [section]: data
                 }));
-                // Also invalidate to ensure sync
-                queryClient.invalidateQueries({ queryKey: ['content', lang] });
+                // Short delay then refetch to ensure server has committed
+                setTimeout(() => {
+                    queryClient.invalidateQueries({ queryKey: ['content', lang] });
+                }, 500);
                 return true;
             }
             return false;
         } catch {
             return false;
         }
-    }, []);
+    }, [queryClient]);
 
     return (
         <ContentContext.Provider value={{ content, loading, updateSection, refreshContent }}>

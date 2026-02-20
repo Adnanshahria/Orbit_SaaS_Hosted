@@ -1,9 +1,9 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
-import { Cpu, Crown, Target } from 'lucide-react';
+import { Cpu, Crown, Target, User } from 'lucide-react';
 
-const memberStyles = [
+const fallbackStyles = [
   { icon: Cpu, gradient: 'linear-gradient(135deg, #6c5ce7, #3b82f6)', shadow: '0 8px 30px rgba(108, 92, 231, 0.35)' },
   { icon: Crown, gradient: 'linear-gradient(135deg, #0891b2, #6c5ce7)', shadow: '0 8px 30px rgba(8, 145, 178, 0.35)' },
   { icon: Target, gradient: 'linear-gradient(135deg, #d946a8, #6c5ce7)', shadow: '0 8px 30px rgba(217, 70, 168, 0.35)' },
@@ -38,10 +38,16 @@ export function LeadershipSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: '-80px' });
 
+  // Sort members by order field (if present), then by original index
+  const members = t.leadership.members || [];
+  const sortedMembers = [...members].sort(
+    (a: any, b: any) => (a.order ?? 999) - (b.order ?? 999)
+  );
+
   return (
     <section id="leadership" className="py-16 sm:py-24 px-4 sm:px-6 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/20 to-transparent" />
-      <div className="max-w-5xl mx-auto relative" ref={ref}>
+      <div className="max-w-7xl mx-auto relative" ref={ref}>
         <motion.div
           initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
           animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
@@ -56,30 +62,46 @@ export function LeadershipSection() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
         >
-          {t.leadership.members.map((member, i) => {
-            const { icon: Icon, gradient, shadow } = memberStyles[i];
+          {sortedMembers.map((member: any, i: number) => {
+            const style = fallbackStyles[i % fallbackStyles.length];
+            const hasImage = !!member.image;
+
             return (
               <motion.div
                 key={i}
                 variants={memberVariants}
                 whileHover={{
                   y: -8,
-                  boxShadow: '0 20px 40px rgba(108, 92, 231, 0.12)',
+                  boxShadow: '0 20px 40px rgba(108, 92, 231, 0.15)',
                   transition: { type: 'spring', stiffness: 300, damping: 20 },
                 }}
-                className="glass-effect rounded-2xl p-8 text-center group hover:border-primary/40 transition-colors duration-300"
+                className="glass-effect rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-6 lg:p-8 text-center group hover:border-primary/40 transition-colors duration-300"
               >
+                {/* Circular photo or fallback icon */}
                 <motion.div
-                  className="w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center"
-                  style={{ background: gradient, boxShadow: shadow }}
-                  whileHover={{ scale: 1.1, rotate: 5, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
+                  className="w-24 h-24 sm:w-40 sm:h-40 lg:w-48 lg:h-48 rounded-full mx-auto mb-4 sm:mb-6 lg:mb-8 overflow-hidden flex items-center justify-center bg-secondary/30 border-2 sm:border-4 border-background shadow-xl lg:shadow-2xl relative"
+                  style={
+                    hasImage
+                      ? { boxShadow: style.shadow }
+                      : { background: style.gradient, boxShadow: style.shadow }
+                  }
+                  whileHover={{ scale: 1.08, transition: { type: 'spring', stiffness: 300, damping: 15 } }}
                 >
-                  <Icon className="w-9 h-9 text-white" strokeWidth={1.5} />
+                  {hasImage ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-16 h-16 text-white" strokeWidth={1} />
+                  )}
+                  <div className="absolute inset-0 rounded-full border border-white/10 pointer-events-none" />
                 </motion.div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-1">{member.name}</h3>
-                <p className="text-neon-cyan text-sm font-medium">{member.role}</p>
+                <h3 className="font-display text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 sm:mb-1.5 leading-tight">{member.name}</h3>
+                <p className="text-neon-cyan text-xs sm:text-sm lg:text-base font-bold tracking-wide uppercase">{member.role}</p>
               </motion.div>
             );
           })}

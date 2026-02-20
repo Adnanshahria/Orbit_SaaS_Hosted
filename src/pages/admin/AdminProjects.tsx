@@ -1,28 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle } from '@/components/admin/EditorComponents';
+import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle, JsonPanel } from '@/components/admin/EditorComponents';
 import { Upload, Trash2, X, Plus } from 'lucide-react';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { useContent } from '@/contexts/ContentContext';
+import { uploadToImgBB } from '@/lib/imgbb';
 
 // --- Shared Helper Components ---
-
-// --- ImgBB Config ---
-const IMGBB_API_KEY = 'b98cf36f5342d5f1e8036109c33d1c09';
-
-async function uploadToImgBB(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: 'POST',
-        body: formData,
-    });
-
-    if (!res.ok) throw new Error('ImgBB upload failed');
-    const data = await res.json();
-    return data.data.url;
-}
 
 function MultiImageUpload({ images, onChange, title }: { images: string[]; onChange: (imgs: string[]) => void; title: string; }) {
     const [uploading, setUploading] = useState(false);
@@ -287,7 +271,7 @@ function ProjectEditor({ item, update }: { item: UnifiedProject; update: (i: Uni
                         <textarea
                             className="w-full bg-background/50 rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground border border-border/50 outline-none resize-y"
                             rows={2}
-                            placeholder="Quick Fill: Paste <meta> tags here..."
+                            placeholder=""
                             onChange={(e) => {
                                 const val = e.target.value;
                                 if (!val.trim()) return;
@@ -314,8 +298,8 @@ function ProjectEditor({ item, update }: { item: UnifiedProject; update: (i: Uni
                     </div>
 
                     <div className="space-y-3">
-                        <TextField label="Meta Title" value={item.seo?.title || ''} onChange={v => updateSeo('title', v)} />
-                        <TextField label="Meta Description" value={item.seo?.description || ''} onChange={v => updateSeo('description', v)} multiline />
+                        <TextField label="Meta Title" value={item.seo?.title || ''} onChange={v => updateSeo('title', v)} lang="en" />
+                        <TextField label="Meta Description" value={item.seo?.description || ''} onChange={v => updateSeo('description', v)} multiline lang="en" />
                         <TagsInput tags={item.seo?.keywords || []} onChange={t => updateSeo('keywords', t)} />
                     </div>
                 </div>
@@ -343,12 +327,14 @@ function ProjectEditor({ item, update }: { item: UnifiedProject; update: (i: Uni
                         label={tab === 'en' ? "Project Title" : "প্রজেক্টের নাম"}
                         value={item[tab].title}
                         onChange={v => updateLoc(tab, 'title', v)}
+                        lang={tab}
                     />
 
                     <RichTextEditor
                         label={tab === 'en' ? "Description" : "বিবরণ"}
                         value={item[tab].description || ''}
                         onChange={v => updateLoc(tab, 'description', v)}
+                        lang={tab}
                     />
                 </div>
             </div>
@@ -527,13 +513,13 @@ export default function AdminProjects() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-6 border border-border">
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary">English Section Info</h3>
-                    <TextField label="Title" value={sectionInfo.en.title} onChange={v => setSectionInfo({ ...sectionInfo, en: { ...sectionInfo.en, title: v } })} />
-                    <TextField label="Subtitle" value={sectionInfo.en.subtitle} onChange={v => setSectionInfo({ ...sectionInfo, en: { ...sectionInfo.en, subtitle: v } })} multiline />
+                    <TextField label="Title" value={sectionInfo.en.title} onChange={v => setSectionInfo({ ...sectionInfo, en: { ...sectionInfo.en, title: v } })} lang="en" />
+                    <TextField label="Subtitle" value={sectionInfo.en.subtitle} onChange={v => setSectionInfo({ ...sectionInfo, en: { ...sectionInfo.en, subtitle: v } })} multiline lang="en" />
                 </div>
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary">Bangla Section Info</h3>
-                    <TextField label="শিরোনাম (Title)" value={sectionInfo.bn.title} onChange={v => setSectionInfo({ ...sectionInfo, bn: { ...sectionInfo.bn, title: v } })} />
-                    <TextField label="সাবটাইটেল (Subtitle)" value={sectionInfo.bn.subtitle} onChange={v => setSectionInfo({ ...sectionInfo, bn: { ...sectionInfo.bn, subtitle: v } })} multiline />
+                    <TextField label="শিরোনাম (Title)" value={sectionInfo.bn.title} onChange={v => setSectionInfo({ ...sectionInfo, bn: { ...sectionInfo.bn, title: v } })} lang="bn" />
+                    <TextField label="সাবটাইটেল (Subtitle)" value={sectionInfo.bn.subtitle} onChange={v => setSectionInfo({ ...sectionInfo, bn: { ...sectionInfo.bn, subtitle: v } })} multiline lang="bn" />
                 </div>
             </div>
 
@@ -548,7 +534,7 @@ export default function AdminProjects() {
                     setItems={setProjects}
                     newItem={DEFAULT_PROJECT}
                     addLabel="Add New Project"
-                    getItemLabel={(item) => item.en.title || item.bn.title || 'Untitled Project'}
+                    getItemLabel={(item) => item.en.title || item.bn.title || ''}
                     renderItem={(item, _i, update) => (
                         <ProjectEditor item={item} update={update} />
                     )}
@@ -556,6 +542,79 @@ export default function AdminProjects() {
             </div>
 
             <SaveButton onClick={handleSave} saving={saving} saved={saved} />
+
+            <div className="mt-8 pt-8 border-t border-border">
+                <JsonPanel
+                    data={{
+                        en: {
+                            title: sectionInfo.en.title,
+                            subtitle: sectionInfo.en.subtitle,
+                            items: projects.map(p => ({
+                                title: p.en.title,
+                                desc: p.en.description,
+                                tags: p.tags,
+                                seo: p.seo,
+                                images: p.images,
+                                link: p.link,
+                                category: p.category,
+                                featured: p.featured,
+                                videoPreview: p.videoPreview
+                            }))
+                        },
+                        bn: {
+                            title: sectionInfo.bn.title,
+                            subtitle: sectionInfo.bn.subtitle,
+                            items: projects.map(p => ({
+                                title: p.bn.title,
+                                desc: p.bn.description,
+                                tags: p.tags,
+                                seo: p.seo,
+                                images: p.images,
+                                link: p.link,
+                                category: p.category,
+                                featured: p.featured,
+                                videoPreview: p.videoPreview
+                            }))
+                        }
+                    }}
+                    onImport={(parsed) => {
+                        if (!parsed.en || !parsed.bn) {
+                            toast.error('JSON must have "en" and "bn" keys');
+                            return;
+                        }
+                        setSectionInfo({
+                            en: { title: parsed.en.title || '', subtitle: parsed.en.subtitle || '' },
+                            bn: { title: parsed.bn.title || '', subtitle: parsed.bn.subtitle || '' }
+                        });
+                        const enItems = parsed.en.items || [];
+                        const bnItems = parsed.bn.items || [];
+                        const maxLen = Math.max(enItems.length, bnItems.length);
+                        const merged: UnifiedProject[] = [];
+                        for (let i = 0; i < maxLen; i++) {
+                            const en = enItems[i] || {};
+                            const bn = bnItems[i] || {};
+                            merged.push({
+                                images: en.images || bn.images || [],
+                                link: en.link || bn.link || '',
+                                category: en.category || bn.category || 'SaaS',
+                                featured: en.featured ?? bn.featured ?? false,
+                                videoPreview: en.videoPreview || bn.videoPreview || '',
+                                tags: en.tags || bn.tags || [],
+                                seo: en.seo || bn.seo || { title: '', description: '', keywords: [] },
+                                en: {
+                                    title: en.title || '',
+                                    description: en.desc || ''
+                                },
+                                bn: {
+                                    title: bn.title || '',
+                                    description: bn.desc || ''
+                                }
+                            });
+                        }
+                        setProjects(merged);
+                    }}
+                />
+            </div>
         </div>
     );
 }

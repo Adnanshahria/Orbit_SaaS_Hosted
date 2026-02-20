@@ -8,9 +8,12 @@ interface RichTextEditorProps {
     onChange: (html: string) => void;
     label?: string;
     placeholder?: string;
+    lang?: string;
 }
 
-export function RichTextEditor({ value, onChange, label, placeholder }: RichTextEditorProps) {
+import { AIEnhanceButton } from './EditorComponents';
+
+export function RichTextEditor({ value, onChange, label, placeholder, lang }: RichTextEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const [showColors, setShowColors] = useState(false);
     const [wordCount, setWordCount] = useState(0);
@@ -56,7 +59,16 @@ export function RichTextEditor({ value, onChange, label, placeholder }: RichText
         <div>
             {label && (
                 <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-sm font-medium text-foreground">{label}</label>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-foreground">{label}</label>
+                        {lang && (
+                            <AIEnhanceButton
+                                text={value}
+                                lang={lang}
+                                onEnhanced={onChange}
+                            />
+                        )}
+                    </div>
                     <span className="text-xs text-muted-foreground tabular-nums">{wordCount} words</span>
                 </div>
             )}

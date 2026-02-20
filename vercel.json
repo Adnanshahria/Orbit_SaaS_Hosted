@@ -64,6 +64,15 @@
                     "value": "public, max-age=3600"
                 }
             ]
+        },
+        {
+            "source": "/api/content",
+            "headers": [
+                {
+                    "key": "CDN-Cache-Control",
+                    "value": "public, s-maxage=60, stale-while-revalidate=120"
+                }
+            ]
         }
     ],
     "rewrites": [

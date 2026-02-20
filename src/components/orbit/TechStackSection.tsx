@@ -2,33 +2,23 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 
-const categories = [
-  {
-    name: 'FRONTEND',
-    color: '#6366f1', // indigo
-    items: ['TypeScript', 'Tailwind CSS', 'React.js', 'Next.js 14', 'Vue.js', 'Framer Motion', 'SASS/SCSS', 'Webpack'],
-  },
-  {
-    name: 'BACKEND',
-    color: '#a855f7', // purple
-    items: ['Scalable Microservices', 'Django', 'Python', 'Node.js', 'PostgreSQL', 'GraphQL', 'Redis', 'Express.js'],
-  },
-  {
-    name: 'INFRASTRUCTURE',
-    color: '#f97316', // orange
-    items: ['AWS', 'Google Cloud', 'CI/CD Pipelines', 'Cloud-Native Architecture', 'Docker', 'Kubernetes', 'Terraform', 'GitHub Actions'],
-  },
-];
+
+interface Category {
+  name: string;
+  color: string;
+  items: string[];
+}
 
 function MarqueeRow({
   category,
   reverse = false,
 }: {
-  category: (typeof categories)[0];
+  category: Category;
   reverse?: boolean;
 }) {
   // Triple the items for a seamless infinite loop
-  const tripled = [...category.items, ...category.items, ...category.items];
+  const itemsList = category.items || [];
+  const tripled = [...itemsList, ...itemsList, ...itemsList];
   const items = reverse ? [...tripled].reverse() : tripled;
 
   return (
@@ -84,6 +74,9 @@ export function TechStackSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: '-100px' });
 
+  // Use dynamic categories from content, fallback to empty array
+  const dynamicCategories = (t.techStack as any).categories || [];
+
   return (
     <section id="tech-stack" className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/30 to-transparent" />
@@ -100,8 +93,8 @@ export function TechStackSection() {
       </div>
 
       <div className="space-y-2">
-        {categories.map((cat, i) => (
-          <MarqueeRow key={cat.name} category={cat} reverse={i % 2 !== 0} />
+        {dynamicCategories.map((cat: any, i: number) => (
+          <MarqueeRow key={cat.name || i} category={cat} reverse={i % 2 !== 0} />
         ))}
       </div>
     </section>

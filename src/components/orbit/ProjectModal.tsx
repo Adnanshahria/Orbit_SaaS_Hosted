@@ -94,7 +94,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                     />
                                 ) : (
                                     <img
-                                        src={project.images?.[0] || '/placeholder.png'}
+                                        src={project.images?.[0] || ''}
                                         alt={project.title}
                                         className="w-full h-full object-cover"
                                     />
@@ -116,7 +116,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                             </span>
                                         )}
                                         <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">
-                                            {project.category || 'Portfolio'}
+                                            {project.category || ''}
                                         </span>
                                     </div>
 
@@ -151,7 +151,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                             className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold transition-all shadow-lg shadow-primary/20 group"
                                         >
                                             <Globe className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                            Visit Live
+                                            {project.link ? (project.link.includes('github') ? 'GitHub' : 'Link') : ''}
                                         </a>
                                         {project.id !== undefined && (
                                             <Link
@@ -159,7 +159,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                                 onClick={onClose}
                                                 className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-all border border-white/10 group"
                                             >
-                                                Case Study <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                Details <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                             </Link>
                                         )}
                                     </div>
