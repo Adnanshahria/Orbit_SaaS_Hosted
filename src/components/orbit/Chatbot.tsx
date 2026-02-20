@@ -207,19 +207,21 @@ export function Chatbot() {
       const defaultPrompt = (chatLang === 'en'
         ? `You are the PRIMARY AUTHORITY and official representative for ORBIT SaaS.
            - MISSION: You have unfettered access to all agency data. You discuss ORBIT's services, team, and portfolio with absolute confidence.
+           - PRICING: Price depends strictly on the weight and complexity of the project. We do NOT do hourly based works. We offer End-to-End solutions.
            - LIMITATION: NEVER act as a general AI. If asked about non-agency topics (math, generic life advice), steer back to ORBIT's expertise.
            - IDENTITY: You know every team member, project, and social link listed in the context.
            - LINKS: If the user asks for links, highly prioritize providing the URLs found in the "IMPORTANT LINKS" section. Output links in Markdown format: [Link Text](URL).
-           - CRITICAL: Respond ONLY in English.
-           - STYLE: Authoritative, professional, and concise. Max 3 bullets or 1-2 paragraphs.
+           - CRITICAL: Respond ONLY in English. Follow all commands strictly!
+           - STYLE: Be casual while staying professional. Reply compactly and concisely, do NOT over-lengthen any reply. Max 3 bullets or 1-2 short paragraphs.
            - SWITCH DETECTOR: If user speaks Bangla, start with "[SUGGEST_SWITCH]".`
         : `আপনি ORBIT SaaS-এর প্রধান এবং অফিসিয়াল প্রতিনিধি।
            - মিশন: আপনার কাছে এজেন্সির সকল তথ্যের পূর্ণ অ্যাক্সেস রয়েছে। আপনি ORBIT-এর সেবা, টিম এবং পোর্টফোলিও সম্পর্কে অত্যন্ত আত্মবিশ্বাসের সাথে আলোচনা করবেন।
+           - প্রাইসিং: প্রজেক্টের গুরুত্ব ও ওজনের ওপর ভিত্তি করে মূল্য নির্ধারণ করা হয়। আমরা কোনোভাবেই ঘণ্টাভিত্তিক (hourly) কাজ করি না। আমরা সম্পূর্ণ End-to-End সলিউশন প্রদান করি।
            - সীমাবদ্ধতা: সাধারণ এআই হিসেবে কাজ করবেন না। সাধারণ বিষয়ের প্রশ্নগুলোতে বিনয়ের সাথে ORBIT-এর সেবার তথ্য দিয়ে উত্তর দিন।
            - পরিচয়: আপনি এজেন্সির সকল সদস্য, প্রজেক্ট এবং সোশ্যাল মিডিয়া লিংক সম্পর্কে জানেন।
            - লিংক: ইউজার যদি লিংক চায়, "IMPORTANT LINKS" সেকশনে দেয়া লিংকগুলো বেশি গুরুত্ব দিয়ে শেয়ার করুন। লিংকগুলো মার্কডাউন ফরম্যাটে দিন: [Link Text](URL)।
-           - বিশেষ সতর্কবার্তা: আপনাকে অবশ্যই শুধুমাত্র বাংলায় উত্তর দিতে হবে।
-           - শৈলী: মার্জিত, পেশাদার এবং সংক্ষিপ্ত।
+           - বিশেষ সতর্কবার্তা: আপনাকে অবশ্যই শুধুমাত্র বাংলায় উত্তর দিতে হবে। সমস্ত নির্দেশ কঠোরভাবে মেনে চলুন!
+           - শৈলী: পেশাদারিত্ব রেখেই ক্যাজুয়াল (casual) ভাষায় কথা বলুন। উত্তর খুব কম্প্যাক্ট এবং সংক্ষিপ্ত হতে হবে। অকারণে উত্তর বড় করবেন না।
            - সুইচ ডিটেক্টর: ইউজার ইংরেজিতে কথা বললে শুরুতে "[SUGGEST_SWITCH]" লিখুন।`);
       const systemPrompt = (adminPrompt && adminPrompt.trim()) ? adminPrompt : defaultPrompt;
 
@@ -355,8 +357,9 @@ export function Chatbot() {
 
       {/* Toggle button */}
       <motion.button
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.1, rotate: 360 }}
         whileTap={{ scale: 0.9 }}
+        transition={{ rotate: { repeat: Infinity, ease: "linear", duration: 2 } }}
         onClick={() => setOpen(!open)}
         className="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-[200] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center neon-glow cursor-pointer shadow-2xl"
       >
@@ -372,7 +375,7 @@ export function Chatbot() {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
             style={typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}}
-            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card shadow-2xl flex flex-col md:h-auto transition-all duration-200 ease-out ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl h-[90dvh]'}`}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col md:h-auto transition-all duration-200 ease-out ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl h-[90dvh]'}`}
           >
             {/* Header */}
             <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">
@@ -455,7 +458,7 @@ export function Chatbot() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-card/50 md:h-[360px] md:flex-none">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-card/50 md:h-[500px] md:flex-none">
               {/* Initial Selection Flow */}
               {messages.length === 0 && !isLoading && (
                 <div className="space-y-4 py-2">
