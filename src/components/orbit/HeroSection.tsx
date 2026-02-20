@@ -92,7 +92,7 @@ export function HeroSection() {
   const words = subtitle.split(' ');
 
   // Dynamic WhatsApp URL from admin settings
-  const whatsappNumber = (t.contact as any).whatsapp || '8801853452264';
+  const whatsappNumber = (t.contact as any).whatsapp || '';
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 
   return (
