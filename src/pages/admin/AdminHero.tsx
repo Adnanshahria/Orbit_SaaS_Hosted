@@ -23,7 +23,7 @@ export default function AdminHero() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between flex-wrap gap-3">
-                <SectionHeader title="Hero Section" description="Edit the main landing section" />
+                <SectionHeader title="Hero Section" description="Edit the main landing section" sectionId="hero" />
                 <LangToggle lang={lang} setLang={setLang} />
             </div>
             <ErrorAlert message={error} />
