@@ -1,9 +1,8 @@
 import { motion, useInView } from 'framer-motion';
-import { Brain, Wrench, Zap, ShieldCheck } from 'lucide-react';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 
-const icons = [Brain, Wrench, Zap, ShieldCheck];
+const emojis = ['🧠', '🔧', '⚡', '🛡️'];
 
 const containerVariants = {
   hidden: {},
@@ -44,7 +43,14 @@ export function WhyUsSection() {
           transition={{ type: 'spring', stiffness: 80, damping: 20 }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4">{t.whyUs.title}</h2>
+          <h2 className="text-[clamp(1.8rem,3vw,2.4rem)] font-bold text-foreground mb-3">
+            {t.whyUs.title.split('ORBIT').map((part, i, arr) => (
+              <React.Fragment key={i}>
+                {part}
+                {i < arr.length - 1 && <span className="text-[#6366f1]">ORBIT</span>}
+              </React.Fragment>
+            ))}
+          </h2>
           <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto">{t.whyUs.subtitle}</p>
         </motion.div>
 
@@ -52,30 +58,29 @@ export function WhyUsSection() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1080px] mx-auto"
         >
           {t.whyUs.items.map((item, i) => {
-            const Icon = icons[i % icons.length];
+            const Emoji = emojis[i % emojis.length];
             return (
               <motion.div
                 key={i}
                 variants={itemVariants}
                 whileHover={{
-                  y: -8,
-                  boxShadow: '0 20px 40px rgba(0, 245, 255, 0.1)',
+                  y: -4,
+                  boxShadow: '0 12px 40px rgba(99,102,241,0.12)',
                   transition: { type: 'spring', stiffness: 300, damping: 20 },
                 }}
-                className="glass-effect rounded-2xl p-8 text-center group hover:border-primary/40 transition-colors duration-300"
+                className="bg-card border border-border rounded-2xl pt-9 px-7 pb-8 text-center transition-all duration-200 cursor-default"
               >
-                <motion.div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                  style={{ backgroundColor: item.bg || '#00f5ff1a', color: item.color || '#00f5ff' }}
-                  whileHover={{ scale: 1.1, rotate: 5, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 text-[26px]"
+                  style={{ backgroundColor: item.bg || '#eef2ff' }}
                 >
-                  <Icon className="w-8 h-8" />
-                </motion.div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-3">{item.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                  {Emoji}
+                </div>
+                <h3 className="text-[1.05rem] font-bold text-foreground mb-2.5">{item.title}</h3>
+                <p className="text-[0.875rem] text-muted-foreground leading-[1.65]">{item.desc}</p>
               </motion.div>
             );
           })}
