@@ -91,6 +91,12 @@ export function HeroSection() {
   const subtitle = t.hero.subtitle || '';
   const words = subtitle.split(' ');
 
+  // Theme Customization from admin
+  const taglineColor = (t.hero as any).taglineColor || '#00F5FF';
+  const titleColor = (t.hero as any).titleColor || '#FF00A8';
+  const ctaGradientStart = (t.hero as any).ctaGradientStart || '#6c5ce7';
+  const ctaGradientEnd = (t.hero as any).ctaGradientEnd || '#3b82f6';
+
   // Dynamic WhatsApp URL from admin settings
   const whatsappNumber = (t.contact as any).whatsapp || '';
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
@@ -118,9 +124,13 @@ export function HeroSection() {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold text-neon-cyan mb-6 sm:mb-8 uppercase tracking-[0.2em]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold mb-6 sm:mb-8 uppercase tracking-[0.2em]"
+            style={{ color: taglineColor }}
           >
-            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_10px_#00F5FF]" />
+            <span
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ backgroundColor: taglineColor, boxShadow: `0 0 10px ${taglineColor}` }}
+            />
             {t.hero.tagline}
           </motion.div>
         )}
@@ -137,7 +147,7 @@ export function HeroSection() {
           </motion.span>
           <motion.span
             className="block mt-3 sm:mt-5 text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold italic leading-snug"
-            style={{ fontFamily: "'Lobster Two', cursive", color: 'var(--neon-pink)' }}
+            style={{ fontFamily: "'Lobster Two', cursive", color: titleColor }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.7 }}
@@ -176,10 +186,11 @@ export function HeroSection() {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            whileHover={{ scale: 1.04, boxShadow: '0 8px 30px rgba(108, 92, 231, 0.35)' }}
+            whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
+            className="inline-flex items-center gap-2 px-7 sm:px-8 py-4 rounded-full font-semibold text-primary-foreground shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-base"
+            style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
           >
             {t.hero.cta}
             <ArrowRight className="w-5 h-5" />

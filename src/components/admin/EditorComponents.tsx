@@ -265,6 +265,49 @@ export function TextField({
     );
 }
 
+/* ─── Color Field ─── */
+export function ColorField({
+    label,
+    value,
+    onChange,
+}: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+}) {
+    return (
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+            <label className="text-sm font-medium text-foreground block">{label}</label>
+            <div className="flex items-center gap-2 bg-secondary rounded-lg px-3 py-2 border border-border">
+                <div
+                    className="w-6 h-6 rounded border border-border flex-shrink-0"
+                    style={{ backgroundColor: value }}
+                />
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="flex-1 bg-transparent text-xs font-mono text-foreground outline-none"
+                    placeholder="#RRGGBB"
+                />
+                <input
+                    type="color"
+                    value={value.startsWith('#') && value.length === 7 ? value : '#6c5ce7'}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-0 h-0 opacity-0 absolute pointer-events-none"
+                    id={`color-${label.replace(/\s+/g, '-').toLowerCase()}`}
+                />
+                <label
+                    htmlFor={`color-${label.replace(/\s+/g, '-').toLowerCase()}`}
+                    className="cursor-pointer text-xs font-bold text-primary hover:text-primary/80"
+                >
+                    Pick
+                </label>
+            </div>
+        </div>
+    );
+}
+
 /* ─── Section Header ─── */
 export function SectionHeader({ title, description }: { title: string; description: string }) {
     return (
