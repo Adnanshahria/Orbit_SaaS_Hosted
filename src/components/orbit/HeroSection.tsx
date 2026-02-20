@@ -147,7 +147,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 100, damping: 20, delay: baseDelay + 0.2 }}
-            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold mb-10 sm:mb-14 uppercase tracking-[0.2em]"
+            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-effect text-xs sm:text-sm font-playfair italic font-medium mb-10 sm:mb-14 tracking-wide"
             style={{ color: taglineColor }}
           >
             <span
@@ -158,9 +158,9 @@ export function HeroSection() {
         )}
 
         {/* Title — "ORBIT SaaS" scales up dramatically */}
-        <motion.h1 className="font-display text-foreground leading-[1] mb-12 sm:mb-16">
+        <motion.h1 className="text-foreground leading-[1] mb-12 sm:mb-16">
           <motion.span
-            className="block text-5xl sm:text-7xl md:text-8xl lg:text-[7.5rem] font-black tracking-tighter"
+            className="block text-4xl sm:text-6xl md:text-7xl lg:text-[6.5rem] font-poppins font-black tracking-tight"
             initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
             animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.4 }}
@@ -168,7 +168,7 @@ export function HeroSection() {
             ORBIT <span className="text-primary">SaaS</span>
           </motion.span>
           <motion.span
-            className="block mt-6 sm:mt-10 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold italic leading-snug tracking-normal px-4"
+            className="block mt-6 sm:mt-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-lobster leading-snug tracking-normal px-4"
             style={{ color: titleColor }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
