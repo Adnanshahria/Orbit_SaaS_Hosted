@@ -85,6 +85,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 args: [section, lang, JSON.stringify(data), JSON.stringify(data)],
             });
 
+            // Rebuild content_cache for this language so GET reads fresh data
+            try {
+                const allSections = await db.execute({
+                    sql: 'SELECT section, data FROM site_content WHERE lang = ?',
+                    args: [lang],
+                });
+                const assembled: Record<string, unknown> = {};
+                for (const row of allSections.rows) {
+                    assembled[row.section as string] = JSON.parse(row.data as string);
+                }
+                await db.execute({
+                    sql: `INSERT INTO content_cache (lang, data, built_at)
+                          VALUES (?, ?, datetime('now'))
+                          ON CONFLICT(lang) DO UPDATE SET data = ?, built_at = datetime('now')`,
+                    args: [lang, JSON.stringify(assembled), JSON.stringify(assembled)],
+                });
+            } catch {
+                // content_cache table might not exist yet — skip silently
+            }
+
             return res.status(200).json({ success: true });
         }
 
