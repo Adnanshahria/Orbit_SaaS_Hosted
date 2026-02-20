@@ -63,7 +63,7 @@ function MemberImageUpload({
     return (
         <div className="flex items-center gap-4">
             {/* Preview */}
-            <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-border flex-shrink-0 group bg-secondary/30">
+            <div className="relative w-40 h-40 rounded-xl overflow-hidden border-2 border-border flex-shrink-0 group bg-secondary/30">
                 {image ? (
                     <>
                         <img
@@ -75,12 +75,12 @@ function MemberImageUpload({
                             onClick={() => onChange('')}
                             className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                         >
-                            <Trash2 className="w-4 h-4 text-white" />
+                            <Trash2 className="w-6 h-6 text-white" />
                         </button>
                     </>
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                        <User className="w-10 h-10 text-muted-foreground" />
+                        <User className="w-16 h-16 text-muted-foreground" />
                     </div>
                 )}
             </div>

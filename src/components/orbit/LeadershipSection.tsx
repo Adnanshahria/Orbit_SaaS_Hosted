@@ -79,15 +79,15 @@ export function LeadershipSection() {
                 }}
                 className="glass-effect rounded-2xl p-8 text-center group hover:border-primary/40 transition-colors duration-300"
               >
-                {/* Circular photo or fallback icon */}
+                {/* Large photo or fallback icon */}
                 <motion.div
-                  className="w-32 h-32 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center"
+                  className="w-48 h-48 sm:w-72 sm:h-72 rounded-3xl mx-auto mb-8 overflow-hidden flex items-center justify-center bg-secondary/30 border border-border/50"
                   style={
                     hasImage
                       ? { boxShadow: style.shadow }
                       : { background: style.gradient, boxShadow: style.shadow }
                   }
-                  whileHover={{ scale: 1.1, transition: { type: 'spring', stiffness: 300, damping: 12 } }}
+                  whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 300, damping: 15 } }}
                 >
                   {hasImage ? (
                     <img
@@ -96,11 +96,11 @@ export function LeadershipSection() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-10 h-10 text-white" strokeWidth={1.5} />
+                    <User className="w-20 h-20 text-white" strokeWidth={1} />
                   )}
                 </motion.div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-1">{member.name}</h3>
-                <p className="text-neon-cyan text-sm font-medium">{member.role}</p>
+                <h3 className="font-display text-2xl font-bold text-foreground mb-1.5">{member.name}</h3>
+                <p className="text-neon-cyan text-base font-semibold">{member.role}</p>
               </motion.div>
             );
           })}
