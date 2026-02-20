@@ -63,7 +63,7 @@ function MemberImageUpload({
     return (
         <div className="flex items-center gap-4">
             {/* Preview */}
-            <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-border flex-shrink-0 group">
+            <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-border flex-shrink-0 group bg-secondary/30">
                 {image ? (
                     <>
                         <img
@@ -79,23 +79,28 @@ function MemberImageUpload({
                         </button>
                     </>
                 ) : (
-                    <div className="w-full h-full bg-secondary flex items-center justify-center">
-                        <User className="w-8 h-8 text-muted-foreground" />
+                    <div className="w-full h-full flex items-center justify-center">
+                        <User className="w-10 h-10 text-muted-foreground" />
                     </div>
                 )}
             </div>
 
             {/* Upload button */}
-            <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors text-sm text-muted-foreground">
-                <Upload className="w-4 h-4" />
-                <span>{uploading ? 'Uploading...' : image ? 'Change Photo' : 'Upload Photo'}</span>
-                <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-                />
-            </label>
+            <div className="space-y-2">
+                <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors text-sm text-muted-foreground">
+                    <Upload className="w-4 h-4" />
+                    <span>{uploading ? 'Uploading...' : image ? 'Change Photo' : 'Upload Photo'}</span>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                    />
+                </label>
+                <p className="text-[10px] text-muted-foreground/60 px-1">
+                    No size limit — high resolution supported.
+                </p>
+            </div>
         </div>
     );
 }

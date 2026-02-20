@@ -81,7 +81,7 @@ export function LeadershipSection() {
               >
                 {/* Circular photo or fallback icon */}
                 <motion.div
-                  className="w-24 h-24 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center"
+                  className="w-32 h-32 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center"
                   style={
                     hasImage
                       ? { boxShadow: style.shadow }
