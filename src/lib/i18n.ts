@@ -23,6 +23,10 @@ export const translations = {
       subtitle: '',
       items: [] as { title: string; desc: string }[],
     },
+    links: {
+      title: 'Important Links',
+      items: [] as { title: string; link: string }[],
+    },
     techStack: {
       title: '',
       subtitle: '',
@@ -92,6 +96,10 @@ export const translations = {
       title: '',
       subtitle: '',
       items: [] as { title: string; desc: string }[],
+    },
+    links: {
+      title: 'গুরুত্বপূর্ণ লিংক',
+      items: [] as { title: string; link: string }[],
     },
     techStack: {
       title: '',

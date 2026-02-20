@@ -14,7 +14,7 @@ import { Chatbot } from './components/orbit/Chatbot';
 import { StructuredData } from './components/seo/StructuredData';
 import ScrollToTop from './components/ScrollToTop';
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 
 // Lazy load admin pages
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -28,6 +28,7 @@ const AdminLeadership = lazy(() => import('./pages/admin/AdminLeadership'));
 const AdminContact = lazy(() => import('./pages/admin/AdminContact'));
 const AdminFooter = lazy(() => import('./pages/admin/AdminFooter'));
 const AdminChatbot = lazy(() => import('./pages/admin/AdminChatbot'));
+const AdminLinks = lazy(() => import('./pages/admin/AdminLinks'));
 const AdminNavbar = lazy(() => import('./pages/admin/AdminNavbar'));
 const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
@@ -35,6 +36,19 @@ const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 import { InitialLoader } from './components/orbit/InitialLoader';
 
 function PublicSite() {
+  // Mobile UX: Scroll to hide address bar
+  useEffect(() => {
+    const hideAddressBar = () => {
+      if (document.documentElement.scrollHeight > window.innerHeight) {
+        setTimeout(() => window.scrollTo(0, 1), 100);
+      }
+    };
+
+    hideAddressBar();
+    window.addEventListener('load', hideAddressBar);
+    return () => window.removeEventListener('load', hideAddressBar);
+  }, []);
+
   return (
     <>
       <InitialLoader />
@@ -108,6 +122,7 @@ export default function App() {
                     <Route path="contact" element={<AdminContact />} />
                     <Route path="footer" element={<AdminFooter />} />
                     <Route path="chatbot" element={<AdminChatbot />} />
+                    <Route path="links" element={<AdminLinks />} />
                     <Route path="navbar" element={<AdminNavbar />} />
                     <Route path="seo" element={<AdminSEO />} />
 

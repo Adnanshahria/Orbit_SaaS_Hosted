@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
     LayoutDashboard, Type, ShoppingCart, Users, FolderOpen,
     MessageCircle, Globe, Shield, LogOut, Menu, X,
-    Lightbulb, Phone, FileText, Cpu, CloudUpload, Loader2
+    Lightbulb, Phone, FileText, Cpu, CloudUpload, Loader2, Link as LinkIcon
 } from 'lucide-react';
 
 const navItems = [
@@ -19,6 +19,7 @@ const navItems = [
     { label: 'Contact', path: '/admin/contact', icon: Phone },
     { label: 'Footer', path: '/admin/footer', icon: FileText },
     { label: 'Chatbot', path: '/admin/chatbot', icon: MessageCircle },
+    { label: 'Links', path: '/admin/links', icon: LinkIcon },
     { label: 'Navbar', path: '/admin/navbar', icon: Globe },
     { label: 'SEO', path: '/admin/seo', icon: Shield },
 ];

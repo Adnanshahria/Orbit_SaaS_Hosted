@@ -191,6 +191,16 @@ export function Chatbot() {
         knowledgeBase += "\n";
       }
 
+      // --- Admin Assigned Links ---
+      const linksData = (activeContent.links as any)?.items || [];
+      if (linksData.length > 0) {
+        knowledgeBase += "IMPORTANT LINKS TO SHARE WITH USERS:\n";
+        linksData.forEach((l: any) => {
+          knowledgeBase += `- Use this link for "${l.title}": ${l.link}\n`;
+        });
+        knowledgeBase += "\n";
+      }
+
       // 2. Prepare System Prompt based on chatLang
       // Use admin-editable system prompt if available, otherwise use defaults
       const adminPrompt = chatContent.systemPrompt;
@@ -199,6 +209,7 @@ export function Chatbot() {
            - MISSION: You have unfettered access to all agency data. You discuss ORBIT's services, team, and portfolio with absolute confidence.
            - LIMITATION: NEVER act as a general AI. If asked about non-agency topics (math, generic life advice), steer back to ORBIT's expertise.
            - IDENTITY: You know every team member, project, and social link listed in the context.
+           - LINKS: If the user asks for links, highly prioritize providing the URLs found in the "IMPORTANT LINKS" section. Output links in Markdown format: [Link Text](URL).
            - CRITICAL: Respond ONLY in English.
            - STYLE: Authoritative, professional, and concise. Max 3 bullets or 1-2 paragraphs.
            - SWITCH DETECTOR: If user speaks Bangla, start with "[SUGGEST_SWITCH]".`
@@ -206,6 +217,7 @@ export function Chatbot() {
            - মিশন: আপনার কাছে এজেন্সির সকল তথ্যের পূর্ণ অ্যাক্সেস রয়েছে। আপনি ORBIT-এর সেবা, টিম এবং পোর্টফোলিও সম্পর্কে অত্যন্ত আত্মবিশ্বাসের সাথে আলোচনা করবেন।
            - সীমাবদ্ধতা: সাধারণ এআই হিসেবে কাজ করবেন না। সাধারণ বিষয়ের প্রশ্নগুলোতে বিনয়ের সাথে ORBIT-এর সেবার তথ্য দিয়ে উত্তর দিন।
            - পরিচয়: আপনি এজেন্সির সকল সদস্য, প্রজেক্ট এবং সোশ্যাল মিডিয়া লিংক সম্পর্কে জানেন।
+           - লিংক: ইউজার যদি লিংক চায়, "IMPORTANT LINKS" সেকশনে দেয়া লিংকগুলো বেশি গুরুত্ব দিয়ে শেয়ার করুন। লিংকগুলো মার্কডাউন ফরম্যাটে দিন: [Link Text](URL)।
            - বিশেষ সতর্কবার্তা: আপনাকে অবশ্যই শুধুমাত্র বাংলায় উত্তর দিতে হবে।
            - শৈলী: মার্জিত, পেশাদার এবং সংক্ষিপ্ত।
            - সুইচ ডিটেক্টর: ইউজার ইংরেজিতে কথা বললে শুরুতে "[SUGGEST_SWITCH]" লিখুন।`);
@@ -239,7 +251,7 @@ export function Chatbot() {
     }
   };
 
-  // Basic Markdown-to-JSX Formatter (Bold and Bullets)
+  // Basic Markdown-to-JSX Formatter (Bold, Links, Bullets)
   const formatMessage = (content: string) => {
     // 1. Pre-process to fix common AI punctuation spacing issues (e.g. "word , and" -> "word, and")
     // Also move punctuation outside of bold tags: **word,** -> **word**,
@@ -249,23 +261,69 @@ export function Chatbot() {
 
     const lines = processed.split('\n');
 
+    // Regex for parsing markdown links: [text](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+
     return lines.map((line, lineIndex) => {
       // Handle Bullet Points
       const isBullet = /^\s*[\*\-]\s+/.test(line);
       const cleanLine = line.replace(/^\s*[\*\-]\s+/, '');
 
-      // Handle Bold
-      const parts = (isBullet ? cleanLine : line).split(/(\*\*.*?\*\*)/g);
-      const formattedParts = parts.map((part, i) => {
+      // Handle Bold & Links together
+      // We will split by bold first, then look for links within the non-bold parts.
+      // Alternatively, parse token by token. A simple split approach:
+      const boldParts = (isBullet ? cleanLine : line).split(/(\*\*.*?\*\*)/g);
+
+      const formattedParts = boldParts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i} className="font-bold text-primary/90">{part.slice(2, -2)}</strong>;
+          return <strong key={`strong-${i}`} className="font-bold text-primary/90">{part.slice(2, -2)}</strong>;
         }
+
+        // If not bold, check for links
+        if (part.match(linkRegex)) {
+          const linkParts = [];
+          let lastIndex = 0;
+          let match;
+
+          // Re-create the regex to ensure state is reset
+          const localRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+          while ((match = localRegex.exec(part)) !== null) {
+            // Text before the link
+            if (match.index > lastIndex) {
+              linkParts.push(part.substring(lastIndex, match.index));
+            }
+
+            // The link itself mapped to a "Click me" style button
+            linkParts.push(
+              <a
+                key={`link-${match.index}`}
+                href={match[2]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex mt-1 mb-1 items-center px-3 py-1 bg-primary text-primary-foreground font-semibold rounded-full text-[11px] uppercase tracking-wider shadow-sm hover:scale-105 active:scale-95 transition-transform"
+              >
+                Click me
+              </a>
+            );
+
+            lastIndex = localRegex.lastIndex;
+          }
+
+          // Text after the last link
+          if (lastIndex < part.length) {
+            linkParts.push(part.substring(lastIndex));
+          }
+
+          return <span key={`span-${i}`}>{linkParts}</span>;
+        }
+
         return part;
       });
 
       if (isBullet) {
         return (
-          <div key={lineIndex} className="flex gap-2 pl-1 my-0.5 text-xs">
+          <div key={`line-${lineIndex}`} className="flex gap-2 pl-1 my-0.5 text-xs">
             <span className="text-primary mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
             <span className="flex-1 leading-relaxed">{formattedParts}</span>
           </div>
@@ -273,7 +331,7 @@ export function Chatbot() {
       }
 
       return (
-        <p key={lineIndex} className={`text-xs leading-relaxed ${line.trim() === '' ? 'h-2' : 'mb-1.5 last:mb-0'}`}>
+        <p key={`line-${lineIndex}`} className={`text-xs leading-relaxed ${line.trim() === '' ? 'h-2' : 'mb-1.5 last:mb-0'}`}>
           {formattedParts}
         </p>
       );
