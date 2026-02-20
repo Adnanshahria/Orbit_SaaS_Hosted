@@ -5,8 +5,6 @@ import { useLang } from '@/contexts/LanguageContext';
 import orbitLogo from '@/assets/orbit-logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const WHATSAPP_URL = 'https://wa.me/8801853452264';
-
 const mobileNavItems = [
   { href: '#hero', icon: Home, label: 'Home' },
   { href: '#services', icon: Layers, label: 'Services' },
@@ -19,6 +17,11 @@ const mobileNavItems = [
 
 export function Navbar() {
   const { t, lang, toggleLang } = useLang();
+
+  // Dynamic WhatsApp URL from admin settings
+  const whatsappNumber = (t.contact as any).whatsapp || '8801853452264';
+  const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const [activeSection, setActiveSection] = useState('#hero');
@@ -92,8 +95,6 @@ export function Navbar() {
         setShowNavbarCTA(rect.top < -50);
       } else {
         // Fallback if on other pages where hero btn might not exist (optional, or hide it)
-        // Let's hidden it on other pages to not distract, OR show it since there's no hero btn to duplicate.
-        // Usually on inner pages you want the CTA visible.
         setShowNavbarCTA(true);
       }
     };
@@ -187,7 +188,7 @@ export function Navbar() {
                     <motion.a
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.96 }}
-                      href={WHATSAPP_URL}
+                      href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"

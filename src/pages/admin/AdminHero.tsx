@@ -3,6 +3,7 @@ import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectio
 
 export default function AdminHero() {
     const { lang, setLang, saving, saved, error, getData, save } = useSectionEditor('hero');
+    const [tagline, setTagline] = useState('');
     const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
     const [cta, setCta] = useState('');
@@ -11,6 +12,7 @@ export default function AdminHero() {
     useEffect(() => {
         const d = getData();
         if (d) {
+            setTagline(d.tagline || '');
             setTitle(d.title || '');
             setSubtitle(d.subtitle || '');
             setCta(d.cta || '');
@@ -26,12 +28,13 @@ export default function AdminHero() {
             </div>
             <ErrorAlert message={error} />
             <div className="space-y-4 bg-card rounded-xl p-6 border border-border">
+                <TextField label="Tagline (Launch at Zero...)" value={tagline} onChange={setTagline} />
                 <TextField label="Title" value={title} onChange={setTitle} />
                 <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} multiline />
                 <TextField label="CTA Button Text" value={cta} onChange={setCta} />
                 <TextField label="Learn More Button Text" value={learnMore} onChange={setLearnMore} />
             </div>
-            <SaveButton onClick={() => save({ title, subtitle, cta, learnMore })} saving={saving} saved={saved} />
+            <SaveButton onClick={() => save({ tagline, title, subtitle, cta, learnMore })} saving={saving} saved={saved} />
         </div>
     );
 }

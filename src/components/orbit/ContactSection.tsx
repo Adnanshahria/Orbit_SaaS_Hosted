@@ -3,12 +3,14 @@ import { ArrowRight } from 'lucide-react';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 
-const WHATSAPP_URL = 'https://wa.me/8801853452264';
-
 export function ContactSection() {
   const { t } = useLang();
   const ref = useRef(null);
   const inView = useInView(ref, { once: false, margin: '-80px' });
+
+  // Dynamic WhatsApp URL from admin settings
+  const whatsappNumber = (t.contact as any).whatsapp || '8801853452264';
+  const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 
   return (
     <section id="contact" className="py-12 sm:py-20 px-4 sm:px-6 relative">
@@ -36,7 +38,7 @@ export function ContactSection() {
             {t.contact.subtitle}
           </motion.p>
           <motion.a
-            href={WHATSAPP_URL}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, y: 20 }}

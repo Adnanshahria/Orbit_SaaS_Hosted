@@ -51,16 +51,13 @@ export const translations = {
     leadership: {
       title: 'Our Leadership',
       subtitle: 'Meet the team driving innovation at ORBIT SaaS.',
-      members: [
-        { name: 'Muhammed Nisar Uddin', role: 'Founder & CTO', image: '', order: 1 },
-        { name: 'Mohammed Adnan Shahria', role: 'Co-Founder & CEO', image: '', order: 2 },
-        { name: 'Abdur Rahman Talha', role: 'Chief Marketing Officer (CMO)', image: '', order: 3 },
-      ],
+      members: [],
     },
     contact: {
-      title: 'Start Your Web Development Project Today',
-      subtitle: 'Ready to build a custom web application? Get a free consultation with our development team.',
-      cta: 'Book a Free Consultation on WhatsApp',
+      title: 'Start Your Project',
+      subtitle: 'Ready to build something amazing? Let\'s talk.',
+      cta: 'Book a Consultation',
+      whatsapp: '',
     },
     footer: {
       rights: '© 2025 ORBIT SaaS. All rights reserved.',
@@ -80,7 +77,11 @@ export const translations = {
       title: 'ORBIT AI Assistant',
       placeholder: 'Ask me anything about our services...',
       greeting: 'Hi! 👋 I\'m the ORBIT SaaS assistant. How can I help you today?',
-      systemPrompt: '',
+      systemPrompt: `You are Orbit AI, the snappy and compact assistant for ORBIT SaaS.
+      - STYLE: Extremely concise. One or two short sentences per point. 
+      - FORMAT: Use bullet points. Use bold for key terms ONLY. No fluff. 
+      - GOAL: Quick answers on services/projects/booking.
+      - BORDERLINE: Directly answer users. No repetitive greetings.`,
       qaPairs: [] as { question: string; answer: string }[],
     },
   },
@@ -133,17 +134,14 @@ export const translations = {
     },
     leadership: {
       title: 'আমাদের নেতৃত্ব',
-      subtitle: 'ORBIT SaaS-এ উদ্ভাবন চালিত দলের সাথে পরিচিত হন।',
-      members: [
-        { name: 'মুহাম্মদ নিসার উদ্দিন', role: 'প্রতিষ্ঠাতা ও সিটিও', image: '', order: 1 },
-        { name: 'মোহাম্মদ আদনান শাহরিয়া', role: 'সহ-প্রতিষ্ঠাতা ও সিইও', image: '', order: 2 },
-        { name: 'আব্দুর রহমান তালহা', role: 'প্রধান বিপণন কর্মকর্তা (CMO)', image: '', order: 3 },
-      ],
+      subtitle: 'ORBIT SaaS-এর উদ্ভাবন চালিত দলের সাথে পরিচিত হন।',
+      members: [],
     },
     contact: {
-      title: 'চলুন দুর্দান্ত কিছু তৈরি করি',
-      subtitle: 'আপনার ডিজিটাল উপস্থিতি রূপান্তর করতে প্রস্তুত? আসুন কথা বলি।',
-      cta: 'হোয়াটসঅ্যাপে অ্যাপয়েন্টমেন্ট বুক করুন',
+      title: 'আপনার প্রজেক্ট শুরু করুন',
+      subtitle: 'দুর্দান্ত কিছু তৈরি করতে প্রস্তুত? আসুন কথা বলি।',
+      cta: 'পরামর্শ বুক করুন',
+      whatsapp: '',
     },
     footer: {
       rights: '© ২০২৫ ORBIT SaaS। সর্বস্বত্ব সংরক্ষিত।',
@@ -163,7 +161,11 @@ export const translations = {
       title: 'ORBIT AI সহকারী',
       placeholder: 'আমাদের সেবা সম্পর্কে যেকোনো কিছু জিজ্ঞাসা করুন...',
       greeting: 'হ্যালো! 👋 আমি ORBIT SaaS সহকারী। আজ আপনাকে কীভাবে সাহায্য করতে পারি?',
-      systemPrompt: '',
+      systemPrompt: `আপনি ORBIT SaaS-এর জন্য একজন চটপটে এবং সংক্ষিপ্ত উত্তর প্রদানকারী AI সহকারী।
+      - শৈলী: অত্যন্ত সংক্ষিপ্ত। প্রতি পয়েন্টে এক বা দুটি ছোট বাক্য।
+      - ফরম্যাট: বুলেট পয়েন্ট ব্যবহার করুন। শুধুমাত্র গুরুত্বপূর্ণ শব্দের জন্য বোল্ড ব্যবহার করুন। 
+      - লক্ষ্য: সেবা/প্রকল্প/বুকিং সম্পর্কে দ্রুত উত্তর দেওয়া।
+      - সীমা: সরাসরি উত্তর দিন। বারবার শুভেচ্ছা জানাবেন না।`,
       qaPairs: [] as { question: string; answer: string }[],
     },
   },

@@ -36,21 +36,22 @@ export function Chatbot() {
       // We use the current language's content, falling back to English if missing
       const activeContent = content[lang] || content['en'];
 
-      let knowledgeBase = "Here is the comprehensive context about various sections of the website:\n\n";
+      let knowledgeBase = "ORBIT SaaS Context:\n\n";
 
       // --- Projects ---
       const projects = (activeContent.projects as any)?.items || [];
       if (projects.length > 0) {
-        knowledgeBase += "## PORTFOLIO / PROJECTS:\n";
+        knowledgeBase += "PORTFOLIO:\n";
         projects.forEach((p: any) => {
-          knowledgeBase += `- Name: ${p.title}\n  Description: ${p.desc}\n  Tech Stack/Tags: ${(p.tags || []).join(', ')}\n  Link: ${p.link}\n\n`;
+          knowledgeBase += `- ${p.title}: ${p.desc} (${(p.tags || []).join(', ')})\n`;
         });
+        knowledgeBase += "\n";
       }
 
       // --- Services ---
       const services = (activeContent.services as any)?.items || [];
       if (services.length > 0) {
-        knowledgeBase += "## SERVICES WE OFFER:\n";
+        knowledgeBase += "SERVICES:\n";
         services.forEach((s: any) => {
           knowledgeBase += `- ${s.title}: ${s.desc}\n`;
         });
@@ -58,20 +59,20 @@ export function Chatbot() {
       }
 
       // --- Tech Stack ---
-      const techStack = (activeContent.techStack as any)?.items || []; // Assuming tech stack might have items, otherwise just general knowledge
+      const techStack = (activeContent.techStack as any)?.items || [];
       if (techStack.length > 0) {
-        knowledgeBase += "## TECH STACK:\n" + techStack.map((t: any) => t.name || t).join(', ') + "\n\n";
+        knowledgeBase += "TECH: " + techStack.map((t: any) => t.name || t).join(', ') + "\n\n";
       }
 
-      // --- Company Info (Hero/Why Us) ---
+      // --- Company Info ---
       const hero = (activeContent.hero as any);
       if (hero) {
-        knowledgeBase += `## COMPANY OVERVIEW:\nTagline: ${hero.title}\nSummary: ${hero.subtitle}\n\n`;
+        knowledgeBase += `OVERVIEW: ${hero.title}. ${hero.subtitle}\n\n`;
       }
 
       const whyUs = (activeContent.whyUs as any)?.items || [];
       if (whyUs.length > 0) {
-        knowledgeBase += "## WHY CHOOSE US:\n";
+        knowledgeBase += "WHY US:\n";
         whyUs.forEach((w: any) => {
           knowledgeBase += `- ${w.title}: ${w.desc}\n`;
         });
@@ -81,32 +82,22 @@ export function Chatbot() {
       // --- Leadership ---
       const leadership = (activeContent.leadership as any)?.members || [];
       if (leadership.length > 0) {
-        knowledgeBase += "## LEADERSHIP TEAM:\n";
-        leadership.forEach((l: any) => {
-          knowledgeBase += `- ${l.name} (${l.role})\n`;
-        });
-        knowledgeBase += "\n";
+        knowledgeBase += "TEAM: " + leadership.map((l: any) => `${l.name} (${l.role})`).join(', ') + "\n\n";
       }
 
       // --- Contact ---
       const contact = (activeContent.contact as any);
       if (contact) {
-        knowledgeBase += `## CONTACT INFO:\nCTA: ${contact.cta}\nTitle: ${contact.title}\n\n`;
+        knowledgeBase += `CONTACT: ${contact.cta}. ${contact.title}\n\n`;
       }
 
       // 2. Prepare System Prompt
-      const systemPrompt = t.chatbot.systemPrompt || `You are Orbit AI, the advanced AI assistant for Orbit SaaS (a web development agency). 
-      Your goal is to help potential clients understand our services, view our portfolio, and book appointments.
-      
-      Tone: Professional, enthusiastic, knowledgeable, and helpful.
-      Format: Use Markdown for readable responses (bolding key terms, bullet points for lists).
-      
-      CRITICAL INSTRUCTIONS:
-      - You have access to the FULL website content below. USE IT to answer specific questions.
-      - If asked about projects, mention specific ones from the Portfolio section.
-      - If asked about services, detail our specific offerings.
-      - If unsure, ask the user to clarify or suggest booking a consultation.
-      - Do NOT make up facts not present in the context.`;
+      const systemPrompt = t.chatbot.systemPrompt || `You are Orbit AI, the friendly and compact assistant for ORBIT SaaS.
+      - STYLE: Very concise, professional, and friendly.
+      - FORMAT: Use bullet points for lists. Use bold for key terms. Avoid long paragraphs.
+      - GOAL: Help users with services, projects, and booking consultations.
+      - BORDERLINE: Don't repeat greetings or tell long stories. Get straight to the point.
+      - CONTACT: Always suggest booking a consultation on WhatsApp if the user seems interested.`;
 
       // 3. Prepare Q&A Context
       const qaContext = (t.chatbot.qaPairs || [])
@@ -134,8 +125,51 @@ export function Chatbot() {
       console.error('Failed to get response:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please try again later." }]);
     } finally {
+      setIsLoading(true); // Wait, this should be false! 
+      // Fixed:
       setIsLoading(false);
     }
+  };
+
+  // Basic Markdown-to-JSX Formatter (Bold and Bullets)
+  const formatMessage = (content: string) => {
+    // 1. Pre-process to fix common AI punctuation spacing issues (e.g. "word , and" -> "word, and")
+    // Also move punctuation outside of bold tags: **word,** -> **word**,
+    let processed = content
+      .replace(/\s+([,\.\?\!])/g, '$1') // Remove space before punctuation
+      .replace(/(\*\*.*?)(([,\.\?\!])\s*)\*\*/g, '$1**$2'); // Move punctuation out of bold
+
+    const lines = processed.split('\n');
+
+    return lines.map((line, lineIndex) => {
+      // Handle Bullet Points
+      const isBullet = /^\s*[\*\-]\s+/.test(line);
+      const cleanLine = line.replace(/^\s*[\*\-]\s+/, '');
+
+      // Handle Bold
+      const parts = (isBullet ? cleanLine : line).split(/(\*\*.*?\*\*)/g);
+      const formattedParts = parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-bold text-primary/90">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+      });
+
+      if (isBullet) {
+        return (
+          <div key={lineIndex} className="flex gap-2 pl-1 my-0.5 text-xs">
+            <span className="text-primary mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
+            <span className="flex-1 leading-relaxed">{formattedParts}</span>
+          </div>
+        );
+      }
+
+      return (
+        <p key={lineIndex} className={`text-xs leading-relaxed ${line.trim() === '' ? 'h-2' : 'mb-1.5 last:mb-0'}`}>
+          {formattedParts}
+        </p>
+      );
+    });
   };
 
   return (
@@ -158,7 +192,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-40 md:bottom-24 right-4 sm:right-6 z-[200] w-[calc(100vw-2rem)] sm:w-[340px] max-w-[340px] rounded-2xl overflow-hidden border border-border bg-card shadow-2xl flex flex-col"
+            className="fixed bottom-40 md:bottom-24 right-4 sm:right-6 z-[200] w-[calc(100vw-2rem)] sm:w-[400px] max-w-[400px] rounded-2xl overflow-hidden border border-border bg-card shadow-2xl flex flex-col"
           >
             {/* Header */}
             <div className="px-5 py-4 bg-primary/10 border-b border-border">
@@ -167,13 +201,13 @@ export function Chatbot() {
             </div>
 
             {/* Messages */}
-            <div className="h-80 overflow-y-auto p-4 space-y-3 bg-card/50">
+            <div className="h-96 overflow-y-auto p-4 space-y-3 bg-card/50">
               {/* Greeting */}
               <div className="flex gap-2">
                 <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                   <MessageCircle className="w-3.5 h-3.5 text-primary" />
                 </div>
-                <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-sm text-foreground max-w-[85%] shadow-sm">
+                <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-xs text-foreground max-w-[85%] shadow-sm">
                   {t.chatbot.greeting}
                 </div>
               </div>
@@ -185,11 +219,11 @@ export function Chatbot() {
                       <MessageCircle className="w-3.5 h-3.5 text-primary" />
                     </div>
                   )}
-                  <div className={`rounded-xl px-3 py-2 text-sm max-w-[85%] shadow-sm ${msg.role === 'user'
+                  <div className={`rounded-xl px-3 py-2 text-xs max-w-[85%] shadow-sm ${msg.role === 'user'
                     ? 'bg-primary text-primary-foreground rounded-tr-none'
                     : 'bg-secondary text-foreground rounded-tl-none'
                     }`}>
-                    {msg.content}
+                    {msg.role === 'assistant' ? formatMessage(msg.content) : msg.content}
                   </div>
                 </div>
               ))}

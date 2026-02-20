@@ -6,6 +6,7 @@ export default function AdminContact() {
     const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
     const [cta, setCta] = useState('');
+    const [whatsapp, setWhatsapp] = useState('');
 
     useEffect(() => {
         const d = getData();
@@ -13,6 +14,7 @@ export default function AdminContact() {
             setTitle(d.title || '');
             setSubtitle(d.subtitle || '');
             setCta(d.cta || '');
+            setWhatsapp(d.whatsapp || '');
         }
     }, [getData]);
 
@@ -27,8 +29,9 @@ export default function AdminContact() {
                 <TextField label="Title" value={title} onChange={setTitle} />
                 <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} multiline />
                 <TextField label="CTA Button Text" value={cta} onChange={setCta} />
+                <TextField label="WhatsApp Number (with country code)" value={whatsapp} onChange={setWhatsapp} />
             </div>
-            <SaveButton onClick={() => save({ title, subtitle, cta })} saving={saving} saved={saved} />
+            <SaveButton onClick={() => save({ title, subtitle, cta, whatsapp })} saving={saving} saved={saved} />
         </div>
     );
 }

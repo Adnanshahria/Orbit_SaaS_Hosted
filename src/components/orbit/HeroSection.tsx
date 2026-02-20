@@ -3,7 +3,7 @@ import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 
-const WHATSAPP_URL = 'https://wa.me/8801853452264';
+
 
 /* ── Particle field ───────────────────────────────────────────── */
 function ParticleField() {
@@ -90,6 +90,10 @@ export function HeroSection() {
   // Staggered word animation for the subtitle
   const words = t.hero.subtitle.split(' ');
 
+  // Dynamic WhatsApp URL from admin settings
+  const whatsappNumber = (t.contact as any).whatsapp || '8801853452264';
+  const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
+
   return (
     <section
       ref={sectionRef}
@@ -109,15 +113,17 @@ export function HeroSection() {
         className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto"
       >
         {/* Badge — slides down with spring */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold text-neon-cyan mb-6 sm:mb-8 uppercase tracking-[0.2em]"
-        >
-          <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_10px_#00F5FF]" />
-          {t.hero.tagline}
-        </motion.div>
+        {t.hero.tagline && (
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-[10px] sm:text-xs font-bold text-neon-cyan mb-6 sm:mb-8 uppercase tracking-[0.2em]"
+          >
+            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_10px_#00F5FF]" />
+            {t.hero.tagline}
+          </motion.div>
+        )}
 
         {/* Title — "ORBIT SaaS" scales up dramatically */}
         <motion.h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-foreground leading-[1] mb-6 sm:mb-8 tracking-tighter">
@@ -166,7 +172,7 @@ export function HeroSection() {
         >
           <motion.a
             id="hero-book-appointment"
-            href={WHATSAPP_URL}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.04, boxShadow: '0 8px 30px rgba(108, 92, 231, 0.35)' }}
