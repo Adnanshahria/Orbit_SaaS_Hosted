@@ -88,8 +88,10 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
                     ...old,
                     [section]: data
                 }));
-                // Also invalidate to ensure sync
-                queryClient.invalidateQueries({ queryKey: ['content', lang] });
+                // Delay invalidation to avoid race with server write commit
+                setTimeout(() => {
+                    queryClient.invalidateQueries({ queryKey: ['content', lang] });
+                }, 3000);
                 return true;
             }
             return false;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useContent } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
-import { Save, Check, AlertCircle, Plus, Trash2, GripVertical, ChevronDown, ChevronsUpDown, Sparkles, Loader2 } from 'lucide-react';
+import { Save, Check, AlertCircle, Plus, Trash2, ChevronDown, ChevronsUpDown, Sparkles, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
 
 /* ─── Language Toggle ─── */
 export function LangToggle({ lang, setLang }: { lang: string; setLang: (l: string) => void }) {
@@ -249,6 +249,24 @@ export function ItemListEditor<T extends Record<string, unknown>>({
         setExpanded(prev => new Set(prev).add(newIndex));
     };
 
+    const moveItem = (index: number, direction: 'up' | 'down') => {
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= items.length) return;
+        const copy = [...items];
+        [copy[index], copy[newIndex]] = [copy[newIndex], copy[index]];
+        // Update expanded state to follow moved items
+        setExpanded(prev => {
+            const next = new Set<number>();
+            prev.forEach(idx => {
+                if (idx === index) next.add(newIndex);
+                else if (idx === newIndex) next.add(index);
+                else next.add(idx);
+            });
+            return next;
+        });
+        setItems(copy);
+    };
+
     const defaultLabel = (item: T, i: number): string => {
         // Try common title fields
         const title = item.title || item.name || item.label;
@@ -279,8 +297,23 @@ export function ItemListEditor<T extends Record<string, unknown>>({
 
                 return (
                     <div key={i} className="flex gap-3 items-start">
-                        <div className="mt-3 text-muted-foreground">
-                            <GripVertical className="w-4 h-4" />
+                        <div className="flex flex-col gap-0.5 mt-2">
+                            <button
+                                onClick={() => moveItem(i, 'up')}
+                                disabled={i === 0}
+                                className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                title="Move up"
+                            >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                                onClick={() => moveItem(i, 'down')}
+                                disabled={i === items.length - 1}
+                                className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                title="Move down"
+                            >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
                         </div>
                         <div className="flex-1 bg-secondary/50 rounded-xl border border-border overflow-hidden">
                             {/* Collapsible Header */}
