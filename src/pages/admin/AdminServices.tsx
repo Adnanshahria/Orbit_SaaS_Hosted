@@ -182,7 +182,7 @@ function ServiceCard({
                         {/* Branding Section */}
                         <div className="rounded-2xl border border-border/40 overflow-hidden">
                             {/* Header */}
-                            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-secondary/50 via-secondary/30 to-transparent border-b border-border/20">
+                            <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-secondary/50 via-secondary/30 to-transparent border-b border-border/20">
                                 <div className="flex items-center gap-2.5">
                                     <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ backgroundColor: `${accentColor}15` }}>
                                         <Palette className="w-3 h-3" style={{ color: accentColor }} />
@@ -203,60 +203,57 @@ function ServiceCard({
                                 </button>
                             </div>
 
-                            {/* Main Content: Color Picker + Live Preview */}
-                            <div className="p-4">
-                                <div className="flex flex-col sm:flex-row gap-5">
-                                    {/* Color Picker Side */}
-                                    <div className="w-full sm:w-48 shrink-0">
-                                        <ColorField label="Accent Color" value={accentColor} onChange={v => update({ ...item, color: v })} />
+                            <div className="p-5 space-y-5">
+                                {/* Live Preview — Full-width realistic card mockup */}
+                                <div>
+                                    <div className="flex items-center gap-1.5 mb-2.5">
+                                        <Eye className="w-3 h-3 text-muted-foreground/50" />
+                                        <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Live Preview</span>
                                     </div>
-
-                                    {/* Live Preview — Full-width realistic card mockup */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-1.5 mb-2">
-                                            <Eye className="w-3 h-3 text-muted-foreground/50" />
-                                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Live Preview</span>
-                                        </div>
+                                    <div
+                                        className="relative rounded-xl border p-5 transition-all duration-300 overflow-hidden"
+                                        style={{
+                                            backgroundColor: item.bg || cardBg,
+                                            borderColor: item.border || cardBorder,
+                                        }}
+                                    >
+                                        {/* Accent gradient glow at top */}
                                         <div
-                                            className="relative rounded-xl border p-4 transition-all duration-300 overflow-hidden"
-                                            style={{
-                                                backgroundColor: item.bg || cardBg,
-                                                borderColor: item.border || cardBorder,
-                                            }}
-                                        >
-                                            {/* Accent gradient glow at top */}
+                                            className="absolute top-0 left-0 right-0 h-1 rounded-t-xl"
+                                            style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}30)` }}
+                                        />
+
+                                        <div className="flex items-start gap-4 mt-1">
+                                            {/* Icon */}
                                             <div
-                                                className="absolute top-0 left-0 right-0 h-1 rounded-t-xl"
-                                                style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}30)` }}
-                                            />
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                                                style={{ backgroundColor: `${accentColor}12`, border: `1px solid ${accentColor}20` }}
+                                            >
+                                                <Sparkles className="w-6 h-6" style={{ color: accentColor }} />
+                                            </div>
 
-                                            <div className="flex items-start gap-3.5 mt-1">
-                                                {/* Icon */}
-                                                <div
-                                                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-                                                    style={{ backgroundColor: `${accentColor}12`, border: `1px solid ${accentColor}20` }}
-                                                >
-                                                    <Sparkles className="w-5 h-5" style={{ color: accentColor }} />
-                                                </div>
-
-                                                {/* Skeleton text */}
-                                                <div className="flex-1 pt-0.5 space-y-2.5">
-                                                    <div className="h-2.5 w-3/5 rounded-full" style={{ backgroundColor: `${accentColor}30` }} />
-                                                    <div className="space-y-1.5">
-                                                        <div className="h-1.5 w-full rounded-full bg-foreground/8" />
-                                                        <div className="h-1.5 w-4/5 rounded-full bg-foreground/6" />
-                                                    </div>
+                                            {/* Skeleton content */}
+                                            <div className="flex-1 pt-1 space-y-3">
+                                                <div className="h-3 w-2/5 rounded-full" style={{ backgroundColor: `${accentColor}30` }} />
+                                                <div className="space-y-2">
+                                                    <div className="h-2 w-full rounded-full bg-foreground/8" />
+                                                    <div className="h-2 w-11/12 rounded-full bg-foreground/6" />
+                                                    <div className="h-2 w-3/4 rounded-full bg-foreground/5" />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Advanced Colors — Card Background & Border */}
-                                {showAdvanced && (
-                                    <div className="mt-5 pt-4 border-t border-border/15">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                            <div className="space-y-2.5">
+                                {/* Color Controls — full-width grid */}
+                                <div className={`grid gap-5 ${showAdvanced ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1'}`}>
+                                    <div>
+                                        <ColorField label="Accent Color" value={accentColor} onChange={v => update({ ...item, color: v })} />
+                                    </div>
+
+                                    {showAdvanced && (
+                                        <>
+                                            <div className="space-y-2">
                                                 <ColorField label="Card Background" value={item.bg || cardBg} onChange={v => update({ ...item, bg: v })} />
                                                 <button
                                                     className="text-[10px] text-muted-foreground/50 hover:text-primary font-medium transition-colors flex items-center gap-1"
@@ -265,7 +262,7 @@ function ServiceCard({
                                                     <span className="text-xs">↺</span> Reset to global
                                                 </button>
                                             </div>
-                                            <div className="space-y-2.5">
+                                            <div className="space-y-2">
                                                 <ColorField label="Card Border" value={item.border || cardBorder} onChange={v => update({ ...item, border: v })} />
                                                 <button
                                                     className="text-[10px] text-muted-foreground/50 hover:text-primary font-medium transition-colors flex items-center gap-1"
@@ -274,9 +271,9 @@ function ServiceCard({
                                                     <span className="text-xs">↺</span> Reset to global
                                                 </button>
                                             </div>
-                                        </div>
-                                    </div>
-                                )}
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
