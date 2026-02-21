@@ -14,12 +14,12 @@ export function LeadMagnetPopup() {
         // Only show once per session
         if (sessionStorage.getItem('leadMagnetDismissed')) return;
 
-        // 1. Time-based trigger (7 seconds)
+        // 1. Time-based trigger (15 seconds)
         const timerId = setTimeout(() => {
             if (!sessionStorage.getItem('leadMagnetDismissed') && localStorage.getItem('orbit_chatbot_email_provided') !== 'true') {
                 setIsOpen(true);
             }
-        }, 7000);
+        }, 15000);
 
         // 2. Exit-intent trigger
         const handleMouseLeave = (e: MouseEvent) => {
