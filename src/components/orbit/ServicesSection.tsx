@@ -84,7 +84,7 @@ export function ServicesSection() {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {t.services.items.map((item: any, i: number) => {
             // Dynamic icon: use stored icon name, fall back to cycling default
             const Icon = (item.icon && ICON_MAP[item.icon]) ? ICON_MAP[item.icon] : DEFAULT_ICONS[i % DEFAULT_ICONS.length];
@@ -103,7 +103,7 @@ export function ServicesSection() {
                   y: -4,
                   transition: { type: 'spring', stiffness: 400, damping: 25 },
                 }}
-                className="relative rounded-2xl p-6 sm:p-7 group cursor-default border overflow-hidden transition-shadow duration-300"
+                className="relative rounded-2xl p-4 sm:p-7 group cursor-default border overflow-hidden transition-shadow duration-300 flex flex-col"
                 style={{
                   backgroundColor: bg,
                   borderColor: border,
@@ -122,21 +122,21 @@ export function ServicesSection() {
                 {/* Content */}
                 <div className="relative z-10">
                   {/* Icon + Title Row */}
-                  <div className="flex items-start gap-4 mb-4">
+                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
                       style={{ backgroundColor: `${accent}15` }}
                     >
-                      <Icon className="w-5 h-5" style={{ color: accent }} />
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: accent }} />
                     </div>
 
-                    <h3 className="font-display text-[1.05rem] font-bold text-foreground leading-snug pt-2">
+                    <h3 className="font-display text-[0.9rem] sm:text-[1.05rem] font-bold text-foreground leading-snug sm:pt-2">
                       {item.title}
                     </h3>
                   </div>
 
                   {/* Description */}
-                  <p className="text-muted-foreground text-sm leading-relaxed opacity-75 group-hover:opacity-100 transition-opacity duration-300 pl-0">
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed opacity-85 sm:opacity-75 group-hover:opacity-100 transition-opacity duration-300 pl-0">
                     {item.desc}
                   </p>
                 </div>
