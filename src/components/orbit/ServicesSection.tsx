@@ -1,9 +1,15 @@
 import { motion, useInView } from 'framer-motion';
-import { Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket } from 'lucide-react';
+import { Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud, Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase, Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette } from 'lucide-react';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
+import type { LucideIcon } from 'lucide-react';
 
-const icons = [Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket];
+const ICON_MAP: Record<string, LucideIcon> = {
+  Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud,
+  Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase,
+  Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette
+};
+const DEFAULT_ICONS = [Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket];
 
 const cardVariants = {
   hidden: {
@@ -80,7 +86,8 @@ export function ServicesSection() {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {t.services.items.map((item: any, i: number) => {
-            const Icon = icons[i % icons.length];
+            // Dynamic icon: use stored icon name, fall back to cycling default
+            const Icon = (item.icon && ICON_MAP[item.icon]) ? ICON_MAP[item.icon] : DEFAULT_ICONS[i % DEFAULT_ICONS.length];
             const accent = item.color || iconColor;
             const bg = item.bg || cardBg;
             const border = item.border || cardBorder;
