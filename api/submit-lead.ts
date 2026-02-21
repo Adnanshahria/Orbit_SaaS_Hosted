@@ -13,7 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email, source, name, interest } = req.body;
+    const { email, source, name, interest, chat_summary } = req.body;
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
         return res.status(400).json({ error: 'Valid email is required' });
@@ -39,6 +39,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             // Ignore error: column already exists
         }
 
+        // Safely attempt to add the 'chat_summary' column
+        try {
+            await db.execute('ALTER TABLE leads ADD COLUMN chat_summary TEXT');
+        } catch (e) {
+            // Ignore error: column already exists
+        }
+
         // Basic deduplication check
         const existing = await db.execute({
             sql: 'SELECT id FROM leads WHERE email = ?',
@@ -46,13 +53,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
 
         if (existing.rows.length > 0) {
-            // Opt to silently succeed to protect against email enumeration or just return a message
-            return res.status(200).json({ success: true, message: 'Lead already captured previously' });
+            // If lead exists, we can update their chat summary if a new one is provided
+            if (chat_summary) {
+                await db.execute({
+                    sql: 'UPDATE leads SET chat_summary = ? WHERE email = ?',
+                    args: [chat_summary, email]
+                });
+            }
+            return res.status(200).json({ success: true, message: 'Lead already captured, updated via chat' });
         }
 
         await db.execute({
-            sql: `INSERT INTO leads (email, source, name, interest, created_at) VALUES (?, ?, ?, ?, datetime('now'))`,
-            args: [email, source || 'website', name || null, interest || null]
+            sql: `INSERT INTO leads (email, source, name, interest, chat_summary, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))`,
+            args: [email, source || 'website', name || null, interest || null, chat_summary || null]
         });
 
         // Trigger Auto-Welcome Email asynchronously

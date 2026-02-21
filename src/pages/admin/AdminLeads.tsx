@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { SectionHeader } from '@/components/admin/EditorComponents';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,7 @@ interface Lead {
     source: string;
     name?: string;
     interest?: string;
+    chat_summary?: string;
     created_at: string;
 }
 
@@ -18,6 +19,7 @@ export default function AdminLeads() {
     const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [totalVisitors, setTotalVisitors] = useState<number>(0);
+    const [expandedLeadId, setExpandedLeadId] = useState<number | null>(null);
 
     const fetchDashboardData = async () => {
         try {
@@ -80,13 +82,15 @@ export default function AdminLeads() {
     const exportCSV = () => {
         if (leads.length === 0) return toast.error('No leads to export');
 
-        const headers = ['ID', 'Email', 'Source', 'Date'];
+        const headers = ['ID', 'Email', 'Source', 'Intent', 'Chat Summary', 'Date'];
         const csvContent = [
             headers.join(','),
             ...leads.map(lead => [
                 lead.id,
                 lead.email,
-                lead.source,
+                `"${(lead.source || '').replace(/"/g, '""')}"`,
+                `"${(lead.interest || '').replace(/"/g, '""')}"`,
+                `"${(lead.chat_summary || '').replace(/"/g, '""')}"`,
                 new Date(lead.created_at).toLocaleString().replace(/,/g, '')
             ].join(','))
         ].join('\n');
@@ -192,53 +196,86 @@ export default function AdminLeads() {
                                         </td>
                                     </tr>
                                 ) : leads.map((lead) => (
-                                    <motion.tr
-                                        key={lead.id}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0, backgroundColor: 'rgba(239, 68, 68, 0.1)' }}
-                                        className="hover:bg-muted/50 transition-colors"
-                                    >
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                                    <Mail className="w-4 h-4 text-primary" />
+                                    <React.Fragment key={lead.id}>
+                                        <motion.tr
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0, backgroundColor: 'rgba(239, 68, 68, 0.1)' }}
+                                            className="hover:bg-muted/50 transition-colors"
+                                        >
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                                        <Mail className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                    <span className="font-medium text-foreground">{lead.email}</span>
                                                 </div>
-                                                <span className="font-medium text-foreground">{lead.email}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary w-fit text-xs font-medium text-muted-foreground border border-border">
-                                                <Globe className="w-3.5 h-3.5" />
-                                                {lead.source}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {lead.interest ? (
-                                                <div className="flex items-start gap-2 max-w-[200px] text-xs text-muted-foreground">
-                                                    <MessageSquare className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary/70" />
-                                                    <span className="truncate" title={lead.interest}>{lead.interest}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary w-fit text-xs font-medium text-muted-foreground border border-border">
+                                                    <Globe className="w-3.5 h-3.5" />
+                                                    {lead.source}
                                                 </div>
-                                            ) : (
-                                                <span className="text-xs text-muted-foreground/50 italic">—</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {lead.interest ? (
+                                                    <div className="flex items-start gap-2 max-w-[200px] text-xs text-muted-foreground">
+                                                        <MessageSquare className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary/70" />
+                                                        <span className="truncate" title={lead.interest}>{lead.interest}</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground/50 italic">—</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 text-muted-foreground">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    {new Date(lead.created_at).toLocaleString()}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {lead.chat_summary && (
+                                                        <button
+                                                            onClick={() => setExpandedLeadId(expandedLeadId === lead.id ? null : lead.id)}
+                                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${expandedLeadId === lead.id ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+                                                        >
+                                                            {expandedLeadId === lead.id ? 'Hide Chat' : 'View Chat'}
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleDelete(lead.id)}
+                                                        className="p-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                                        title="Delete Lead"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </motion.tr>
+
+                                        <AnimatePresence>
+                                            {expandedLeadId === lead.id && lead.chat_summary && (
+                                                <motion.tr
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                >
+                                                    <td colSpan={5} className="px-6 py-4 bg-muted/20 border-b border-border">
+                                                        <div className="p-4 bg-card border border-border rounded-xl shadow-inner max-h-[300px] overflow-y-auto">
+                                                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
+                                                                <MessageSquare className="w-4 h-4 text-primary" />
+                                                                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Chat History Context</h4>
+                                                            </div>
+                                                            <pre className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">
+                                                                {lead.chat_summary}
+                                                            </pre>
+                                                        </div>
+                                                    </td>
+                                                </motion.tr>
                                             )}
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            <div className="flex items-center gap-1.5">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                                {new Date(lead.created_at).toLocaleString()}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button
-                                                onClick={() => handleDelete(lead.id)}
-                                                className="p-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                                                title="Delete Lead"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </td>
-                                    </motion.tr>
+                                        </AnimatePresence>
+                                    </React.Fragment>
                                 ))}
                             </AnimatePresence>
                         </tbody>
