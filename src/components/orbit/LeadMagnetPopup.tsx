@@ -64,8 +64,8 @@ export function LeadMagnetPopup() {
                 setStatus('success');
                 toast.success(
                     lang === 'bn'
-                        ? 'ধন্যবাদ! গাইডটি আপনার ইনবক্সে পাঠানো হবে।'
-                        : 'Thank you! Your guide is on its way.'
+                        ? 'ধন্যবাদ! আপনি ওয়েটলিস্টে যুক্ত হয়েছেন।'
+                        : 'Thank you! You have joined the waitlist.'
                 );
                 setTimeout(handleClose, 3000);
             } else {
@@ -94,7 +94,7 @@ export function LeadMagnetPopup() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed left-[50%] top-[50%] z-[260] w-[90%] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-card border border-border shadow-2xl overflow-hidden"
+                        className="fixed left-1/2 top-1/2 z-[260] w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card border border-border shadow-2xl overflow-hidden"
                     >
                         <button
                             onClick={handleClose}
@@ -116,12 +116,12 @@ export function LeadMagnetPopup() {
                             </div>
 
                             <h2 className="font-display text-2xl font-bold mb-2">
-                                {lang === 'bn' ? 'স্কেলিং গাইড পেতে চান?' : 'Scale Your Business 10x'}
+                                {lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হোন' : 'Join The Waitlist'}
                             </h2>
                             <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                                 {lang === 'bn'
-                                    ? 'আমাদের ফ্রি গাইড ডাউনলোড করুন এবং জানুন কীভাবে AI দিয়ে সপ্তাহে ২০+ ঘণ্টা বাঁচানো যায়।'
-                                    : 'Get our free guide on how founders save 20+ hours a week using custom AI automations.'
+                                    ? 'আমাদের এক্সক্লুসিভ আপডেটের জন্য ওয়েটলিস্টে যুক্ত হোন।'
+                                    : 'Join our exclusive waitlist to get early access and modern AI insights.'
                                 }
                             </p>
 
@@ -132,7 +132,7 @@ export function LeadMagnetPopup() {
                                     className="bg-green-500/10 text-green-500 border border-green-500/20 rounded-xl p-4 font-semibold flex items-center justify-center gap-2"
                                 >
                                     <Send className="w-4 h-4" />
-                                    {lang === 'bn' ? 'পাঠানো হয়েছে!' : 'Guide sent successfully!'}
+                                    {lang === 'bn' ? 'যুক্ত হওয়া সম্পন্ন হয়েছে!' : 'Successfully joined!'}
                                 </motion.div>
                             ) : (
                                 <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -154,7 +154,7 @@ export function LeadMagnetPopup() {
                                             <Loader2 className="w-5 h-5 animate-spin" />
                                         ) : (
                                             <>
-                                                {lang === 'bn' ? 'গাইডটি ডাউনলোড করুন' : 'Send Me The Free Guide'}
+                                                {lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হোন' : 'Join Waitlist'}
                                                 <Send className="w-4 h-4" />
                                             </>
                                         )}

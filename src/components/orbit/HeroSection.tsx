@@ -118,7 +118,7 @@ export function HeroSection() {
       });
       if (res.ok) {
         setStatus('success');
-        toast.success(lang === 'bn' ? 'সাবস্ক্রাইব করা হয়েছে!' : 'Subscribed successfully!');
+        toast.success(lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হয়েছেন!' : 'Joined waitlist successfully!');
         setEmail('');
         setTimeout(() => setStatus('idle'), 3000);
       } else {
@@ -317,12 +317,12 @@ export function HeroSection() {
               className="absolute right-1.5 top-1.5 bottom-1.5 px-4 sm:px-6 rounded-full bg-primary text-primary-foreground font-semibold text-[13px] sm:text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
             >
               {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              <span className="inline">{lang === 'bn' ? 'জমা দিন' : 'Subscribe'}</span>
+              <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : 'Join Waitlist'}</span>
             </button>
           </form>
           {status === 'success' && (
             <p className="text-green-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-              {lang === 'bn' ? 'আমাদের ফ্রি নিউজলেটারে স্বাগতম!' : 'Welcome to our newsletter!'}
+              {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
             </p>
           )}
         </motion.div>
