@@ -2,7 +2,16 @@ import { motion, useInView } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 
-const emojis = ['🧠', '🔧', '⚡', '🛡️'];
+import { Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud, Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase, Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette, Brain, Wrench } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud,
+  Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase,
+  Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette,
+  Brain, Wrench
+};
+const DEFAULT_ICONS = ['Brain', 'Wrench', 'Zap', 'Shield', 'Target', 'Rocket'];
 
 const containerVariants = {
   hidden: {},
@@ -58,29 +67,38 @@ export function WhyUsSection() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 max-w-[1200px] mx-auto"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full"
         >
-          {t.whyUs.items.map((item, i) => {
-            const Emoji = emojis[i % emojis.length];
+          {t.whyUs.items.map((item: any, i: number) => {
+            const currentIconName = item.icon || DEFAULT_ICONS[i % DEFAULT_ICONS.length] || 'Zap';
+            const CurrentIcon = ICON_MAP[currentIconName] || Zap;
+            const accentColor = item.color || '#6366f1';
+            const bgColor = item.bg || `${accentColor}10`; // fallback to 10% opacity of accent
+            const borderColor = item.border || 'border-border';
+
             return (
               <motion.div
                 key={i}
                 variants={itemVariants}
                 whileHover={{
                   y: -4,
-                  boxShadow: '0 12px 40px rgba(99,102,241,0.12)',
+                  boxShadow: `0 12px 40px ${accentColor}25`,
                   transition: { type: 'spring', stiffness: 300, damping: 20 },
                 }}
-                className="bg-card border border-border rounded-2xl pt-9 px-7 pb-8 text-center transition-all duration-200 cursor-default"
+                className={`bg-card border ${borderColor} rounded-2xl p-5 sm:pt-9 sm:px-7 sm:pb-8 text-center transition-all duration-300 group`}
+                style={{ backgroundImage: item.bg?.includes('gradient') || item.bg?.includes('url') ? item.bg : undefined }}
               >
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 text-[26px]"
-                  style={{ backgroundColor: item.bg || '#eef2ff' }}
+                  className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5 transition-transform group-hover:scale-110 duration-300"
+                  style={{
+                    backgroundColor: item.bg?.includes('gradient') || item.bg?.includes('url') ? 'transparent' : bgColor,
+                    border: `1px solid ${accentColor}30`
+                  }}
                 >
-                  {Emoji}
+                  <CurrentIcon className="w-5 h-5 sm:w-7 sm:h-7" style={{ color: accentColor }} />
                 </div>
-                <h3 className="text-[1.05rem] font-bold text-foreground mb-2.5">{item.title}</h3>
-                <p className="text-[0.875rem] text-muted-foreground leading-[1.65]">{item.desc}</p>
+                <h3 className="text-[0.95rem] sm:text-[1.05rem] font-bold text-foreground mb-1.5 sm:mb-2.5 leading-tight">{item.title}</h3>
+                <p className="text-[0.75rem] sm:text-[0.875rem] text-muted-foreground leading-[1.5] sm:leading-[1.65]">{item.desc}</p>
               </motion.div>
             );
           })}
