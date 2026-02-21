@@ -205,11 +205,21 @@ export default function ProjectDetail() {
     const enItems: any[] = Array.isArray(enData.items) ? enData.items : [];
     const bnItems: any[] = Array.isArray(bnData.items) ? bnData.items : [];
 
-    const idx = parseInt(id || '0', 10);
+    // Try slug-based lookup first, then fall back to numeric index
+    let idx = -1;
+    const slugIndex = enItems.findIndex((item: any) => item.id && item.id === id);
+    if (slugIndex >= 0) {
+        idx = slugIndex;
+    } else {
+        const numericIdx = parseInt(id || '-1', 10);
+        if (!isNaN(numericIdx) && numericIdx >= 0 && numericIdx < enItems.length) {
+            idx = numericIdx;
+        }
+    }
 
     // Get potential projects
-    const projectEn = enItems[idx];
-    const projectBn = bnItems[idx];
+    const projectEn = idx >= 0 ? enItems[idx] : undefined;
+    const projectBn = idx >= 0 ? bnItems[idx] : undefined;
 
     // Determine fallback
     // If we are in BN mode, and BN project exists and has a title, use it. Otherwise use EN.
@@ -217,7 +227,7 @@ export default function ProjectDetail() {
     const hasBnContent = projectBn && projectBn.title && projectBn.title.trim() !== '';
     const project = (isBn && hasBnContent) ? projectBn : projectEn;
 
-    if (!project || isNaN(idx) || idx < 0 || idx >= enItems.length) {
+    if (!project || idx < 0) {
         return (
             <div className="min-h-screen bg-background text-foreground">
                 <Navbar />

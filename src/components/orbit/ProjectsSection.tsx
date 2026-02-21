@@ -35,6 +35,8 @@ const CATEGORIES = ['All', 'SaaS', 'eCommerce', 'Enterprise', 'Education', 'Port
 
 import { ensureAbsoluteUrl } from '@/lib/utils';
 
+const HOMEPAGE_LIMIT = 6;
+
 export function ProjectsSection() {
   const { lang, t } = useLang();
   const { content } = useContent();
@@ -46,27 +48,34 @@ export function ProjectsSection() {
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
 
   // Data with Fallback Logic
-  // 1. Get both lists
   const enData = (content.en as any).projects || {};
   const bnData = (content.bn as any).projects || {};
   const enItems: any[] = Array.isArray(enData.items) ? enData.items : [];
   const bnItems: any[] = Array.isArray(bnData.items) ? bnData.items : [];
 
-  // 2. Use EN as master list for length/iteration
+  // Build display items with original index preserved
   const displayItems = enItems.map((enItem, i) => {
     const bnItem = bnItems[i];
-    // If language is BN, declare checks
-    // We show BN if: we are in BN mode AND BN item exists AND BN item has a title
     const showBn = lang === 'bn' && bnItem && bnItem.title && bnItem.title.trim() !== '';
+    const item = showBn ? bnItem : enItem;
+    return { ...item, _originalIndex: i, _id: enItem.id || '' };
+  });
 
-    // Return the item to display, preserved with original index logic
-    return showBn ? bnItem : enItem;
+  // Sort by order field (ascending), then by original index as tiebreaker
+  const sortedItems = [...displayItems].sort((a, b) => {
+    const orderA = a.order ?? a._originalIndex;
+    const orderB = b.order ?? b._originalIndex;
+    return orderA - orderB;
   });
 
   // Filter items
-  const items = displayItems.filter(item =>
+  const filteredItems = sortedItems.filter(item =>
     activeCategory === 'All' || item.category === activeCategory || (!item.category && activeCategory === 'Other')
   );
+
+  // Limit to homepage count
+  const items = filteredItems.slice(0, HOMEPAGE_LIMIT);
+  const hasMore = filteredItems.length > HOMEPAGE_LIMIT;
 
   // Section Title/Subtitle Fallback
   const sectionTitle = lang === 'bn' && bnData.title ? bnData.title : (enData.title || 'Featured Projects');
@@ -120,32 +129,29 @@ export function ProjectsSection() {
         >
           <AnimatePresence mode="popLayout">
             {items.map((item: any) => {
-              // Re-calculate original index based on master EN list to ensure routing consistency
-              // We finding the index of this item in the displayItems maps 1:1 to enItems
-              const originalIndex = displayItems.indexOf(item);
+              const routeId = item._id || item._originalIndex;
 
               const plainDesc = stripHtml(item.desc || '');
               const shortDesc = truncate(plainDesc, 100);
-              // Determine cover image
               const coverImage = item.images?.[0] || item.image || '/placeholder.png';
 
               return (
                 <motion.div
                   layout
-                  key={originalIndex} // Use original index as key for stability
-                  custom={originalIndex}
+                  key={routeId}
+                  custom={item._originalIndex}
                   variants={cardVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
                   className="group relative bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 flex flex-col h-full"
-                  onMouseEnter={() => setHoveredProject(originalIndex)}
+                  onMouseEnter={() => setHoveredProject(item._originalIndex)}
                   onMouseLeave={() => setHoveredProject(null)}
                 >
                   {/* Media Area - Linked to Detail Page */}
-                  <Link to={`/project/${originalIndex}`} className="block relative aspect-video overflow-hidden bg-muted cursor-pointer">
+                  <Link to={`/project/${routeId}`} className="block relative aspect-video overflow-hidden bg-muted cursor-pointer">
                     {/* Video Preview (on hover) */}
-                    {item.videoPreview && hoveredProject === originalIndex ? (
+                    {item.videoPreview && hoveredProject === item._originalIndex ? (
                       <video src={item.videoPreview} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover z-20" />
                     ) : null}
 
@@ -193,7 +199,7 @@ export function ProjectsSection() {
                         <span className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1 block">
                           {item.category || 'Portfolio'}
                         </span>
-                        <Link to={`/project/${originalIndex}`}>
+                        <Link to={`/project/${routeId}`}>
                           <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                             {item.title}
                           </h3>
@@ -208,7 +214,6 @@ export function ProjectsSection() {
                     {/* Footer: Tags & Link */}
                     <div className="pt-4 border-t border-border flex items-center justify-between mt-auto">
                       <div className="flex -space-x-2">
-                        {/* Simplified tech stack display */}
                         {item.tags?.slice(0, 3).map((tag: string, j: number) => (
                           <div key={j} className="w-6 h-6 rounded-full bg-secondary border border-background flex items-center justify-center text-[10px] text-muted-foreground" title={tag}>
                             {tag[0]}
@@ -222,7 +227,7 @@ export function ProjectsSection() {
                       </div>
 
                       <Link
-                        to={`/project/${originalIndex}`}
+                        to={`/project/${routeId}`}
                         className="text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all"
                       >
                         View Details <ArrowRight className="w-4 h-4" />
@@ -234,6 +239,23 @@ export function ProjectsSection() {
             })}
           </AnimatePresence>
         </motion.div>
+
+        {/* View All Projects Button */}
+        {hasMore && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mt-14"
+          >
+            <Link
+              to="/projects"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary text-white font-semibold text-base hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:gap-3"
+            >
+              View All Projects <ArrowRight className="w-5 h-5" />
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   );

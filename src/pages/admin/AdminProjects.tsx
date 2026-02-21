@@ -163,6 +163,8 @@ interface SEOData {
 
 interface UnifiedProject {
     // Shared
+    id: string; // Slug for URL (e.g. 'lifesolver')
+    order: number; // Display order on homepage
     images: string[];
     link: string;
     category: string;
@@ -183,6 +185,8 @@ const DEFAULT_LOCALIZED: LocalizedContent = {
 };
 
 const DEFAULT_PROJECT: UnifiedProject = {
+    id: '',
+    order: 0,
     images: [],
     link: '',
     category: 'SaaS',
@@ -222,7 +226,18 @@ function ProjectEditor({ item, update }: { item: UnifiedProject; update: (i: Uni
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                     🌍 Shared Settings (Applies to both languages)
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <TextField label="Project ID (Slug for URL)" value={item.id || ''} onChange={v => update({ ...item, id: v.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-') })} />
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-foreground block">Display Order</label>
+                        <input
+                            type="number"
+                            value={item.order || 0}
+                            onChange={e => update({ ...item, order: parseInt(e.target.value) || 0 })}
+                            className="w-full bg-secondary rounded-lg px-4 py-2.5 text-sm text-foreground outline-none border border-border"
+                            min={0}
+                        />
+                    </div>
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium text-foreground block">Category</label>
                         <select
@@ -233,6 +248,8 @@ function ProjectEditor({ item, update }: { item: UnifiedProject; update: (i: Uni
                             {['SaaS', 'eCommerce', 'Enterprise', 'Education', 'Portfolio', 'Other'].map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="text-sm font-medium text-foreground block mb-1.5">Feature this project?</label>
                         <div className="flex items-center gap-2 bg-secondary rounded-lg px-4 py-2.5 border border-border">
@@ -400,6 +417,8 @@ export default function AdminProjects() {
 
             merged.push({
                 // Shared
+                id: enItem.id || bnItem.id || '',
+                order: enItem.order ?? bnItem.order ?? i,
                 images: sharedImages,
                 link: enItem.link || bnItem.link || '',
                 category: enItem.category || bnItem.category || 'SaaS',
@@ -411,7 +430,7 @@ export default function AdminProjects() {
                 // Localized
                 en: {
                     title: enItem.title || '',
-                    description: enItem.desc || '', // Note: API uses 'desc', we use 'description' internally for clarity, will map back on save
+                    description: enItem.desc || '',
                 },
                 bn: {
                     title: bnItem.title || '',
@@ -434,12 +453,13 @@ export default function AdminProjects() {
             // 1. Construct EN payload
             const enItems = projects.map(p => ({
                 title: p.en.title,
-                desc: p.en.description, // Map back to 'desc'
-                tags: p.tags, // Use shared tags
-                seo: p.seo, // Use shared SEO
-                // Shared
+                desc: p.en.description,
+                tags: p.tags,
+                seo: p.seo,
+                id: p.id,
+                order: p.order,
                 images: p.images,
-                image: p.images[0] || '', // Legacy support
+                image: p.images[0] || '',
                 link: p.link,
                 category: p.category,
                 featured: p.featured,
@@ -450,9 +470,10 @@ export default function AdminProjects() {
             const bnItems = projects.map(p => ({
                 title: p.bn.title,
                 desc: p.bn.description,
-                tags: p.tags, // Use shared tags
-                seo: p.seo, // Use shared SEO
-                // Shared
+                tags: p.tags,
+                seo: p.seo,
+                id: p.id,
+                order: p.order,
                 images: p.images,
                 image: p.images[0] || '',
                 link: p.link,
@@ -554,6 +575,8 @@ export default function AdminProjects() {
                                 desc: p.en.description,
                                 tags: p.tags,
                                 seo: p.seo,
+                                id: p.id,
+                                order: p.order,
                                 images: p.images,
                                 link: p.link,
                                 category: p.category,
@@ -569,6 +592,8 @@ export default function AdminProjects() {
                                 desc: p.bn.description,
                                 tags: p.tags,
                                 seo: p.seo,
+                                id: p.id,
+                                order: p.order,
                                 images: p.images,
                                 link: p.link,
                                 category: p.category,
@@ -594,6 +619,8 @@ export default function AdminProjects() {
                             const en = enItems[i] || {};
                             const bn = bnItems[i] || {};
                             merged.push({
+                                id: en.id || bn.id || '',
+                                order: en.order ?? bn.order ?? i,
                                 images: en.images || bn.images || [],
                                 link: en.link || bn.link || '',
                                 category: en.category || bn.category || 'SaaS',

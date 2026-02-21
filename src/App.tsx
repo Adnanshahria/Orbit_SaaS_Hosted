@@ -33,6 +33,7 @@ const AdminNavbar = lazy(() => import('./pages/admin/AdminNavbar'));
 const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const AdminBackup = lazy(() => import('./pages/admin/AdminBackup'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 
 import { InitialLoader } from './components/orbit/InitialLoader';
 
@@ -123,6 +124,7 @@ export default function App() {
               <Suspense fallback={<AdminLoading />}>
                 <Routes>
                   <Route path="/" element={<PublicSite />} />
+                  <Route path="/projects" element={<ProjectsPage />} />
                   <Route path="/project/:id" element={<ProjectDetail />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin" element={<AdminLayout />}>
