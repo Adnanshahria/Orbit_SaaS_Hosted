@@ -82,20 +82,27 @@ export function LeadMagnetPopup() {
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4" style={{ height: '100dvh' }}>
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[250] bg-background/60 backdrop-blur-sm"
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0 bg-background/70 backdrop-blur-sm"
                         onClick={handleClose}
                     />
                     <motion.div
+                        layout
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed left-1/2 top-1/2 z-[260] w-[92%] sm:w-[85%] md:w-[70%] max-w-md md:max-w-lg lg:max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-card border border-border shadow-2xl overflow-hidden"
+                        transition={{
+                            type: 'spring',
+                            damping: 25,
+                            stiffness: 300,
+                            layout: { duration: 0.3, ease: 'easeOut' }
+                        }}
+                        className="relative z-10 w-full max-w-[95%] sm:max-w-md md:max-w-lg lg:max-w-2xl rounded-2xl bg-card border border-border shadow-2xl overflow-hidden"
                     >
                         <button
                             onClick={handleClose}
@@ -167,7 +174,7 @@ export function LeadMagnetPopup() {
                             )}
                         </div>
                     </motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );

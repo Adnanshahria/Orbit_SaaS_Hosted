@@ -467,11 +467,20 @@ export function Chatbot() {
       <AnimatePresence>
         {open && (
           <motion.div
+            layout
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            style={typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}}
+            transition={{
+              type: 'spring',
+              damping: 25,
+              stiffness: 300,
+              layout: { duration: 0.3, ease: 'easeOut' }
+            }}
+            style={{
+              ...(typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}),
+              transformOrigin: 'bottom'
+            }}
             className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col md:h-auto transition-all duration-200 ease-out ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl h-[90dvh]'}`}
           >
             {/* Header */}
