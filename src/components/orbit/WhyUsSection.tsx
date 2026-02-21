@@ -58,7 +58,7 @@ export function WhyUsSection() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1080px] mx-auto"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 max-w-[1200px] mx-auto"
         >
           {t.whyUs.items.map((item, i) => {
             const Emoji = emojis[i % emojis.length];
