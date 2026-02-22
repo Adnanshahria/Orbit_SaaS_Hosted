@@ -446,7 +446,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               rel="noopener noreferrer"
               className="inline-flex mt-1 mb-1 items-center px-3 py-1 bg-primary text-primary-foreground font-bold rounded-full text-[11px] uppercase tracking-wider shadow-sm hover:scale-105 active:scale-95 transition-transform"
             >
-              Click Me
+              {link.text || 'View'}
             </a>
           );
         }
