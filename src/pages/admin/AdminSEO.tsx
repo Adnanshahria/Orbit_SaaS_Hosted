@@ -10,9 +10,9 @@ export default function AdminSEO() {
     useEffect(() => {
         const d = getData();
         if (d) {
-            setSeoTitle(d.title || seoTitle);
-            setSeoDesc(d.description || seoDesc);
-            setSeoKeywords(d.keywords || seoKeywords);
+            setSeoTitle(d.title || '');
+            setSeoDesc(d.description || '');
+            setSeoKeywords(d.keywords || '');
         }
     }, [getData]);
 

@@ -351,6 +351,7 @@ export function ItemListEditor<T extends Record<string, unknown>>({
     // When items change externally (e.g. language switch), reset expanded to all
     useEffect(() => {
         setExpanded(new Set(items.map((_, i) => i)));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [items.length]);
 
     // Listen for save events to auto-collapse
