@@ -272,7 +272,7 @@ export function Chatbot() {
       }
 
       // 2. Prepare System Prompt based on chatLang
-      const adminPrompt = chatContent.systemPrompt;
+      const adminPrompt = (chatContent as any)?.systemPrompt;
       const defaultPrompt = (chatLang === 'en'
         ? `You are the PRIMARY AUTHORITY and official representative for ORBIT SaaS.
            - GREETINGS: For any type of greetings (e.g., "Hi", "Hello"), you must start your reply with: "Hello! I am the authority of Orbit SaaS agency." Do not use specific human names like Muhammad Nisar Uddin.
@@ -331,368 +331,368 @@ export function Chatbot() {
     }
   };
 
-// Basic Markdown-to-JSX Formatter (Bold, Links, Bullets)
-const formatMessage = (content: string) => {
-  // 1. Pre-process to fix common AI punctuation spacing issues (e.g. "word , and" -> "word, and")
-  // Also move punctuation outside of bold tags: **word,** -> **word**,
-  let processed = content
-    .replace(/\s+([,\.\?\!])/g, '$1') // Remove space before punctuation
-    .replace(/(\*\*.*?)(([,\.\?\!])\s*)\*\*/g, '$1**$2'); // Move punctuation out of bold
+  // Basic Markdown-to-JSX Formatter (Bold, Links, Bullets)
+  const formatMessage = (content: string) => {
+    // 1. Pre-process to fix common AI punctuation spacing issues (e.g. "word , and" -> "word, and")
+    // Also move punctuation outside of bold tags: **word,** -> **word**,
+    let processed = content
+      .replace(/\s+([,\.\?\!])/g, '$1') // Remove space before punctuation
+      .replace(/(\*\*.*?)(([,\.\?\!])\s*)\*\*/g, '$1**$2'); // Move punctuation out of bold
 
-  const lines = processed.split('\n');
+    const lines = processed.split('\n');
 
-  // Regex for parsing markdown links: [text](url)
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    // Regex for parsing markdown links: [text](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
-  return lines.map((line, lineIndex) => {
-    // Handle Bullet Points
-    const isBullet = /^\s*[\*\-]\s+/.test(line);
-    const cleanLine = line.replace(/^\s*[\*\-]\s+/, '');
+    return lines.map((line, lineIndex) => {
+      // Handle Bullet Points
+      const isBullet = /^\s*[\*\-]\s+/.test(line);
+      const cleanLine = line.replace(/^\s*[\*\-]\s+/, '');
 
-    // Handle Bold & Links together
-    // We will split by bold first, then look for links within the non-bold parts.
-    // Alternatively, parse token by token. A simple split approach:
-    const boldParts = (isBullet ? cleanLine : line).split(/(\*\*.*?\*\*)/g);
+      // Handle Bold & Links together
+      // We will split by bold first, then look for links within the non-bold parts.
+      // Alternatively, parse token by token. A simple split approach:
+      const boldParts = (isBullet ? cleanLine : line).split(/(\*\*.*?\*\*)/g);
 
-    const formattedParts = boldParts.map((part, i) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={`strong-${i}`} className="font-bold text-primary/90">{part.slice(2, -2)}</strong>;
-      }
+      const formattedParts = boldParts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={`strong-${i}`} className="font-bold text-primary/90">{part.slice(2, -2)}</strong>;
+        }
 
-      // If not bold, check for links
-      if (part.match(linkRegex)) {
-        const linkParts = [];
-        let lastIndex = 0;
-        let match;
+        // If not bold, check for links
+        if (part.match(linkRegex)) {
+          const linkParts = [];
+          let lastIndex = 0;
+          let match;
 
-        // Re-create the regex to ensure state is reset
-        const localRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+          // Re-create the regex to ensure state is reset
+          const localRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
-        while ((match = localRegex.exec(part)) !== null) {
-          // Text before the link
-          if (match.index > lastIndex) {
-            linkParts.push(part.substring(lastIndex, match.index));
+          while ((match = localRegex.exec(part)) !== null) {
+            // Text before the link
+            if (match.index > lastIndex) {
+              linkParts.push(part.substring(lastIndex, match.index));
+            }
+
+            // The link itself mapped to a "Click me" style button
+            linkParts.push(
+              <a
+                key={`link-${match.index}`}
+                href={match[2]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex mt-1 mb-1 items-center px-3 py-1 bg-primary text-primary-foreground font-semibold rounded-full text-[11px] uppercase tracking-wider shadow-sm hover:scale-105 active:scale-95 transition-transform"
+              >
+                Click me
+              </a>
+            );
+
+            lastIndex = localRegex.lastIndex;
           }
 
-          // The link itself mapped to a "Click me" style button
-          linkParts.push(
-            <a
-              key={`link-${match.index}`}
-              href={match[2]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex mt-1 mb-1 items-center px-3 py-1 bg-primary text-primary-foreground font-semibold rounded-full text-[11px] uppercase tracking-wider shadow-sm hover:scale-105 active:scale-95 transition-transform"
-            >
-              Click me
-            </a>
-          );
+          // Text after the last link
+          if (lastIndex < part.length) {
+            linkParts.push(part.substring(lastIndex));
+          }
 
-          lastIndex = localRegex.lastIndex;
+          return <span key={`span-${i}`}>{linkParts}</span>;
         }
 
-        // Text after the last link
-        if (lastIndex < part.length) {
-          linkParts.push(part.substring(lastIndex));
-        }
+        return part;
+      });
 
-        return <span key={`span-${i}`}>{linkParts}</span>;
+      if (isBullet) {
+        return (
+          <div key={`line-${lineIndex}`} className="flex gap-2 pl-1 my-0.5 text-xs">
+            <span className="text-primary mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
+            <span className="flex-1 leading-relaxed">{formattedParts}</span>
+          </div>
+        );
       }
 
-      return part;
-    });
-
-    if (isBullet) {
       return (
-        <div key={`line-${lineIndex}`} className="flex gap-2 pl-1 my-0.5 text-xs">
-          <span className="text-primary mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
-          <span className="flex-1 leading-relaxed">{formattedParts}</span>
-        </div>
+        <p key={`line-${lineIndex}`} className={`text-xs leading-relaxed ${line.trim() === '' ? 'h-2' : 'mb-1.5 last:mb-0'}`}>
+          {formattedParts}
+        </p>
       );
-    }
+    });
+  };
 
-    return (
-      <p key={`line-${lineIndex}`} className={`text-xs leading-relaxed ${line.trim() === '' ? 'h-2' : 'mb-1.5 last:mb-0'}`}>
-        {formattedParts}
-      </p>
-    );
-  });
-};
+  return (
+    <>
+      {/* Backdrop for mobile */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-[190] bg-background/40 backdrop-blur-sm md:hidden"
+          />
+        )}
+      </AnimatePresence>
 
-return (
-  <>
-    {/* Backdrop for mobile */}
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 z-[190] bg-background/40 backdrop-blur-sm md:hidden"
-        />
-      )}
-    </AnimatePresence>
+      {/* Toggle button */}
+      <motion.button
+        whileHover={{ scale: 1.1, rotate: 360 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ rotate: { repeat: Infinity, ease: "linear", duration: 2 } }}
+        onClick={() => setOpen(!open)}
+        className="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-[200] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center neon-glow cursor-pointer shadow-2xl"
+      >
+        {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+      </motion.button>
 
-    {/* Toggle button */}
-    <motion.button
-      whileHover={{ scale: 1.1, rotate: 360 }}
-      whileTap={{ scale: 0.9 }}
-      transition={{ rotate: { repeat: Infinity, ease: "linear", duration: 2 } }}
-      onClick={() => setOpen(!open)}
-      className="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-[200] w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center neon-glow cursor-pointer shadow-2xl"
-    >
-      {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-    </motion.button>
-
-    {/* Chat panel */}
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          transition={{
-            type: 'spring',
-            damping: 25,
-            stiffness: 300
-          }}
-          style={{
-            ...(typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}),
-            transformOrigin: 'bottom'
-          }}
-          className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
-        >
-          {/* Header */}
-          <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">
-            <div>
-              <h4 className="font-display font-semibold text-foreground text-sm leading-tight">
-                {chatContent.title}
-              </h4>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
-                  {chatLang === 'bn' ? 'অনলাইন' : 'Online'}
-                </p>
+      {/* Chat panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{
+              type: 'spring',
+              damping: 25,
+              stiffness: 300
+            }}
+            style={{
+              ...(typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}),
+              transformOrigin: 'bottom'
+            }}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
+          >
+            {/* Header */}
+            <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">
+              <div>
+                <h4 className="font-display font-semibold text-foreground text-sm leading-tight">
+                  {chatContent.title}
+                </h4>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                    {chatLang === 'bn' ? 'অনলাইন' : 'Online'}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-1 chatbot-menu-container">
-              {/* Control Pill */}
-              <div className="flex items-center gap-1 bg-secondary/80 p-0.5 rounded-full border border-border/50 shadow-sm">
-                {/* Actions Menu Trigger */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowMenu(!showMenu)}
-                    className={`w-7 h-7 flex items-center justify-center rounded-full transition-all cursor-pointer ${showMenu ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background/50 text-muted-foreground hover:text-foreground hover:bg-background'}`}
-                  >
-                    <MoreVertical className="w-3.5 h-3.5" />
-                  </button>
+              <div className="flex items-center gap-1 chatbot-menu-container">
+                {/* Control Pill */}
+                <div className="flex items-center gap-1 bg-secondary/80 p-0.5 rounded-full border border-border/50 shadow-sm">
+                  {/* Actions Menu Trigger */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowMenu(!showMenu)}
+                      className={`w-7 h-7 flex items-center justify-center rounded-full transition-all cursor-pointer ${showMenu ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background/50 text-muted-foreground hover:text-foreground hover:bg-background'}`}
+                    >
+                      <MoreVertical className="w-3.5 h-3.5" />
+                    </button>
 
-                  {/* Dropdown Menu */}
-                  <AnimatePresence>
-                    {showMenu && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                        className="absolute right-0 mt-3 w-48 rounded-2xl bg-card border border-border shadow-2xl z-[210] py-2 overflow-hidden ring-1 ring-black/5"
-                      >
-                        {/* Lang Selector inside Menu */}
-                        <div className="px-4 py-2 border-b border-border/50">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                            {chatLang === 'bn' ? 'ভাষা নির্বাচন করুন' : 'Select Language'}
-                          </p>
-                          <div className="flex bg-secondary p-0.5 rounded-lg border border-border/50">
-                            <button
-                              onClick={() => { setChatLang('en'); setShowMenu(false); }}
-                              className={`flex-1 px-2 py-1.5 text-[10px] font-bold rounded-md transition-all ${chatLang === 'en' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                              English
-                            </button>
-                            <button
-                              onClick={() => { setChatLang('bn'); setShowMenu(false); }}
-                              className={`flex-1 px-2 py-1.5 text-[10px] font-bold rounded-md transition-all ${chatLang === 'bn' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                              বাংলা
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Clear Chat inside Menu */}
-                        <button
-                          onClick={() => { clearChat(); setShowMenu(false); }}
-                          className="w-full px-4 py-2.5 flex items-center gap-3 text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors"
+                    {/* Dropdown Menu */}
+                    <AnimatePresence>
+                      {showMenu && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                          className="absolute right-0 mt-3 w-48 rounded-2xl bg-card border border-border shadow-2xl z-[210] py-2 overflow-hidden ring-1 ring-black/5"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          {chatLang === 'bn' ? 'চ্যাট মুছুন' : 'Clear Conversation'}
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                          {/* Lang Selector inside Menu */}
+                          <div className="px-4 py-2 border-b border-border/50">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                              {chatLang === 'bn' ? 'ভাষা নির্বাচন করুন' : 'Select Language'}
+                            </p>
+                            <div className="flex bg-secondary p-0.5 rounded-lg border border-border/50">
+                              <button
+                                onClick={() => { setChatLang('en'); setShowMenu(false); }}
+                                className={`flex-1 px-2 py-1.5 text-[10px] font-bold rounded-md transition-all ${chatLang === 'en' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                              >
+                                English
+                              </button>
+                              <button
+                                onClick={() => { setChatLang('bn'); setShowMenu(false); }}
+                                className={`flex-1 px-2 py-1.5 text-[10px] font-bold rounded-md transition-all ${chatLang === 'bn' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                              >
+                                বাংলা
+                              </button>
+                            </div>
+                          </div>
 
-                {/* Minimize Button */}
-                <button
-                  onClick={() => setOpen(false)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full bg-background/50 text-muted-foreground hover:text-foreground hover:bg-background transition-all cursor-pointer"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
+                          {/* Clear Chat inside Menu */}
+                          <button
+                            onClick={() => { clearChat(); setShowMenu(false); }}
+                            className="w-full px-4 py-2.5 flex items-center gap-3 text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            {chatLang === 'bn' ? 'চ্যাট মুছুন' : 'Clear Conversation'}
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Minimize Button */}
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-background/50 text-muted-foreground hover:text-foreground hover:bg-background transition-all cursor-pointer"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-card/50 md:h-[500px] md:flex-none relative">
-            <div className="space-y-3 transition-all duration-500">
-              {/* Initial Selection Flow */}
-              {messages.length === 0 && !isLoading && (
-                <div className="space-y-4 py-2">
-                  <div className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                      <MessageCircle className="w-3.5 h-3.5 text-primary" />
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-card/50 md:h-[500px] md:flex-none relative">
+              <div className="space-y-3 transition-all duration-500">
+                {/* Initial Selection Flow */}
+                {messages.length === 0 && !isLoading && (
+                  <div className="space-y-4 py-2">
+                    <div className="flex gap-2">
+                      <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                        <MessageCircle className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-xs text-foreground max-w-[85%] shadow-sm leading-relaxed">
+                        <p className="font-semibold mb-1 text-primary">
+                          {chatLang === 'bn' ? 'স্বাগতম!' : 'Welcome!'}
+                        </p>
+                        {chatLang === 'bn'
+                          ? 'শুরু করার জন্য আপনার পছন্দের ভাষাটি নির্বাচন করুন:'
+                          : 'Please select your preferred language to begin:'}
+                      </div>
                     </div>
-                    <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-xs text-foreground max-w-[85%] shadow-sm leading-relaxed">
-                      <p className="font-semibold mb-1 text-primary">
-                        {chatLang === 'bn' ? 'স্বাগতম!' : 'Welcome!'}
-                      </p>
-                      {chatLang === 'bn'
-                        ? 'শুরু করার জন্য আপনার পছন্দের ভাষাটি নির্বাচন করুন:'
-                        : 'Please select your preferred language to begin:'}
+                    <div className="flex gap-2 pl-9">
+                      <button
+                        onClick={() => setChatLang('en')}
+                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all shadow-sm ${chatLang === 'en' ? 'bg-primary border-primary text-primary-foreground shadow-primary/20' : 'bg-background border-border text-muted-foreground hover:border-primary/40'}`}
+                      >
+                        English
+                      </button>
+                      <button
+                        onClick={() => setChatLang('bn')}
+                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all shadow-sm ${chatLang === 'bn' ? 'bg-primary border-primary text-primary-foreground shadow-primary/20' : 'bg-background border-border text-muted-foreground hover:border-primary/40'}`}
+                      >
+                        বাংলা
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-2 pl-9">
-                    <button
-                      onClick={() => setChatLang('en')}
-                      className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all shadow-sm ${chatLang === 'en' ? 'bg-primary border-primary text-primary-foreground shadow-primary/20' : 'bg-background border-border text-muted-foreground hover:border-primary/40'}`}
-                    >
-                      English
-                    </button>
-                    <button
-                      onClick={() => setChatLang('bn')}
-                      className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all shadow-sm ${chatLang === 'bn' ? 'bg-primary border-primary text-primary-foreground shadow-primary/20' : 'bg-background border-border text-muted-foreground hover:border-primary/40'}`}
-                    >
-                      বাংলা
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {messages.filter(m => m.role !== 'system').map((msg, i) => {
-                const isAssistant = msg.role === 'assistant';
-                const hasSwitchSuggestion = isAssistant && msg.content.includes('[SUGGEST_SWITCH]');
-                const cleanContent = isAssistant ? msg.content.replace('[SUGGEST_SWITCH]', '').trim() : msg.content;
+                {messages.filter(m => m.role !== 'system').map((msg, i) => {
+                  const isAssistant = msg.role === 'assistant';
+                  const hasSwitchSuggestion = isAssistant && msg.content.includes('[SUGGEST_SWITCH]');
+                  const cleanContent = isAssistant ? msg.content.replace('[SUGGEST_SWITCH]', '').trim() : msg.content;
 
-                return (
-                  <div key={i} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
-                      {isAssistant && (
-                        <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                          <MessageCircle className="w-3.5 h-3.5 text-primary" />
+                  return (
+                    <div key={i} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                        {isAssistant && (
+                          <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                            <MessageCircle className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                        )}
+                        <div className={`rounded-xl px-3 py-2 text-xs max-w-[85%] shadow-sm ${msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-tr-none'
+                          : 'bg-secondary text-foreground rounded-tl-none'
+                          }`}>
+                          {isAssistant ? formatMessage(cleanContent) : msg.content}
+                        </div>
+                      </div>
+                      {hasSwitchSuggestion && (
+                        <div className="flex justify-start ml-9 pb-1">
+                          <button
+                            onClick={() => setChatLang(chatLang === 'en' ? 'bn' : 'en')}
+                            className="px-4 py-1.5 rounded-full text-[10px] font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-1.5 cursor-pointer ring-2 ring-primary/20"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            {chatLang === 'en' ? 'বাংলায় কথা বলুন' : 'Switch to English'}
+                          </button>
                         </div>
                       )}
-                      <div className={`rounded-xl px-3 py-2 text-xs max-w-[85%] shadow-sm ${msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-tr-none'
-                        : 'bg-secondary text-foreground rounded-tl-none'
-                        }`}>
-                        {isAssistant ? formatMessage(cleanContent) : msg.content}
+                    </div>
+                  );
+                })}
+
+                {/* Email Prompt Native Chat Bubble */}
+                {showEmailPrompt && !hasProvidedEmail && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex gap-2">
+                      <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                        <MessageCircle className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <div className="bg-secondary rounded-xl rounded-tl-none px-4 py-3 text-sm text-foreground shadow-sm max-w-[90%] border border-primary/20 bg-gradient-to-br from-secondary to-primary/5">
+                        <p className="mb-3 text-xs leading-relaxed font-medium">
+                          {chatLang === 'bn'
+                            ? 'অবশ্যই, আমি সাহায্য করতে পারি। তবে আমাদের সংযোগ বিচ্ছিন্ন হয়ে গেলে, আমি কোথায় উত্তর পাঠাবো? আপনার ইমেইলটি দিন:'
+                            : 'Definitely I can help with that. In case we get disconnected, what is your email address?'}
+                        </p>
+                        <form onSubmit={handleLeadSubmit} className="flex flex-col gap-2 relative z-10">
+                          <input
+                            type="email"
+                            required
+                            placeholder={chatLang === 'bn' ? 'আপনার ইমেইল...' : 'Your email address...'}
+                            value={leadEmail}
+                            onChange={(e) => setLeadEmail(e.target.value)}
+                            disabled={leadStatus === 'loading'}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pointer-events-auto"
+                          />
+                          <button
+                            type="submit"
+                            disabled={leadStatus === 'loading' || !leadEmail}
+                            className="w-full bg-primary text-primary-foreground font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 text-xs transition-opacity cursor-pointer pointer-events-auto"
+                          >
+                            {leadStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                            {chatLang === 'bn' ? 'উত্তর পান' : 'Send & Continue'}
+                          </button>
+                          <p className="text-[9px] text-muted-foreground text-center mt-1">
+                            {chatLang === 'bn' ? 'আমরা স্প্যাম করি না।' : '100% Secure. No spam.'}
+                          </p>
+                        </form>
                       </div>
                     </div>
-                    {hasSwitchSuggestion && (
-                      <div className="flex justify-start ml-9 pb-1">
-                        <button
-                          onClick={() => setChatLang(chatLang === 'en' ? 'bn' : 'en')}
-                          className="px-4 py-1.5 rounded-full text-[10px] font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-1.5 cursor-pointer ring-2 ring-primary/20"
-                        >
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                          </svg>
-                          {chatLang === 'en' ? 'বাংলায় কথা বলুন' : 'Switch to English'}
-                        </button>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
+                )}
 
-              {/* Email Prompt Native Chat Bubble */}
-              {showEmailPrompt && !hasProvidedEmail && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                {isLoading && (
                   <div className="flex gap-2">
                     <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                       <MessageCircle className="w-3.5 h-3.5 text-primary" />
                     </div>
-                    <div className="bg-secondary rounded-xl rounded-tl-none px-4 py-3 text-sm text-foreground shadow-sm max-w-[90%] border border-primary/20 bg-gradient-to-br from-secondary to-primary/5">
-                      <p className="mb-3 text-xs leading-relaxed font-medium">
-                        {chatLang === 'bn'
-                          ? 'অবশ্যই, আমি সাহায্য করতে পারি। তবে আমাদের সংযোগ বিচ্ছিন্ন হয়ে গেলে, আমি কোথায় উত্তর পাঠাবো? আপনার ইমেইলটি দিন:'
-                          : 'Definitely I can help with that. In case we get disconnected, what is your email address?'}
-                      </p>
-                      <form onSubmit={handleLeadSubmit} className="flex flex-col gap-2 relative z-10">
-                        <input
-                          type="email"
-                          required
-                          placeholder={chatLang === 'bn' ? 'আপনার ইমেইল...' : 'Your email address...'}
-                          value={leadEmail}
-                          onChange={(e) => setLeadEmail(e.target.value)}
-                          disabled={leadStatus === 'loading'}
-                          className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pointer-events-auto"
-                        />
-                        <button
-                          type="submit"
-                          disabled={leadStatus === 'loading' || !leadEmail}
-                          className="w-full bg-primary text-primary-foreground font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 text-xs transition-opacity cursor-pointer pointer-events-auto"
-                        >
-                          {leadStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                          {chatLang === 'bn' ? 'উত্তর পান' : 'Send & Continue'}
-                        </button>
-                        <p className="text-[9px] text-muted-foreground text-center mt-1">
-                          {chatLang === 'bn' ? 'আমরা স্প্যাম করি না।' : '100% Secure. No spam.'}
-                        </p>
-                      </form>
+                    <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-sm text-foreground shadow-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} />
+              </div> {/* End of blurred wrapper */}
+            </div>
 
-              {isLoading && (
-                <div className="flex gap-2">
-                  <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                    <MessageCircle className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-sm text-foreground shadow-sm">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-              <div ref={messagesEndRef} />
-            </div> {/* End of blurred wrapper */}
-          </div>
-
-          {/* Input */}
-          <div className={`px-4 py-3 pb-6 md:pb-3 border-t border-border flex gap-2 bg-card transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder={chatContent.placeholder}
-              disabled={isLoading}
-              // Prevent auto-focus on open to stop keyboard jumping
-              autoFocus={false}
-              className="flex-1 bg-secondary rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-shadow"
-            />
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 gentle-animation cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </>
-);
+            {/* Input */}
+            <div className={`px-4 py-3 pb-6 md:pb-3 border-t border-border flex gap-2 bg-card transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
+              <input
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSend()}
+                placeholder={chatContent.placeholder}
+                disabled={isLoading}
+                // Prevent auto-focus on open to stop keyboard jumping
+                autoFocus={false}
+                className="flex-1 bg-secondary rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-shadow"
+              />
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !input.trim()}
+                className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 gentle-animation cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
