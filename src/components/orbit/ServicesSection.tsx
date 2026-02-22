@@ -133,23 +133,22 @@ export function ServicesSection() {
                 />
 
                 {/* Content */}
-                <div className="relative z-10">
-                  {/* Icon + Title Row */}
-                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-                    <div
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
-                      style={{ backgroundColor: bg && !bg.includes('gradient') && isDark ? bg : `${accent}15` }}
-                    >
-                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: accent }} />
-                    </div>
-
-                    <h3 className="font-display text-[0.9rem] sm:text-[1.05rem] font-bold text-foreground leading-snug sm:pt-2">
-                      {item.title}
-                    </h3>
+                <div className="relative z-10 flex flex-col items-center text-center h-full">
+                  {/* Icon */}
+                  <div
+                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110 mb-3 sm:mb-4"
+                    style={{ backgroundColor: bg && !bg.includes('gradient') && isDark ? bg : `${accent}15` }}
+                  >
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: accent }} />
                   </div>
 
+                  {/* Title Row */}
+                  <h3 className="font-display text-[0.95rem] sm:text-[1.1rem] font-bold text-foreground leading-snug mb-3">
+                    {item.title}
+                  </h3>
+
                   {/* Description */}
-                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed opacity-85 sm:opacity-75 group-hover:opacity-100 transition-opacity duration-300 pl-0">
+                  <p className="text-muted-foreground text-[0.8rem] sm:text-[0.85rem] leading-[1.6] opacity-85 sm:opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     {item.desc}
                   </p>
                 </div>

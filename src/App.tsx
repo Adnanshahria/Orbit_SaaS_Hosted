@@ -50,7 +50,8 @@ function PublicSite() {
     }
 
     // Ping the api silently to log the visitor
-    fetch('/api/record-visit', {
+    const API_BASE = import.meta.env.VITE_API_URL || '';
+    fetch(`${API_BASE}/api/record-visit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: sessionId })

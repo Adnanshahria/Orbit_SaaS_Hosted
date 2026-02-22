@@ -110,8 +110,9 @@ export function HeroSection() {
       return;
     }
     setStatus('loading');
+    const API_BASE = import.meta.env.VITE_API_URL || '';
     try {
-      const res = await fetch('/api/submit-lead', {
+      const res = await fetch(`${API_BASE}/api/submit-lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, source: 'Hero Section' })
@@ -178,7 +179,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 100, damping: 20, delay: baseDelay + 0.2 }}
-            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-effect text-xs sm:text-sm font-playfair italic font-medium mb-10 sm:mb-14 tracking-wide"
+            className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-effect text-[11px] sm:text-sm font-playfair italic font-medium mb-10 sm:mb-14 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0"
             style={{ color: taglineColor }}
           >
             <span

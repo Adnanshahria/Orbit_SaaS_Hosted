@@ -97,7 +97,8 @@ export function Chatbot() {
         ? userMessages[userMessages.length - 1].content
         : 'General Inquiry';
 
-      const res = await fetch('/api/submit-lead', {
+      const API_BASE = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API_BASE}/api/submit-lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -191,7 +192,8 @@ export function Chatbot() {
           .map(m => `${m.role === 'user' ? 'User' : 'Orbit AI'}: ${m.content}`)
           .join('\n\n');
 
-        fetch('/api/submit-lead', {
+        const API_BASE = import.meta.env.VITE_API_URL || '';
+        fetch(`${API_BASE}/api/submit-lead`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -357,7 +359,15 @@ export function Chatbot() {
     return lines.map((line, lineIndex) => {
       // Handle Bullet Points
       const isBullet = /^\s*[*-]\s+/.test(line);
-      const cleanLine = line.replace(/^\s*[*-]\s+/, '');
+      let cleanLine = line.replace(/^\s*[*-]\s+/, '');
+
+      if (isBullet) {
+        // Auto-bold the main point (text before colon) if not already bolded
+        const colonIndex = cleanLine.indexOf(':');
+        if (colonIndex > 0 && colonIndex < 80 && !cleanLine.includes('**')) {
+          cleanLine = `**${cleanLine.substring(0, colonIndex + 1)}**${cleanLine.substring(colonIndex + 1)}`;
+        }
+      }
 
       // Handle Bold & Links together
       // We will split by bold first, then look for links within the non-bold parts.
@@ -481,7 +491,7 @@ export function Chatbot() {
               ...(typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}),
               transformOrigin: 'bottom'
             }}
-            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col h-[100dvh] md:h-auto md:max-h-[85vh] ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
           >
             {/* Header */}
             <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">

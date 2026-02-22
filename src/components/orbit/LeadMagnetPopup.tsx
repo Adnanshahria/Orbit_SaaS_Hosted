@@ -53,8 +53,9 @@ export function LeadMagnetPopup() {
 
         setStatus('loading');
 
+        const API_BASE = import.meta.env.VITE_API_URL || '';
         try {
-            const res = await fetch('/api/submit-lead', {
+            const res = await fetch(`${API_BASE}/api/submit-lead`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, source: 'Exit Intent Popup' })
