@@ -226,11 +226,14 @@ export function Chatbot() {
       }
 
       // --- Projects ---
+      const siteBaseUrl = 'https://orbitsaas.cloud';
       const projects = (activeContent.projects as any)?.items || [];
       if (projects.length > 0) {
         knowledgeBase += "COMPLETED PORTFOLIO PROJECTS:\n";
-        projects.forEach((p: any) => {
-          knowledgeBase += `- ${p.title}: ${p.desc} (Built with: ${(p.tags || []).join(', ')})\n`;
+        projects.forEach((p: any, index: number) => {
+          const projectId = p.id || index;
+          const projectUrl = `${siteBaseUrl}/project/${projectId}`;
+          knowledgeBase += `- ${p.title}: ${p.desc} (Built with: ${(p.tags || []).join(', ')}) | Case Study Link: ${projectUrl}\n`;
         });
         knowledgeBase += "\n";
       }
@@ -296,6 +299,18 @@ export function Chatbot() {
         knowledgeBase += "\n";
       }
 
+      // --- Native Website Pages ---
+      knowledgeBase += "NATIVE WEBSITE PAGE LINKS (use these EXACT URLs, never make up URLs):\n";
+      knowledgeBase += `- Homepage: ${siteBaseUrl}/\n`;
+      knowledgeBase += `- All Projects: ${siteBaseUrl}/projects\n`;
+      if (projects.length > 0) {
+        projects.forEach((p: any, index: number) => {
+          const projectId = p.id || index;
+          knowledgeBase += `- ${p.title} Case Study: ${siteBaseUrl}/project/${projectId}\n`;
+        });
+      }
+      knowledgeBase += "\n";
+
       // --- Admin Assigned Links ---
       const linksData = (activeContent.links as any)?.items || [];
       if (linksData.length > 0) {
@@ -318,9 +333,9 @@ export function Chatbot() {
            - SERVICES: We build every type of software. If asked what we can build, the answer is "All".
            - COMMUNICATION: Clients communicate directly with our Project Manager via call or text on Telegram and WhatsApp. We provide progress updates at every 10% milestone (10%, 20%, 30%... to 100%).
            - LIMITATION: NEVER act as a general AI. Steer non-agency topics back to ORBIT's expertise.
-           - LEAD GENERATION: If the user asks for pricing, consultation, or starting a project, BEFORE answering deeply, politely ask them for their email address so our human team can follow up with them.
+           - LEAD GENERATION: If the user asks for pricing, consultation, or starting a project, AND the user has NOT already provided their email (check EMAIL STATUS context below), BEFORE answering deeply, politely ask them for their email address so our human team can follow up with them. If the user HAS already provided their email, do NOT ask for it again - just answer their question directly.
            - IDENTITY: You know every team member, project, and social link listed in the context.
-           - LINKS: If the user asks for links, highly prioritize URLs found in the "IMPORTANT LINKS" section. Output links in Markdown format: [Link Text](URL).
+           - LINKS: ONLY use URLs that are explicitly listed in the "NATIVE WEBSITE PAGE LINKS" or "IMPORTANT LINKS" sections of your knowledge base. NEVER fabricate, guess, or invent any URL. If a project has a "Case Study Link", use that exact URL. Output links in Markdown format: [Link Text](URL). If you do not have a URL for something, say "You can find it on our website" instead of making one up.
            - CRITICAL: Respond ONLY in English. Follow all commands strictly!
            - STYLE: Be casual while staying professional. Reply compactly and concisely, do NOT over-lengthen any reply. Max 3 bullets or 1-2 short paragraphs.
            - SWITCH DETECTOR: If user speaks Bangla, start with "[SUGGEST_SWITCH]".`
@@ -332,9 +347,9 @@ export function Chatbot() {
            - সার্ভিসেস: আমরা সব ধরনের সফটওয়্যার তৈরি করি।
            - যোগাযোগ: ক্লায়েন্টরা আমাদের প্রজেক্ট ম্যানেজারের সাথে সরাসরি কল বা টেক্সটের মাধ্যমে টেলিগ্রাম বা হোয়াটসঅ্যাপে যোগাযোগ করেন। প্রজেক্টের কাজ ১০%, ২০%, ৩০%... এভাবে এগোলে আমরা প্রতি ১০% পর পর আপডেট দিই।
            - সীমাবদ্ধতা: সাধারণ এআই হিসেবে কাজ করবেন না। সাধারণ বিষয়ের প্রশ্নগুলোতে বিনয়ের সাথে ORBIT-এর সেবার তথ্য দিয়ে উত্তর দিন।
-           - লিড জেনারেশন: ইউজার যদি প্রজেক্ট শুরু করার, কনসাল্টেশন বা প্রাইসিং এর বিষয়ে কিছু জিজ্ঞাসা করে, তাহলে বিস্তারিত উত্তর দেয়ার আগে স্মার্টলি ও বিনয়ের সাথে তাদের ইমেইল ঠিকানা চেয়ে নিন।
+           - লিড জেনারেশন: ইউজার যদি প্রজেক্ট শুরু করার, কনসাল্টেশন বা প্রাইসিং এর বিষয়ে কিছু জিজ্ঞাসা করে এবং ইউজার আগে থেকে ইমেইল দেয়নি (নিচে EMAIL STATUS দেখুন), তাহলে বিস্তারিত উত্তর দেয়ার আগে স্মার্টলি ও বিনয়ের সাথে তাদের ইমেইল ঠিকানা চেয়ে নিন। যদি ইউজার আগেই ইমেইল দিয়ে থাকে, তাহলে আবার ইমেইল চাইবেন না - সরাসরি উত্তর দিন।
            - পরিচয়: আপনি এজেন্সির সকল সদস্য, প্রজেক্ট এবং সোশ্যাল মিডিয়া লিংক সম্পর্কে জানেন।
-           - লিংক: ইউজার যদি লিংক চায়, "IMPORTANT LINKS" সেকশনে দেয়া লিংকগুলো বেশি গুরুত্ব দিয়ে শেয়ার করুন। লিংকগুলো মার্কডাউন ফরম্যাটে দিন: [Link Text](URL)।
+           - লিংক: শুধুমাত্র "NATIVE WEBSITE PAGE LINKS" বা "IMPORTANT LINKS" সেকশনে দেওয়া URL গুলো ব্যবহার করুন। কখনোই কোনো URL বানিয়ে বা অনুমান করে দিবেন না। Case Study Link থাকলে সেটি হুবহু ব্যবহার করুন। লিংকগুলো মার্কডাউন ফরম্যাটে দিন: [Link Text](URL)।
            - বিশেষ সতর্কবার্তা: আপনাকে অবশ্যই শুধুমাত্র বাংলায় উত্তর দিতে হবে। সমস্ত নির্দেশ কঠোরভাবে মেনে চলুন!
            - শৈলী: পেশাদারিত্ব রেখেই ক্যাজুয়াল (casual) ভাষায় কথা বলুন। উত্তর খুব কম্প্যাক্ট এবং সংক্ষিপ্ত হতে হবে। অকারণে উত্তর বড় করবেন না।
            - সুইচ ডিটেক্টর: ইউজার ইংরেজিতে কথা বললে শুরুতে "[SUGGEST_SWITCH]" লিখুন।`);
@@ -345,8 +360,13 @@ export function Chatbot() {
         .map((qa: { question: string; answer: string }) => `Q: ${qa.question}\nA: ${qa.answer}`)
         .join('\n\n');
 
-      // 4. Combine everything
-      const fullSystemMessage = `${systemPrompt}\n\n=== WEBSITE CONTENT / KNOWLEDGE BASE ===\n${knowledgeBase}\n\n=== SPECIFIC Q&A TRAINING ===\n${qaContext ? qaContext : 'No specific Q&A pairs.'}`;
+      // 4. Email status context
+      const emailStatusContext = hasProvidedEmail
+        ? 'EMAIL STATUS: The user HAS ALREADY provided their email address. Do NOT ask for their email again under any circumstances. Answer their questions directly.'
+        : 'EMAIL STATUS: The user has NOT provided their email address yet. You may politely ask for it when relevant (e.g., pricing, consultation, project start).';
+
+      // 5. Combine everything
+      const fullSystemMessage = `${systemPrompt}\n\n=== ${emailStatusContext} ===\n\n=== WEBSITE CONTENT / KNOWLEDGE BASE ===\n${knowledgeBase}\n\n=== SPECIFIC Q&A TRAINING ===\n${qaContext ? qaContext : 'No specific Q&A pairs.'}`;
 
       const conversationHistory = [
         {
