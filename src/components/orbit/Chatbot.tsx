@@ -137,6 +137,7 @@ export function Chatbot() {
         setIsKeyboardOpen(isKbOpen);
 
         if (window.innerWidth < 768) {
+          // Mobile: use visual viewport height
           const height = isKbOpen ? window.visualViewport.height : window.visualViewport.height * 0.9;
           const bottom = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
 
@@ -146,7 +147,12 @@ export function Chatbot() {
             transition: 'height 0.35s cubic-bezier(0.32, 0.72, 0, 1), bottom 0.35s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.35s cubic-bezier(0.32, 0.72, 0, 1)'
           });
         } else {
-          setViewportStyle({});
+          // Desktop: use actual visible height minus bottom padding (toggle button area ~100px)
+          const availableHeight = window.visualViewport.height - 100;
+          const maxH = Math.min(availableHeight, window.innerHeight * 0.75);
+          setViewportStyle({
+            maxHeight: `${maxH}px`,
+          });
         }
       }
     };
@@ -154,10 +160,12 @@ export function Chatbot() {
     updateViewport();
     window.visualViewport?.addEventListener('resize', updateViewport);
     window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
 
     return () => {
       window.visualViewport?.removeEventListener('resize', updateViewport);
       window.visualViewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
     };
   }, []);
 
@@ -528,11 +536,11 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               stiffness: 300
             }}
             style={{
-              ...(typeof window !== 'undefined' && window.innerWidth < 768 ? viewportStyle : {}),
+              ...viewportStyle,
               transformOrigin: 'bottom',
               boxShadow: '0 0 10px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3), 0 0 60px rgba(124, 58, 237, 0.15), inset 0 0 10px rgba(124, 58, 237, 0.05)'
             }}
-            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col h-[100dvh] md:h-auto md:max-h-[85vh] ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col h-[100dvh] md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
           >
             {/* Header */}
             <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">
