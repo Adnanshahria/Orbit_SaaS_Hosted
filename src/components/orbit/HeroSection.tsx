@@ -160,7 +160,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-24 pb-20 sm:pt-0 sm:pb-0"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-24 pb-32 sm:pt-0 sm:pb-0"
     >
       {/* Parallax background layers */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-background via-secondary/40 to-background" />
