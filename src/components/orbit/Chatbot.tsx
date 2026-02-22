@@ -338,11 +338,23 @@ FOLLOW-UP: Always end your reply with 1 short related follow-up question to keep
 
       const responseContent = await sendToGroq(conversationHistory);
 
-      // Extract follow-up suggestions (lines starting with 💬)
-      const lines = responseContent.split('\n');
+      // Extract follow-up suggestions:
+      // 1. Lines starting with 💬
+      // 2. Last line if it ends with "?" (AI often writes follow-up as plain question)
+      const lines = responseContent.split('\n').filter(l => l.trim());
       const suggestionLines = lines.filter(l => l.trim().startsWith('💬'));
-      const cleanedContent = lines.filter(l => !l.trim().startsWith('💬')).join('\n').trimEnd();
-      const newSuggestions = suggestionLines.map(l => l.replace(/^\s*💬\s*/, '').trim()).filter(Boolean);
+      let remainingLines = lines.filter(l => !l.trim().startsWith('💬'));
+
+      // Check if the last remaining line is a standalone question (follow-up)
+      const lastLine = remainingLines[remainingLines.length - 1]?.trim() || '';
+      const isTrailingQuestion = lastLine.endsWith('?') && remainingLines.length > 1 && !lastLine.startsWith('-') && !lastLine.startsWith('•');
+      if (isTrailingQuestion) {
+        suggestionLines.push(lastLine);
+        remainingLines = remainingLines.slice(0, -1);
+      }
+
+      const cleanedContent = remainingLines.join('\n').trimEnd();
+      const newSuggestions = suggestionLines.map(l => l.replace(/^[\s💬]*/, '').trim()).filter(Boolean);
 
       setSuggestions(newSuggestions);
       setMessages(prev => [...prev, { role: 'assistant', content: cleanedContent }]);
