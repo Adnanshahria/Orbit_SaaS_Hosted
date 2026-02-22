@@ -338,19 +338,47 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
 
       const responseContent = await sendToGroq(conversationHistory);
 
-      // Extract follow-up suggestions:
-      // 1. Lines starting with 💬
-      // 2. Last line if it ends with "?" (AI often writes follow-up as plain question)
+      // Extract follow-up suggestions with multiple fallback strategies:
       const lines = responseContent.split('\n').filter(l => l.trim());
-      const suggestionLines = lines.filter(l => l.trim().startsWith('💬'));
+      const suggestionLines: string[] = [];
+
+      // Strategy 1: Lines starting with 💬 (ideal case)
+      const emojiLines = lines.filter(l => l.trim().startsWith('💬'));
+      suggestionLines.push(...emojiLines);
+
       let remainingLines = lines.filter(l => !l.trim().startsWith('💬'));
 
-      // Check if the last remaining line is a standalone question (follow-up)
-      const lastLine = remainingLines[remainingLines.length - 1]?.trim() || '';
-      const isTrailingQuestion = lastLine.endsWith('?') && remainingLines.length > 1 && !lastLine.startsWith('-') && !lastLine.startsWith('•');
-      if (isTrailingQuestion) {
-        suggestionLines.push(lastLine);
-        remainingLines = remainingLines.slice(0, -1);
+      // Strategy 2: Last line ending with ? (standalone follow-up question)
+      if (suggestionLines.length === 0 && remainingLines.length > 1) {
+        const lastLine = remainingLines[remainingLines.length - 1]?.trim() || '';
+        if (lastLine.endsWith('?') && !lastLine.startsWith('-') && !lastLine.startsWith('•')) {
+          suggestionLines.push(lastLine);
+          remainingLines = remainingLines.slice(0, -1);
+        }
+      }
+
+      // Strategy 3: Extract last sentence ending with ? from any paragraph
+      if (suggestionLines.length === 0) {
+        const fullText = remainingLines.join('\n');
+        const sentences = fullText.match(/[^.!?\n]*\?/g);
+        if (sentences && sentences.length > 0) {
+          const lastQuestion = sentences[sentences.length - 1].trim();
+          if (lastQuestion.length > 5 && lastQuestion.length < 120) {
+            suggestionLines.push(lastQuestion);
+            // Remove the question from the content
+            const idx = fullText.lastIndexOf(lastQuestion);
+            const cleaned = (fullText.slice(0, idx) + fullText.slice(idx + lastQuestion.length)).trim();
+            remainingLines = cleaned.split('\n').filter(l => l.trim());
+          }
+        }
+      }
+
+      // Strategy 4: If ALL strategies failed, provide a generic follow-up
+      if (suggestionLines.length === 0) {
+        const fallbacks = chatLang === 'bn'
+          ? ['আরো বিস্তারিত জানাও', 'তোমাদের প্রাইসিং জানাও', 'প্রজেক্টগুলো দেখাও']
+          : ['Tell me more about this', 'Show me your pricing', 'View your projects'];
+        suggestionLines.push(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
       }
 
       const cleanedContent = remainingLines.join('\n').trimEnd();
