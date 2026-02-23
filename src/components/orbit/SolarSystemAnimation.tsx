@@ -222,8 +222,8 @@ export function SolarSystemAnimation() {
 
                     if (!isMobile) {
                         let sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 5);
-                        sunGlow.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
-                        sunGlow.addColorStop(1, 'rgba(0, 50, 255, 0)');
+                        sunGlow.addColorStop(0, 'rgba(255, 200, 0, 0.4)');
+                        sunGlow.addColorStop(1, 'rgba(255, 100, 0, 0)');
                         ctx.beginPath();
                         ctx.arc(proj.x, proj.y, sunRadius * 5, 0, Math.PI * 2);
                         ctx.fillStyle = sunGlow;
@@ -232,8 +232,8 @@ export function SolarSystemAnimation() {
 
                     let sunGradient = ctx.createRadialGradient(proj.x, proj.y, sunRadius * 0.5, proj.x, proj.y, sunRadius * 2);
                     sunGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-                    sunGradient.addColorStop(0.4, 'rgba(0, 255, 255, 0.8)');
-                    sunGradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
+                    sunGradient.addColorStop(0.4, 'rgba(255, 220, 0, 0.8)');
+                    sunGradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
                     ctx.beginPath();
                     ctx.arc(proj.x, proj.y, sunRadius * 2, 0, Math.PI * 2);
                     ctx.fillStyle = sunGradient;
