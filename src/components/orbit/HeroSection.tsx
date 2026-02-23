@@ -78,7 +78,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-14 pb-6 sm:pt-20 sm:pb-0"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
     >
 
 
@@ -86,14 +86,14 @@ export function HeroSection() {
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-background/90 px-4 sm:px-14 py-8 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)]">
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-background/90 px-4 sm:px-14 py-10 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)] flex flex-col justify-between items-center min-h-[60dvh] sm:min-h-0">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 100, damping: 20, delay: baseDelay + 0.2 }}
-              className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-effect text-[11px] sm:text-sm font-playfair italic font-medium mb-4 sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0"
+              className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-effect text-[11px] sm:text-sm font-playfair italic font-medium mb-8 sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0"
               style={{ color: taglineColor }}
             >
               <span
@@ -103,9 +103,9 @@ export function HeroSection() {
             </motion.div>
           )}
 
-          <motion.h1 className="text-foreground leading-[1] mb-4 sm:mb-10">
+          <motion.h1 className="text-foreground leading-[1] mb-10 sm:mb-10">
             <motion.span
-              className="block text-[3.2rem] leading-[1.1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight"
+              className="block text-[4.5rem] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight"
               initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.4 }}
@@ -125,7 +125,7 @@ export function HeroSection() {
           </motion.h1>
 
           {/* Subtitle — word-by-word reveal */}
-          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-6 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
+          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
             {words.map((word, i) => (
               <motion.span
                 key={i}
