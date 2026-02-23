@@ -129,6 +129,46 @@
   }
 }
 
+/* All-time loading sweep animations */
+@keyframes textShimmerSweep {
+  0% { background-position: 0% 50%; }
+  100% { background-position: -200% 50%; }
+}
+
+.animate-text-shimmer-orbit {
+  background: linear-gradient(
+    to right,
+    var(--foreground) 30%,
+    var(--neon-cyan) 40%,
+    var(--primary) 45%,
+    var(--foreground) 55%,
+    var(--foreground) 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmerSweep 5s linear infinite;
+  display: inline-block;
+}
+
+.animate-text-shimmer-saas {
+  background: linear-gradient(
+    to right,
+    var(--primary) 30%,
+    var(--foreground) 40%,
+    var(--neon-cyan) 45%,
+    var(--primary) 55%,
+    var(--primary) 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmerSweep 5s linear infinite;
+  display: inline-block;
+}
+
 /* ── Mobile Performance: disable GPU-heavy blur effects ── */
 @media (max-width: 639px) {
   /* Remove backdrop-blur from container cards — biggest perf win */

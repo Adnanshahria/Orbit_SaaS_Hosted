@@ -110,8 +110,8 @@ export function HeroSection() {
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.4 }}
             >
-              <span className="inline-block animate-[neonShimmer_3s_ease-in-out_infinite]">ORBIT</span>{' '}
-              <span className="text-primary inline-block animate-[neonShimmer_3s_ease-in-out_infinite_0.5s]">SaaS</span>
+              <span className="inline-block animate-text-shimmer-orbit drop-shadow-lg pb-1">ORBIT</span>{' '}
+              <span className="inline-block animate-text-shimmer-saas drop-shadow-lg pb-1">SaaS</span>
             </motion.span>
             <motion.span
               className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
