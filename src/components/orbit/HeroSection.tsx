@@ -217,9 +217,9 @@ export function HeroSection() {
       {/* Newsletter Subscribe — fixed bottom bar on mobile, inline on desktop */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 60, damping: 16, delay: baseDelay + 1.8 }}
-        className={`fixed bottom-[116px] left-4 right-[112px] z-[100] transition-all duration-300 sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:z-auto sm:mt-10 sm:w-[450px] sm:max-w-full sm:mx-auto sm:px-0 sm:opacity-100 sm:translate-y-0 sm:pointer-events-auto ${showEmailBar ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none sm:opacity-100 sm:translate-y-0 sm:pointer-events-auto'}`}
+        animate={showEmailBar ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+        transition={{ type: 'spring', stiffness: 60, damping: 16, delay: showEmailBar ? 0 : 0 }}
+        className={`fixed bottom-[116px] left-4 right-[112px] z-[100] sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:z-auto sm:mt-10 sm:w-[450px] sm:max-w-full sm:mx-auto sm:px-0 ${!showEmailBar ? 'pointer-events-none sm:pointer-events-auto' : ''}`}
       >
         <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
           <input
