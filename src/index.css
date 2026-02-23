@@ -138,11 +138,12 @@
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
-  /* Make semi-transparent cards fully opaque to compensate */
+  /* Make semi-transparent cards match page background seamlessly */
   .bg-white\/\[0\.02\],
   .bg-white\/\[0\.03\],
-  .bg-white\/\[0\.05\] {
-    background-color: rgba(18, 18, 26, 0.95) !important;
+  .bg-white\/\[0\.05\],
+  .bg-background\/90 {
+    background-color: #0a0a0f !important;
   }
   /* Hide massive decorative blur orbs that tank GPU */
   .blur-\[120px\],
