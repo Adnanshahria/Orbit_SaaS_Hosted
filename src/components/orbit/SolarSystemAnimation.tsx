@@ -269,8 +269,8 @@ export function SolarSystemAnimation() {
         }
       `}} />
             <div className="absolute inset-0 w-full h-full bg-[#000510] z-0 pointer-events-none select-none overflow-hidden">
-                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-90" />
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at center, transparent 30%, rgba(0,5,16,0.85) 80%, #000 100%)' }} />
+                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-100" />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at center, transparent 40%, rgba(0,5,16,0.7) 85%, #000 100%)' }} />
             </div>
         </>
     );

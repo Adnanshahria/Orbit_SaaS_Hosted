@@ -44,6 +44,8 @@ function MarqueeRow({
           style={{
             animation: `marquee ${reverse ? '50s' : '45s'} linear infinite ${reverse ? 'reverse' : ''}`,
             willChange: 'transform',
+            transform: 'translateZ(0)',
+            WebkitTransform: 'translateZ(0)'
           }}
         >
           {items.map((item, i) => (
