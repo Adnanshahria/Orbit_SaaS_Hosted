@@ -74,10 +74,8 @@ export function HeroSection() {
       id="hero"
       className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-20 pb-32 sm:pt-20 sm:pb-0"
     >
-      {/* Parallax background layers */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-gradient-to-br from-transparent via-secondary/10 to-transparent" />
-      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.12),transparent_60%)]" />
-      <motion.div style={{ y: bgY }} className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.08),transparent_60%)]" />
+
+
       <motion.div
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
