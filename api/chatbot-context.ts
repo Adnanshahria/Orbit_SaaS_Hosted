@@ -163,8 +163,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!knowledgeBase) {
             const fullKB = buildKnowledgeBase(content, lang);
 
+            // Append lead stats so the chatbot knows about captured leads
+            let leadInfo = '';
+            try {
+                const leadResult = await db.execute('SELECT COUNT(*) as count FROM leads');
+                const count = Number(leadResult.rows[0]?.count ?? 0);
+                if (count > 0) {
+                    leadInfo = `\nLEAD STATS: ${count} total leads captured.\n`;
+                }
+            } catch {
+                // leads table might not exist — skip
+            }
+
+            const fullKBWithLeads = fullKB + leadInfo;
+
             // Try AI summarization
-            const gist = await generateGist(fullKB);
+            const gist = await generateGist(fullKBWithLeads);
 
             if (gist) {
                 knowledgeBase = gist;
@@ -189,7 +203,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 }
             } else {
                 // AI summary failed — fall back to compact KB
-                knowledgeBase = fullKB;
+                knowledgeBase = fullKBWithLeads;
             }
         }
 

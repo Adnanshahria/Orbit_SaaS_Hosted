@@ -78,24 +78,26 @@ export function TechStackSection() {
   const dynamicCategories = (t.techStack as any).categories || [];
 
   return (
-    <section id="tech-stack" className="py-24 relative overflow-hidden">
+    <section id="tech-stack" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/10 to-transparent pointer-events-none" />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.techStack.title}</h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t.techStack.subtitle}</p>
-        </motion.div>
-      </div>
+      <div className="max-w-6xl mx-auto relative" ref={ref}>
+        <div className="rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-8 sm:px-14 py-12 sm:py-20 shadow-[0_0_40px_rgba(108,92,231,0.08)] overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.techStack.title}</h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t.techStack.subtitle}</p>
+          </motion.div>
 
-      <div className="space-y-2">
-        {dynamicCategories.map((cat: any, i: number) => (
-          <MarqueeRow key={cat.name || i} category={cat} reverse={i % 2 !== 0} />
-        ))}
+          <div className="space-y-2">
+            {dynamicCategories.map((cat: any, i: number) => (
+              <MarqueeRow key={cat.name || i} category={cat} reverse={i % 2 !== 0} />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

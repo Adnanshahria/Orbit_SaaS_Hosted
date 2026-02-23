@@ -71,6 +71,15 @@ export default function AdminLeads() {
             if (res.ok) {
                 toast.success('Lead deleted');
                 setLeads(leads.filter(l => l.id !== id));
+
+                // Trigger Vercel cache rebuild so chatbot AI context stays fresh
+                fetch(`${API_BASE}/api/cache`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }).catch(() => { /* cache rebuild is best-effort */ });
             } else {
                 toast.error('Failed to delete lead');
             }
