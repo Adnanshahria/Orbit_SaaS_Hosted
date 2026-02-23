@@ -150,7 +150,7 @@ export function Chatbot() {
         } else {
           // Desktop: use actual visible height minus bottom padding (toggle button area ~100px)
           const availableHeight = window.visualViewport.height - 100;
-          const maxH = Math.min(availableHeight, window.innerHeight * 0.75);
+          const maxH = Math.min(availableHeight, window.innerHeight * 0.85);
           setViewportStyle({
             maxHeight: `${maxH}px`,
           });
@@ -489,7 +489,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
 
   return (
     <>
-      {/* Backdrop for mobile */}
+      {/* Backdrop for mobile - blur entire background and close on click */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -497,18 +497,18 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-[190] bg-background/40 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-[190] bg-background/60 backdrop-blur-md md:hidden"
           />
         )}
       </AnimatePresence>
 
-      {/* Toggle button */}
+      {/* Toggle button - hide on mobile when chat is open since we have a new close button */}
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setOpen(!open)}
         className={`fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
-          ? 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary text-primary-foreground neon-glow shadow-2xl'
+          ? 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary text-primary-foreground neon-glow shadow-2xl hidden md:flex'
           : 'w-24 h-24 sm:w-32 sm:h-32 bg-transparent'
           }`}
       >
@@ -548,10 +548,10 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               transformOrigin: 'bottom',
               boxShadow: '0 0 10px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3), 0 0 60px rgba(124, 58, 237, 0.15), inset 0 0 10px rgba(124, 58, 237, 0.05)'
             }}
-            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-card/80 backdrop-blur-md shadow-2xl flex flex-col h-[100dvh] md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-background/95 md:bg-card/90 backdrop-blur-3xl shadow-2xl flex flex-col h-[100dvh] md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
           >
             {/* Header */}
-            <div className="px-5 py-3.5 bg-primary/10 border-b border-border flex items-center justify-between relative">
+            <div className="shrink-0 px-5 py-3.5 bg-primary/20 border-b border-border flex items-center justify-between relative">
               <div>
                 <h4 className="font-display font-semibold text-foreground text-sm leading-tight">
                   {chatContent.title}
@@ -631,7 +631,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-card/50 md:h-[500px] md:flex-none relative">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-background/40 md:bg-card/40 md:max-h-[500px] relative">
               <div className="space-y-3 transition-all duration-500">
                 {/* Initial Selection Flow */}
                 {messages.length === 0 && !isLoading && (
@@ -765,7 +765,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 : ['Our Services', 'View Projects', 'Get a Quote', 'Contact Us'];
               const activeChips = suggestions.length > 0 ? suggestions : (messages.length <= 1 ? defaultChips : []);
               return activeChips.length > 0 && !isLoading ? (
-                <div className={`px-4 pt-2 pb-0 border-t border-border bg-card/80 transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
+                <div className={`shrink-0 px-4 pt-2 pb-0 border-t border-border bg-card/80 transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
                   <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                     {activeChips.map((s, i) => (
                       <button
@@ -791,25 +791,35 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               ) : null;
             })()}
 
-            {/* Input */}
-            <div className={`px-4 py-3 pb-6 md:pb-3 ${suggestions.length > 0 && !isLoading ? 'pt-2' : ''} border-t border-border flex gap-2 bg-card transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
-              <input
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSend()}
-                placeholder={chatContent.placeholder}
-                disabled={isLoading}
-                // Prevent auto-focus on open to stop keyboard jumping
-                autoFocus={false}
-                className="flex-1 bg-secondary rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-shadow"
-              />
+            {/* Input & Mobile Close Button */}
+            <div className="shrink-0 relative">
+              {/* Floating Close Button for Mobile */}
               <button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
-                className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 gentle-animation cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => setOpen(false)}
+                className="absolute -top-12 right-4 w-10 h-10 rounded-full bg-red-500/90 text-white flex items-center justify-center shadow-lg md:hidden z-10 border border-red-400/50 backdrop-blur-md"
+                aria-label="Close Chat"
               >
-                <Send className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
+
+              <div className={`px-4 py-3 pb-6 md:pb-3 ${suggestions.length > 0 && !isLoading ? 'pt-2' : ''} border-t border-border flex gap-2 bg-card/90 backdrop-blur-md transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
+                <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSend()}
+                  placeholder={chatContent.placeholder}
+                  disabled={isLoading}
+                  // Prevent auto-focus on open to stop keyboard jumping
+                  autoFocus={false}
+                  className="flex-1 bg-secondary rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-shadow"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={isLoading || !input.trim()}
+                  className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 gentle-animation cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
