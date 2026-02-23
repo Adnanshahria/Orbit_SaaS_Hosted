@@ -6,8 +6,8 @@ export function GlobalBackground() {
     const lottieRef = useRef<LottieRefCurrentProps>(null);
 
     return (
-        <div className="fixed inset-0 w-full h-[100dvh] -z-50 overflow-hidden pointer-events-none select-none flex items-center justify-center">
-            <div className="w-[250%] sm:w-[150%] max-w-none opacity-40 transition-opacity duration-700">
+        <div className="fixed inset-0 w-full h-[100dvh] -z-50 overflow-hidden pointer-events-none select-none flex items-center justify-center bg-black">
+            <div className="opacity-40 transition-opacity duration-700" style={{ width: 'max(150%, 150vh)', maxWidth: 'none' }}>
                 <Lottie
                     lottieRef={lottieRef}
                     animationData={solarSystemData}
