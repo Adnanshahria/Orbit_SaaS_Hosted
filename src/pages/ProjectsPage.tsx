@@ -114,26 +114,26 @@ export default function ProjectsPage() {
                         </motion.div>
 
                         {/* Big Container Card */}
-                        <div className="rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-8 sm:px-14 py-12 sm:py-20 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+                        <div className="rounded-2xl sm:rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-8 md:px-14 py-6 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
 
                             {/* Header */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={inView ? { opacity: 1, y: 0 } : {}}
                                 transition={{ duration: 0.6 }}
-                                className="text-center mb-12 sm:mb-16"
+                                className="text-center mb-8 sm:mb-12"
                             >
                                 <div className="inline-block px-4 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-bold uppercase tracking-widest mb-4 neon-text">
                                     Our Portfolio
                                 </div>
-                                <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground mb-6 neon-text">
+                                <h1 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
                                     {sectionTitle}
                                 </h1>
-                                <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+                                <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                                     {sectionSubtitle}
                                 </p>
 
-                                <div className="flex flex-wrap justify-center gap-2 mt-10">
+                                <div className="flex flex-wrap justify-center gap-2 mt-6 sm:mt-8">
                                     {ALL_CATEGORIES.map((cat) => (
                                         <button
                                             key={cat}
@@ -152,7 +152,7 @@ export default function ProjectsPage() {
                             {/* Projects Grid */}
                             <motion.div
                                 layout
-                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
                             >
                                 <AnimatePresence mode="popLayout">
                                     {items.map((item: any) => {

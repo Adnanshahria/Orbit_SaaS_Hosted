@@ -43,13 +43,13 @@ export function WhyUsSection() {
   const inView = useInView(ref, { once: false, margin: '-80px' });
 
   return (
-    <section id="why-us" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 relative">
+    <section id="why-us" className="py-10 sm:py-24 px-3 sm:px-6 lg:px-8 relative">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,245,255,0.05),transparent_70%)]" />
-      <div className="max-w-6xl mx-auto relative" ref={ref}>
-        <div className="rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-8 sm:px-14 py-12 sm:py-20 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
-          <div className="text-center mb-10 sm:mb-16">
+      <div className="max-w-7xl mx-auto relative" ref={ref}>
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+          <div className="text-center mb-6 sm:mb-10">
             <motion.h2
-              className="text-[clamp(1.8rem,3vw,2.4rem)] font-bold text-foreground mb-3 flex flex-wrap justify-center gap-[0.3em]"
+              className="inline-flex px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 text-[clamp(1.8rem,3vw,2.4rem)] font-bold text-foreground mb-3 flex-wrap justify-center gap-[0.3em]"
               variants={{
                 hidden: { opacity: 0 },
                 visible: {
@@ -103,7 +103,7 @@ export function WhyUsSection() {
             variants={containerVariants}
             initial="hidden"
             animate={inView ? 'visible' : 'hidden'}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full"
           >
             {t.whyUs.items.map((item: any, i: number) => {
               const currentIconName = item.icon || DEFAULT_ICONS[i % DEFAULT_ICONS.length] || 'Zap';

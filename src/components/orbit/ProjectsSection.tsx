@@ -79,7 +79,7 @@ export function ProjectsSection() {
   const sectionSubtitle = lang === 'bn' && bnData.subtitle ? bnData.subtitle : (enData.subtitle || 'Real solutions we\'ve built for real businesses.');
 
   return (
-    <section id="projects" className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section id="projects" className="py-12 sm:py-32 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Neon Background Decorations */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.12),transparent_50%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.08),transparent_50%)] pointer-events-none" />
@@ -89,7 +89,7 @@ export function ProjectsSection() {
 
       <div className="max-w-7xl mx-auto relative" ref={ref}>
         {/* Big Container Card */}
-        <div className="relative rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-8 sm:px-14 py-12 sm:py-20 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="relative rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           {/* Visit Button */}
           <Link
             to="/projects"
@@ -102,32 +102,14 @@ export function ProjectsSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12 sm:mb-20"
+            className="text-center mb-6 sm:mb-10"
           >
-            <div className="inline-block px-4 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-bold uppercase tracking-widest mb-4 neon-text">
-              Our Work
-            </div>
-            <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground mb-6 neon-text">
+            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {sectionTitle}
             </h2>
             <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
               {sectionSubtitle}
             </p>
-
-            <div className="flex flex-wrap justify-center gap-2 mt-10">
-              {ALL_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${activeCategory === cat
-                    ? 'bg-neon-purple/20 text-neon-purple border-neon-purple/40 shadow-[0_0_15px_rgba(108,92,231,0.25)] scale-105'
-                    : 'bg-white/[0.03] text-muted-foreground border-white/10 hover:bg-white/[0.06] hover:text-foreground hover:border-white/20 backdrop-blur-sm'
-                    }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
           </motion.div>
 
           {/* Projects Grid */}

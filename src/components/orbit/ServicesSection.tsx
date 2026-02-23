@@ -59,18 +59,18 @@ export function ServicesSection() {
   const words = subtitle.split(' ');
 
   return (
-    <section id="services" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section id="services" className="py-12 sm:py-28 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.08),transparent_60%)]" />
 
-      <div className="max-w-6xl mx-auto relative" ref={ref}>
-        <div className="rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-8 sm:px-14 py-12 sm:py-20 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+      <div className="max-w-7xl mx-auto relative" ref={ref}>
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           {/* Section Header */}
-          <div className="text-center mb-8 sm:mb-12">
+          <div className="text-center mb-5 sm:mb-8">
             <motion.h2
               initial={{ opacity: 0, y: -16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 tracking-tight text-foreground"
+              className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 tracking-tight text-foreground"
               style={titleColor ? { color: titleColor } : undefined}
             >
               {t.services.title}
@@ -98,7 +98,7 @@ export function ServicesSection() {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {t.services.items.map((item: any, i: number) => {
               const Icon = (item.icon && ICON_MAP[item.icon]) ? ICON_MAP[item.icon] : DEFAULT_ICONS[i % DEFAULT_ICONS.length];
               const accent = item.color || iconColor;
@@ -116,7 +116,7 @@ export function ServicesSection() {
                     y: -4,
                     transition: { type: 'spring', stiffness: 400, damping: 25 },
                   }}
-                  className={`relative rounded-2xl p-4 sm:p-7 group cursor-default border-2 overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md hover:border-primary/50`}
+                  className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-7 group cursor-default border sm:border-2 overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md hover:border-primary/50`}
                   style={{
                     borderColor: border?.startsWith('border-') ? undefined : (border || 'rgba(108, 92, 231, 0.4)'),
                   }}

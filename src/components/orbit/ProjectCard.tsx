@@ -28,7 +28,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
 
     return (
         <div
-            className="group relative rounded-2xl overflow-hidden flex flex-col h-full bg-white/[0.03] backdrop-blur-xl border-2 border-neon-purple/40 hover:border-neon-purple/70 transition-all duration-500 hover:shadow-[0_0_30px_rgba(108,92,231,0.2),0_0_60px_rgba(108,92,231,0.08)]"
+            className="group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full bg-white/[0.03] backdrop-blur-xl border border-neon-purple/30 sm:border-2 sm:border-neon-purple/40 hover:border-neon-purple/70 transition-all duration-500 hover:shadow-[0_0_30px_rgba(108,92,231,0.2),0_0_60px_rgba(108,92,231,0.08)]"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
@@ -77,26 +77,26 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
             </Link>
 
             {/* Content */}
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="p-4 sm:p-6 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-3">
                     <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-neon-cyan neon-text-cyan mb-1 block">
+                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neon-cyan neon-text-cyan mb-1 block">
                             {categories.join(' · ')}
                         </span>
                         <Link to={`/project/${routeId}`}>
-                            <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                            <h3 className="font-display text-base sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
                                 {item.title}
                             </h3>
                         </Link>
                     </div>
                 </div>
 
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-2 flex-grow">
+                <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 line-clamp-2 flex-grow">
                     {shortDesc}
                 </p>
 
                 {/* Footer: Tags & Link */}
-                <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between mt-auto">
+                <div className="pt-3 sm:pt-4 border-t border-white/[0.06] flex items-center justify-between mt-auto">
                     <div className="flex -space-x-2">
                         {item.tags?.slice(0, 3).map((tag: string, j: number) => (
                             <div key={j} className="w-6 h-6 rounded-full bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-[10px] text-neon-purple" title={tag}>
@@ -112,7 +112,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
 
                     <Link
                         to={`/project/${routeId}`}
-                        className="text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all"
+                        className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all"
                     >
                         View Details <ArrowRight className="w-4 h-4" />
                     </Link>
