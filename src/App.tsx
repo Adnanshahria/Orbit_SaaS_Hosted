@@ -36,8 +36,6 @@ const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const AdminBackup = lazy(() => import('./pages/admin/AdminBackup'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
-
-import { InitialLoader } from './components/orbit/InitialLoader';
 import { GlobalBackground } from './components/orbit/GlobalBackground';
 
 function PublicSite() {
@@ -88,7 +86,6 @@ function PublicSite() {
   return (
     <>
       <LeadMagnetPopup />
-      <InitialLoader />
       <StructuredData />
       <GlobalBackground />
       <div className="min-h-[100dvh] text-foreground relative z-0">
