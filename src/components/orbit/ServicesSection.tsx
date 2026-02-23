@@ -33,7 +33,7 @@ const cardVariants = {
 export function ServicesSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: false, margin: '-60px' });
+  const inView = useInView(ref, { once: true, margin: '-60px' });
 
   // Theme from admin
   const titleColor = (t.services as any).titleColor || '';

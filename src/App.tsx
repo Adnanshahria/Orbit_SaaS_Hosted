@@ -10,12 +10,12 @@ import { ProjectsSection } from './components/orbit/ProjectsSection';
 import { LeadershipSection } from './components/orbit/LeadershipSection';
 import { ContactSection } from './components/orbit/ContactSection';
 import { OrbitFooter } from './components/orbit/OrbitFooter';
-import { Chatbot } from './components/orbit/Chatbot';
+// Chatbot is lazy-loaded below for performance
 import { StructuredData } from './components/seo/StructuredData';
 import { LeadMagnetPopup } from './components/orbit/LeadMagnetPopup';
 import ScrollToTop from './components/ScrollToTop';
 
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 
 // Lazy load admin pages
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -36,19 +36,34 @@ const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const AdminBackup = lazy(() => import('./pages/admin/AdminBackup'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const Chatbot = lazy(() => import('./components/orbit/Chatbot').then(m => ({ default: m.Chatbot })));
 import { GlobalBackground } from './components/orbit/GlobalBackground';
 
+// Low-end device detection — applies .low-perf class to <html>
+function detectLowEndDevice() {
+  const cores = navigator.hardwareConcurrency || 2;
+  const memory = (navigator as any).deviceMemory || 4;
+  const isMobile = window.innerWidth < 768;
+  const isLowEnd = cores <= 4 || memory <= 4 || isMobile;
+  if (isLowEnd) {
+    document.documentElement.classList.add('low-perf');
+  }
+  return isLowEnd;
+}
+
 function PublicSite() {
+  const [showChatbot, setShowChatbot] = useState(false);
+  // Tracks whether the dice loader has finished (3.2s)
+  const [isLoaded, setIsLoaded] = useState(() => !!sessionStorage.getItem('orbit_has_visited'));
+
   // Formulate and record unique visitor session
   useEffect(() => {
     let sessionId = localStorage.getItem('orbit_visitor_session_id');
     if (!sessionId) {
-      // Create a unique UUID for this visitor
       sessionId = crypto.randomUUID();
       localStorage.setItem('orbit_visitor_session_id', sessionId);
     }
 
-    // Ping the api silently to log the visitor
     const API_BASE = import.meta.env.VITE_API_URL || '';
     fetch(`${API_BASE}/api/record-visit`, {
       method: 'POST',
@@ -57,20 +72,34 @@ function PublicSite() {
     }).catch(err => console.error("Visitor logging failed", err));
   }, []);
 
-  // Mobile UX: Scroll to hide address bar
+  // Low-end device detection on mount
+  useEffect(() => {
+    detectLowEndDevice();
+  }, []);
+
+  // After dice loader finishes (3.2s), mount the rest of the sections
+  useEffect(() => {
+    if (isLoaded) return; // Already loaded (return visit)
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      sessionStorage.setItem('orbit_has_visited', 'true');
+    }, 3400); // Slightly after the 3.2s dice animation
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
+
+  // Defer chatbot loading until well after page is loaded
+  useEffect(() => {
+    if (!isLoaded) return;
+    const timer = setTimeout(() => setShowChatbot(true), 2000);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
+
+  // Mobile UX: Scroll to hide address bar (simplified)
   useEffect(() => {
     const hideAddressBar = () => {
-      window.scrollTo({
-        top: 1,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 1, behavior: 'smooth' });
     };
-
-    // Try multiple times to ensure it works across different browsers/loading speeds
-    setTimeout(hideAddressBar, 0);
-    setTimeout(hideAddressBar, 100);
-    setTimeout(hideAddressBar, 500);
-    setTimeout(hideAddressBar, 1000);
+    setTimeout(hideAddressBar, 300);
 
     window.addEventListener('load', hideAddressBar);
     window.addEventListener('orientationchange', () => {
@@ -85,22 +114,30 @@ function PublicSite() {
 
   return (
     <>
-      <LeadMagnetPopup />
       <StructuredData />
       <GlobalBackground />
       <div className="min-h-[100dvh] text-foreground relative z-0">
         <Navbar />
         <main>
           <HeroSection />
-          <ServicesSection />
-          <TechStackSection />
-          <WhyUsSection />
-          <ProjectsSection />
-          <LeadershipSection />
-          <ContactSection />
+          {isLoaded && (
+            <>
+              <ServicesSection />
+              <TechStackSection />
+              <WhyUsSection />
+              <ProjectsSection />
+              <LeadershipSection />
+              <ContactSection />
+            </>
+          )}
         </main>
-        <OrbitFooter />
-        <Chatbot />
+        {isLoaded && <OrbitFooter />}
+        {isLoaded && <LeadMagnetPopup />}
+        {showChatbot && (
+          <Suspense fallback={null}>
+            <Chatbot />
+          </Suspense>
+        )}
       </div>
     </>
   );

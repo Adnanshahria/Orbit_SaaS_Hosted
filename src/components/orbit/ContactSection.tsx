@@ -6,7 +6,7 @@ import { useLang } from '@/contexts/LanguageContext';
 export function ContactSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: false, margin: '-80px' });
+  const inView = useInView(ref, { once: true, margin: '-80px' });
 
   // Dynamic WhatsApp URL from admin settings
   const whatsappNumber = (t.contact as any).whatsapp || '';

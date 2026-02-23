@@ -36,7 +36,7 @@ const memberVariants = {
 export function LeadershipSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: false, margin: '-80px' });
+  const inView = useInView(ref, { once: true, margin: '-80px' });
 
   const members = t.leadership.members || [];
   const sortedMembers = [...members].sort(

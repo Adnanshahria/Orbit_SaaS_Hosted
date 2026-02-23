@@ -28,73 +28,54 @@ export function Navbar() {
   const location = useLocation();
   const [showNavbarCTA, setShowNavbarCTA] = useState(false);
 
-  // Handle scroll spy — only on home page
+  // Unified scroll handler — single listener with rAF throttling
   useEffect(() => {
+    let rafId = 0;
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        setIsScrolled(window.scrollY > 50);
 
-      // Only detect active sections on the home page
-      if (location.pathname !== '/') {
-        setActiveSection('');
-        return;
-      }
-
-      // Detect active section
-      const sections = ['hero', 'services', 'tech-stack', 'why-us', 'projects', 'leadership', 'contact'];
-      let current = 'hero';
-
-      // If scrolled to bottom of page, highlight contact
-      const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
-      if (atBottom) {
-        current = 'contact';
-      } else {
-        for (const id of sections) {
-          const el = document.getElementById(id);
-          if (el) {
-            const rect = el.getBoundingClientRect();
-            if (rect.top <= 150) {
-              current = id;
+        // Detect active section (only on home page)
+        if (location.pathname !== '/') {
+          setActiveSection('');
+        } else {
+          const sections = ['hero', 'services', 'tech-stack', 'why-us', 'projects', 'leadership', 'contact'];
+          let current = 'hero';
+          const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
+          if (atBottom) {
+            current = 'contact';
+          } else {
+            for (const id of sections) {
+              const el = document.getElementById(id);
+              if (el) {
+                const rect = el.getBoundingClientRect();
+                if (rect.top <= 150) {
+                  current = id;
+                }
+              }
             }
           }
+          setActiveSection(`#${current}`);
         }
-      }
-      setActiveSection(`#${current}`);
+
+        // CTA visibility based on Hero button position
+        const heroBtn = document.getElementById('hero-book-appointment');
+        if (heroBtn) {
+          const rect = heroBtn.getBoundingClientRect();
+          setShowNavbarCTA(rect.top < -50);
+        } else {
+          setShowNavbarCTA(true);
+        }
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // Run immediately to set correct state
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [location.pathname]);
-
-  // Handle hash scrolling on mount or when location changes (for cross-page nav)
-  useEffect(() => {
-    if (location.pathname === '/' && location.hash) {
-      const id = location.hash.substring(1);
-      const el = document.getElementById(id);
-      if (el) {
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }, 100); // Small delay to ensure render
-      }
-    }
-  }, [location.pathname, location.hash]);
-
-  // Handle CTA visibility based on Hero button position
-  useEffect(() => {
-    const handleScroll = () => {
-      const heroBtn = document.getElementById('hero-book-appointment');
-      if (heroBtn) {
-        const rect = heroBtn.getBoundingClientRect();
-        // Show navbar CTA only when hero CTA is scrolled out of view (top < 0)
-        setShowNavbarCTA(rect.top < -50);
-      } else {
-        // Fallback if on other pages where hero btn might not exist (optional, or hide it)
-        setShowNavbarCTA(true);
-      }
+    onScroll();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check on mount
-    return () => window.removeEventListener('scroll', handleScroll);
   }, [location.pathname]);
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {

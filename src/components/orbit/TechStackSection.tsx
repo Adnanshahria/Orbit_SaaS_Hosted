@@ -51,7 +51,7 @@ function MarqueeRow({
           {items.map((item, i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 rounded-full px-5 py-2.5 border border-border/50 bg-card/70 backdrop-blur-sm hover:border-foreground/25 gentle-animation whitespace-nowrap group cursor-default"
+              className="flex items-center gap-2.5 rounded-full px-5 py-2.5 border border-border/50 bg-card/70 hover:border-foreground/25 gentle-animation whitespace-nowrap group cursor-default"
             >
               <span
                 className="w-2.5 h-2.5 rounded-full flex-shrink-0 group-hover:scale-125 gentle-animation"
@@ -74,7 +74,7 @@ function MarqueeRow({
 export function TechStackSection() {
   const { t } = useLang();
   const ref = useRef(null);
-  const inView = useInView(ref, { once: false, margin: '-100px' });
+  const inView = useInView(ref, { once: true, margin: '-100px' });
 
   // Use dynamic categories from content, fallback to empty array
   const dynamicCategories = (t.techStack as any).categories || [];

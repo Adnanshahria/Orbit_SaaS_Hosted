@@ -1,6 +1,15 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Zap, Sparkles, Globe, Bot, Code, Database, Cpu, Smartphone } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
+
+// Detect low-end device based on hardware hints
+function isLowEndDevice(): boolean {
+    const cores = navigator.hardwareConcurrency || 2;
+    const memory = (navigator as any).deviceMemory || 4;
+    const isMobile = window.innerWidth < 768;
+    // Low-end: <=4 cores, <=4GB RAM, or mobile
+    return cores <= 4 || memory <= 4 || isMobile;
+}
 
 export function SolarSystemAnimation() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -8,32 +17,68 @@ export function SolarSystemAnimation() {
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
         if (!ctx) return;
 
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-        let isMobile = window.innerWidth < 768;
+        const isMobile = window.innerWidth < 768;
+        const lowEnd = isLowEndDevice();
+
+        // Cap DPI to 1 on mobile to reduce pixel count significantly
+        const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.scale(dpr, dpr);
+
+        // Frame rate throttling: 20fps mobile, 30fps desktop
+        const targetFPS = isMobile ? 20 : (lowEnd ? 24 : 30);
+        const frameDuration = 1000 / targetFPS;
+        let lastFrameTime = 0;
+
+        // Visibility tracking - pause when not visible
+        let isVisible = true;
+        let isTabActive = true;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => { isVisible = entry.isIntersecting; },
+            { threshold: 0.05 }
+        );
+        if (canvas.parentElement) observer.observe(canvas.parentElement);
+
+        const onVisibilityChange = () => {
+            isTabActive = document.visibilityState === 'visible';
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
 
         const handleResize = () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            isMobile = window.innerWidth < 768;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
         };
         window.addEventListener('resize', handleResize);
 
+        // Planet speeds boosted slightly for a more dynamic, realistic feel
         const planets = [
-            { name: 'Mercury', dist: 80, speed: 2.5, size: 16, color: '0, 255, 255', Icon: Zap },
-            { name: 'Venus', dist: 130, speed: 1.8, size: 18, color: '100, 210, 255', Icon: Sparkles },
-            { name: 'Earth', dist: 190, speed: 1.2, size: 22, color: '0, 160, 255', Icon: Globe },
-            { name: 'Mars', dist: 250, speed: 0.9, size: 18, color: '160, 110, 255', Icon: Bot },
-            { name: 'Jupiter', dist: 400, speed: 0.4, size: 32, color: '0, 255, 255', Icon: Code },
-            { name: 'Saturn', dist: 550, speed: 0.25, size: 28, color: '110, 255, 255', Icon: Database },
-            { name: 'Uranus', dist: 700, speed: 0.15, size: 24, color: '0, 210, 255', Icon: Cpu },
-            { name: 'Neptune', dist: 850, speed: 0.1, size: 24, color: '160, 255, 255', Icon: Smartphone },
+            { name: 'Mercury', dist: 80, speed: 3.0, size: 16, color: '0, 255, 255', Icon: Zap },
+            { name: 'Venus', dist: 130, speed: 2.2, size: 18, color: '100, 210, 255', Icon: Sparkles },
+            { name: 'Earth', dist: 190, speed: 1.5, size: 22, color: '0, 160, 255', Icon: Globe },
+            { name: 'Mars', dist: 250, speed: 1.1, size: 18, color: '160, 110, 255', Icon: Bot },
+            { name: 'Jupiter', dist: 400, speed: 0.55, size: 32, color: '0, 255, 255', Icon: Code },
+            { name: 'Saturn', dist: 550, speed: 0.35, size: 28, color: '110, 255, 255', Icon: Database },
+            { name: 'Uranus', dist: 700, speed: 0.22, size: 24, color: '0, 210, 255', Icon: Cpu },
+            { name: 'Neptune', dist: 850, speed: 0.15, size: 24, color: '160, 255, 255', Icon: Smartphone },
         ];
 
-        // Pre-render icons to textures for performance
+        // Pre-render icons to textures
         const iconTextures: Record<string, HTMLImageElement> = {};
         planets.forEach(p => {
             const svgString = renderToStaticMarkup(
@@ -46,7 +91,11 @@ export function SolarSystemAnimation() {
             iconTextures[p.name] = img;
         });
 
-        const asteroids = Array.from({ length: isMobile ? 80 : 200 }).map(() => ({
+        // Reduced particle counts for performance
+        const starCount = isMobile ? 120 : (lowEnd ? 200 : 350);
+        const asteroidCount = isMobile ? 40 : (lowEnd ? 60 : 120);
+
+        const asteroids = Array.from({ length: asteroidCount }).map(() => ({
             dist: 290 + Math.random() * 80,
             angle: Math.random() * Math.PI * 2,
             speed: 0.5 + Math.random() * 0.3,
@@ -54,7 +103,7 @@ export function SolarSystemAnimation() {
             alpha: Math.random() * 0.3 + 0.05
         }));
 
-        const stars = Array.from({ length: isMobile ? 250 : 600 }).map(() => ({
+        const stars = Array.from({ length: starCount }).map(() => ({
             x: (Math.random() - 0.5) * 5000,
             y: (Math.random() - 0.5) * 5000,
             z: (Math.random() - 0.5) * 5000,
@@ -65,29 +114,49 @@ export function SolarSystemAnimation() {
 
         let t = 0;
         const sunSpeed = 150;
-        const trailPoints = isMobile ? 50 : 150;
+        // Reduced trail points but compensated by faster speed
+        const trailPoints = isMobile ? 20 : (lowEnd ? 35 : 60);
         const trailDt = 0.03;
+        // Target animation speed: t units per second (matches original 60fps * 0.02 = 1.2/s)
+        const animSpeed = 1.2;
 
         function rotate(x: number, y: number, z: number, pitch: number, yaw: number, roll: number) {
-            let cosa = Math.cos(pitch), sina = Math.sin(pitch);
-            let y1 = y * cosa - z * sina;
-            let z1 = y * sina + z * cosa;
+            const cosa = Math.cos(pitch), sina = Math.sin(pitch);
+            const y1 = y * cosa - z * sina;
+            const z1 = y * sina + z * cosa;
 
-            let cosb = Math.cos(yaw), sinb = Math.sin(yaw);
-            let x2 = x * cosb + z1 * sinb;
-            let z2 = -x * sinb + z1 * cosb;
+            const cosb = Math.cos(yaw), sinb = Math.sin(yaw);
+            const x2 = x * cosb + z1 * sinb;
+            const z2 = -x * sinb + z1 * cosb;
 
-            let cosc = Math.cos(roll), sinc = Math.sin(roll);
-            let x3 = x2 * cosc - y1 * sinc;
-            let y3 = x2 * sinc + y1 * cosc;
+            const cosc = Math.cos(roll), sinc = Math.sin(roll);
+            const x3 = x2 * cosc - y1 * sinc;
+            const y3 = x2 * sinc + y1 * cosc;
 
             return { x: x3, y: y3, z: z2 };
         }
 
         let animationFrameId: number;
+        let prevTime = 0;
 
-        function render() {
-            t += isMobile ? 0.04 : 0.02;
+        function render(now: number) {
+            animationFrameId = requestAnimationFrame(render);
+
+            // Skip frames if not visible or tab inactive
+            if (!isVisible || !isTabActive) {
+                prevTime = now;
+                return;
+            }
+
+            // Frame rate throttling
+            const elapsed = now - lastFrameTime;
+            if (elapsed < frameDuration) return;
+            lastFrameTime = now - (elapsed % frameDuration);
+
+            // Delta-time based animation: speed is independent of frame rate
+            const dt = Math.min((now - prevTime) / 1000, 0.1); // cap at 100ms to avoid jumps
+            prevTime = now;
+            t += dt * animSpeed;
 
             ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1.0;
@@ -117,6 +186,7 @@ export function SolarSystemAnimation() {
                 };
             };
 
+            // Stars
             for (const star of stars) {
                 let sy = star.y - t * sunSpeed;
                 sy = sy % 5000;
@@ -131,6 +201,7 @@ export function SolarSystemAnimation() {
                 ctx.fillRect(proj.x - size, proj.y - size, size * 2, size * 2);
             }
 
+            // Planet trails — no shadowBlur used
             ctx.globalCompositeOperation = 'screen';
             for (const p of planets) {
                 let prevProj: any = null;
@@ -160,6 +231,7 @@ export function SolarSystemAnimation() {
                 }
             }
 
+            // Collect items for depth-sorted rendering
             const renderItems: any[] = [];
             const sunProj = project(0, 0, 0);
             if (sunProj.s > 0) renderItems.push({ type: 'sun', proj: sunProj, z: sunProj.z });
@@ -196,20 +268,16 @@ export function SolarSystemAnimation() {
 
                     if (texture && texture.complete) {
                         const s = Math.max(12, p.size * proj.s * (isMobile ? 2.0 : 2.5));
-
-                        if (!isMobile) {
-                            ctx.shadowBlur = 30 * proj.s;
-                            ctx.shadowColor = `rgba(${p.color}, 0.4)`;
-                            ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
-
-                            ctx.shadowBlur = 10 * proj.s;
+                        // No shadowBlur — replaced with a simple glow circle for desktop only
+                        if (!isMobile && !lowEnd) {
+                            ctx.globalAlpha = 0.15;
+                            ctx.fillStyle = `rgb(${p.color})`;
+                            ctx.beginPath();
+                            ctx.arc(proj.x, proj.y, s * 0.8, 0, Math.PI * 2);
+                            ctx.fill();
                         }
-                        ctx.shadowColor = `rgba(${p.color}, 0.9)`;
+                        ctx.globalAlpha = 1.0;
                         ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
-
-                        if (!isMobile) {
-                            ctx.shadowBlur = 0;
-                        }
                     } else {
                         ctx.beginPath();
                         ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s), 0, Math.PI * 2);
@@ -220,26 +288,27 @@ export function SolarSystemAnimation() {
                     const { proj } = item;
                     const sunRadius = 60 * proj.s;
 
-                    if (!isMobile) {
-                        let sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 5);
-                        sunGlow.addColorStop(0, 'rgba(255, 200, 0, 0.4)');
+                    // Simplified sun — no outer glow gradient on low-end
+                    if (!lowEnd) {
+                        const sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 3);
+                        sunGlow.addColorStop(0, 'rgba(255, 200, 0, 0.3)');
                         sunGlow.addColorStop(1, 'rgba(255, 100, 0, 0)');
                         ctx.beginPath();
-                        ctx.arc(proj.x, proj.y, sunRadius * 5, 0, Math.PI * 2);
+                        ctx.arc(proj.x, proj.y, sunRadius * 3, 0, Math.PI * 2);
                         ctx.fillStyle = sunGlow;
                         ctx.fill();
                     }
 
-                    let sunGradient = ctx.createRadialGradient(proj.x, proj.y, sunRadius * 0.5, proj.x, proj.y, sunRadius * 2);
+                    const sunGradient = ctx.createRadialGradient(proj.x, proj.y, sunRadius * 0.5, proj.x, proj.y, sunRadius * 1.5);
                     sunGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
                     sunGradient.addColorStop(0.4, 'rgba(255, 220, 0, 0.8)');
                     sunGradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
                     ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 2, 0, Math.PI * 2);
+                    ctx.arc(proj.x, proj.y, sunRadius * 1.5, 0, Math.PI * 2);
                     ctx.fillStyle = sunGradient;
                     ctx.fill();
 
-                    if (!isMobile) {
+                    if (!lowEnd) {
                         ctx.beginPath();
                         ctx.arc(proj.x, proj.y, sunRadius * 0.7, 0, Math.PI * 2);
                         ctx.fillStyle = '#ffffff';
@@ -249,13 +318,14 @@ export function SolarSystemAnimation() {
             }
 
             ctx.globalAlpha = 1.0;
-            animationFrameId = requestAnimationFrame(render);
         }
 
-        render();
+        animationFrameId = requestAnimationFrame(render);
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+            observer.disconnect();
             cancelAnimationFrame(animationFrameId);
         };
     }, []);
