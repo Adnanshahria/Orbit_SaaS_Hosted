@@ -117,6 +117,34 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ── Mobile Performance: disable GPU-heavy blur effects ── */
+@media (max-width: 639px) {
+  /* Remove backdrop-blur from container cards — biggest perf win */
+  .backdrop-blur-xl,
+  .backdrop-blur-md,
+  .backdrop-blur-2xl {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  /* Make semi-transparent cards fully opaque to compensate */
+  .bg-white\/\[0\.02\],
+  .bg-white\/\[0\.03\],
+  .bg-white\/\[0\.05\] {
+    background-color: rgba(18, 18, 26, 0.95) !important;
+  }
+  /* Hide massive decorative blur orbs that tank GPU */
+  .blur-\[120px\],
+  .blur-\[130px\],
+  .blur-\[150px\] {
+    display: none !important;
+  }
+  /* GPU compositing for smooth scroll on containers */
+  section > div > div {
+    will-change: auto;
+    transform: translateZ(0);
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
