@@ -1,5 +1,6 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { ElectricLoader } from '@/components/ui/ElectricLoader';
 import { MessageCircle, X, Send, Loader2, Trash2, MoreVertical, ChevronDown, Mail } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -515,11 +516,9 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
           <X className="w-6 h-6" />
         ) : (
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Electrical Arc Aura Layers */}
-            <div className="electric-aura-container">
-              <div className="electric-core-glow" />
-              <div className="electric-arc-1" />
-              <div className="electric-arc-2" />
+            {/* Electric Loader Aura */}
+            <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+              <ElectricLoader size={140} />
             </div>
 
             <Lottie
