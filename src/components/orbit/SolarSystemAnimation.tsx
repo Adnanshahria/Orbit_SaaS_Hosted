@@ -13,10 +13,12 @@ export function SolarSystemAnimation() {
 
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
+        let isMobile = window.innerWidth < 768;
 
         const handleResize = () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
+            isMobile = window.innerWidth < 768;
         };
         window.addEventListener('resize', handleResize);
 
@@ -35,7 +37,7 @@ export function SolarSystemAnimation() {
         const iconTextures: Record<string, HTMLImageElement> = {};
         planets.forEach(p => {
             const svgString = renderToStaticMarkup(
-                <p.Icon color={`rgb(${p.color})`} size={64} strokeWidth={2.5} />
+                <p.Icon color={`rgb(${p.color})`} size={isMobile ? 48 : 64} strokeWidth={isMobile ? 2 : 2.5} />
             );
             const blob = new Blob([svgString], { type: 'image/svg+xml' });
             const url = URL.createObjectURL(blob);
@@ -44,7 +46,7 @@ export function SolarSystemAnimation() {
             iconTextures[p.name] = img;
         });
 
-        const asteroids = Array.from({ length: 200 }).map(() => ({
+        const asteroids = Array.from({ length: isMobile ? 80 : 200 }).map(() => ({
             dist: 290 + Math.random() * 80,
             angle: Math.random() * Math.PI * 2,
             speed: 0.5 + Math.random() * 0.3,
@@ -52,7 +54,7 @@ export function SolarSystemAnimation() {
             alpha: Math.random() * 0.3 + 0.05
         }));
 
-        const stars = Array.from({ length: 600 }).map(() => ({
+        const stars = Array.from({ length: isMobile ? 250 : 600 }).map(() => ({
             x: (Math.random() - 0.5) * 5000,
             y: (Math.random() - 0.5) * 5000,
             z: (Math.random() - 0.5) * 5000,
@@ -63,7 +65,7 @@ export function SolarSystemAnimation() {
 
         let t = 0;
         const sunSpeed = 150;
-        const trailPoints = 150;
+        const trailPoints = isMobile ? 50 : 150;
         const trailDt = 0.03;
 
         function rotate(x: number, y: number, z: number, pitch: number, yaw: number, roll: number) {
@@ -85,7 +87,7 @@ export function SolarSystemAnimation() {
         let animationFrameId: number;
 
         function render() {
-            t += 0.02;
+            t += isMobile ? 0.04 : 0.02;
 
             ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1.0;
@@ -193,17 +195,21 @@ export function SolarSystemAnimation() {
                     const texture = iconTextures[p.name];
 
                     if (texture && texture.complete) {
-                        const s = Math.max(12, p.size * proj.s * 2.5);
+                        const s = Math.max(12, p.size * proj.s * (isMobile ? 2.0 : 2.5));
 
-                        ctx.shadowBlur = 30 * proj.s;
-                        ctx.shadowColor = `rgba(${p.color}, 0.4)`;
-                        ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
+                        if (!isMobile) {
+                            ctx.shadowBlur = 30 * proj.s;
+                            ctx.shadowColor = `rgba(${p.color}, 0.4)`;
+                            ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
 
-                        ctx.shadowBlur = 10 * proj.s;
+                            ctx.shadowBlur = 10 * proj.s;
+                        }
                         ctx.shadowColor = `rgba(${p.color}, 0.9)`;
                         ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
 
-                        ctx.shadowBlur = 0;
+                        if (!isMobile) {
+                            ctx.shadowBlur = 0;
+                        }
                     } else {
                         ctx.beginPath();
                         ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s), 0, Math.PI * 2);
@@ -214,13 +220,15 @@ export function SolarSystemAnimation() {
                     const { proj } = item;
                     const sunRadius = 60 * proj.s;
 
-                    let sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 5);
-                    sunGlow.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
-                    sunGlow.addColorStop(1, 'rgba(0, 50, 255, 0)');
-                    ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 5, 0, Math.PI * 2);
-                    ctx.fillStyle = sunGlow;
-                    ctx.fill();
+                    if (!isMobile) {
+                        let sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 5);
+                        sunGlow.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
+                        sunGlow.addColorStop(1, 'rgba(0, 50, 255, 0)');
+                        ctx.beginPath();
+                        ctx.arc(proj.x, proj.y, sunRadius * 5, 0, Math.PI * 2);
+                        ctx.fillStyle = sunGlow;
+                        ctx.fill();
+                    }
 
                     let sunGradient = ctx.createRadialGradient(proj.x, proj.y, sunRadius * 0.5, proj.x, proj.y, sunRadius * 2);
                     sunGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
@@ -231,10 +239,12 @@ export function SolarSystemAnimation() {
                     ctx.fillStyle = sunGradient;
                     ctx.fill();
 
-                    ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 0.7, 0, Math.PI * 2);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fill();
+                    if (!isMobile) {
+                        ctx.beginPath();
+                        ctx.arc(proj.x, proj.y, sunRadius * 0.7, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fill();
+                    }
                 }
             }
 

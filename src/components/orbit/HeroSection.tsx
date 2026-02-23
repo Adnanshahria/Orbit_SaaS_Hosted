@@ -86,7 +86,7 @@ export function HeroSection() {
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
-        <div className="rounded-2xl border border-neon-purple/40 bg-background/50 backdrop-blur-sm shadow-[0_0_50px_rgba(108,92,231,0.12)] sm:border-0 sm:bg-transparent sm:backdrop-blur-none sm:shadow-none sm:rounded-none px-4 sm:px-14 py-10 sm:py-10 flex flex-col justify-between items-center min-h-[60dvh] sm:min-h-0">
+        <div className="px-4 sm:px-14 py-10 sm:py-10 flex flex-col justify-between items-center min-h-[60dvh] sm:min-h-0">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
