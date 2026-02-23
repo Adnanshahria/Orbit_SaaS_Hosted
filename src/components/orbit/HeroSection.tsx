@@ -80,7 +80,7 @@ export function HeroSection() {
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-white/[0.05] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)]">
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-background/90 px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)]">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
@@ -97,18 +97,18 @@ export function HeroSection() {
             </motion.div>
           )}
 
-          {/* Title — "ORBIT SaaS" scales up dramatically */}
-          <motion.h1 className="text-foreground leading-[1] mb-6 sm:mb-16">
+          <motion.h1 className="text-foreground leading-[1] mb-4 sm:mb-10">
             <motion.span
-              className="block text-[2.5rem] leading-[1.1] sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] font-poppins font-black tracking-tight"
+              className="block text-[3.2rem] leading-[1.1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight"
               initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.4 }}
             >
-              ORBIT <span className="text-primary">SaaS</span>
+              <span className="inline-block animate-[neonShimmer_3s_ease-in-out_infinite]">ORBIT</span>{' '}
+              <span className="text-primary inline-block animate-[neonShimmer_3s_ease-in-out_infinite_0.5s]">SaaS</span>
             </motion.span>
             <motion.span
-              className="block mt-3 sm:mt-10 text-[1.5rem] leading-[1.2] sm:text-4xl md:text-5xl lg:text-[3.5rem] xl:text-6xl font-lobster tracking-normal px-1 sm:px-4"
+              className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
               style={{ color: titleColor }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ export function HeroSection() {
           </motion.h1>
 
           {/* Subtitle — word-by-word reveal */}
-          <motion.p className="text-muted-foreground text-sm sm:text-lg md:text-xl max-w-3xl mx-auto mb-8 sm:mb-16 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
+          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-6 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
             {words.map((word, i) => (
               <motion.span
                 key={i}
@@ -141,17 +141,17 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 60, damping: 16, delay: baseDelay + 1.6 }}
-            className="flex flex-col sm:flex-row gap-3.5 sm:gap-6 justify-center items-center px-2 sm:px-0"
+            className="flex flex-row gap-2.5 sm:gap-6 justify-center items-center px-2 sm:px-0"
           >
             {/* Relative Container for Dropdown */}
-            <div className="relative w-full sm:w-auto">
+            <div className="relative w-auto sm:w-auto">
               <motion.button
                 id="hero-book-appointment"
                 onClick={() => setIsCtaOpen(!isCtaOpen)}
                 whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="inline-flex items-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 rounded-[1.5rem] sm:rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer w-full sm:w-auto justify-center text-lg sm:text-lg"
+                className="inline-flex items-center gap-1.5 px-4 sm:px-10 py-2.5 sm:py-5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer justify-center text-sm sm:text-lg"
                 style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
               >
                 {t.hero.cta}
@@ -199,7 +199,7 @@ export function HeroSection() {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              className="inline-flex items-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 rounded-[1.5rem] sm:rounded-full font-bold glass-effect text-foreground cursor-pointer w-full sm:w-auto justify-center text-base sm:text-lg"
+              className="inline-flex items-center gap-1.5 px-4 sm:px-10 py-2.5 sm:py-5 rounded-full font-bold glass-effect text-foreground cursor-pointer justify-center text-sm sm:text-lg"
             >
               {t.hero.learnMore}
             </motion.a>
