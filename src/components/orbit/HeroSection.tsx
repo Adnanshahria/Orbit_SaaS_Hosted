@@ -147,7 +147,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 60, damping: 16, delay: baseDelay + 1.6 }}
-            className="flex flex-row gap-2.5 sm:gap-6 justify-center items-center px-2 sm:px-0"
+            className="flex flex-row gap-4 sm:gap-10 justify-center items-center px-2 sm:px-0"
           >
             {/* Relative Container for Dropdown */}
             <div className="relative w-auto sm:w-auto">
