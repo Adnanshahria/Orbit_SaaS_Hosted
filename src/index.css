@@ -40,6 +40,50 @@
   --neon-blue: #4facfe;
 }
 
+/* Scoped light theme for project pages only */
+.project-light {
+  --background: #f8f9fc;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --card-foreground: #1a1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a2e;
+  --primary: #6c5ce7;
+  --primary-foreground: #ffffff;
+  --secondary: #eef0f6;
+  --secondary-foreground: #1a1a2e;
+  --muted: #eef0f6;
+  --muted-foreground: #6b7280;
+  --accent: #eef0f6;
+  --accent-foreground: #1a1a2e;
+  --border: #e2e4ea;
+  --input: #eef0f6;
+  --ring: #6c5ce7;
+  --neon-cyan: #0891b2;
+  --neon-purple: #6c5ce7;
+  --neon-pink: #ec4899;
+  --neon-blue: #3b82f6;
+
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.project-light .neon-glow {
+  box-shadow: 0 0 12px rgba(108, 92, 231, 0.15), 0 0 30px rgba(108, 92, 231, 0.05);
+}
+
+.project-light .neon-glow-cyan {
+  box-shadow: 0 0 12px rgba(8, 145, 178, 0.15), 0 0 30px rgba(8, 145, 178, 0.05);
+}
+
+.project-light .neon-text {
+  text-shadow: none;
+}
+
+.project-light .neon-text-cyan {
+  text-shadow: none;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -168,7 +168,7 @@ interface UnifiedProject {
     order: number; // Display order on homepage
     images: string[];
     link: string;
-    category: string;
+    categories: string[];
     featured: boolean;
     videoPreview: string;
     tags: string[]; // Shared tags
@@ -190,7 +190,7 @@ const DEFAULT_PROJECT: UnifiedProject = {
     order: 0,
     images: [],
     link: '',
-    category: 'SaaS',
+    categories: ['SaaS'],
     featured: false,
     videoPreview: '',
     tags: [],
@@ -201,7 +201,7 @@ const DEFAULT_PROJECT: UnifiedProject = {
 
 // --- Project Editor Component (Handles Tabs) ---
 
-function ProjectEditor({ item, update, categories }: { item: UnifiedProject; update: (i: UnifiedProject) => void; categories: string[] }) {
+function ProjectEditor({ item, update, categories: availableCategories }: { item: UnifiedProject; update: (i: UnifiedProject) => void; categories: string[] }) {
     const [tab, setTab] = useState<'en' | 'bn'>('en');
 
     // Helper to update localized content
@@ -239,15 +239,32 @@ function ProjectEditor({ item, update, categories }: { item: UnifiedProject; upd
                             min={0}
                         />
                     </div>
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium text-foreground block">Category</label>
-                        <select
-                            value={item.category || (categories[0] || 'SaaS')}
-                            onChange={e => update({ ...item, category: e.target.value })}
-                            className="w-full bg-secondary rounded-lg px-4 py-2.5 text-sm text-foreground outline-none border border-border"
-                        >
-                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
+                    <div className="space-y-1.5 sm:col-span-1">
+                        <label className="text-sm font-medium text-foreground block">Categories</label>
+                        <div className="flex flex-wrap gap-1.5 p-2.5 bg-secondary rounded-lg border border-border min-h-[42px]">
+                            {availableCategories.map(cat => {
+                                const isSelected = (item.categories || []).includes(cat);
+                                return (
+                                    <button
+                                        key={cat}
+                                        type="button"
+                                        onClick={() => {
+                                            const current = item.categories || [];
+                                            const updated = isSelected
+                                                ? current.filter(c => c !== cat)
+                                                : [...current, cat];
+                                            update({ ...item, categories: updated.length > 0 ? updated : [cat] });
+                                        }}
+                                        className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${isSelected
+                                                ? 'bg-primary text-white shadow-sm'
+                                                : 'bg-background/50 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border/50'
+                                            }`}
+                                    >
+                                        {cat}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -420,13 +437,17 @@ export default function AdminProjects() {
             // Shared tags: prefer EN, then BN, then empty
             const sharedTags = enItem.tags || bnItem.tags || [];
 
+            // Auto-migrate: category (string) → categories (array)
+            const rawCats = enItem.categories || bnItem.categories || (enItem.category ? [enItem.category] : (bnItem.category ? [bnItem.category] : ['SaaS']));
+            const sharedCategories = Array.isArray(rawCats) ? rawCats : [rawCats];
+
             merged.push({
                 // Shared
                 id: enItem.id || bnItem.id || '',
                 order: enItem.order ?? bnItem.order ?? i,
                 images: sharedImages,
                 link: enItem.link || bnItem.link || '',
-                category: enItem.category || bnItem.category || 'SaaS',
+                categories: sharedCategories,
                 featured: enItem.featured ?? bnItem.featured ?? false,
                 videoPreview: enItem.videoPreview || bnItem.videoPreview || '',
                 tags: sharedTags,
@@ -466,7 +487,8 @@ export default function AdminProjects() {
                 images: p.images,
                 image: p.images[0] || '',
                 link: p.link,
-                category: p.category,
+                categories: p.categories,
+                category: p.categories[0] || 'SaaS',
                 featured: p.featured,
                 videoPreview: p.videoPreview
             }));
@@ -482,7 +504,8 @@ export default function AdminProjects() {
                 images: p.images,
                 image: p.images[0] || '',
                 link: p.link,
-                category: p.category,
+                categories: p.categories,
+                category: p.categories[0] || 'SaaS',
                 featured: p.featured,
                 videoPreview: p.videoPreview
             }));
@@ -671,7 +694,8 @@ export default function AdminProjects() {
                                 order: p.order,
                                 images: p.images,
                                 link: p.link,
-                                category: p.category,
+                                categories: p.categories,
+                                category: p.categories[0] || 'SaaS',
                                 featured: p.featured,
                                 videoPreview: p.videoPreview
                             }))
@@ -688,7 +712,8 @@ export default function AdminProjects() {
                                 order: p.order,
                                 images: p.images,
                                 link: p.link,
-                                category: p.category,
+                                categories: p.categories,
+                                category: p.categories[0] || 'SaaS',
                                 featured: p.featured,
                                 videoPreview: p.videoPreview
                             }))
@@ -710,12 +735,13 @@ export default function AdminProjects() {
                         for (let i = 0; i < maxLen; i++) {
                             const en = enItems[i] || {};
                             const bn = bnItems[i] || {};
+                            const importCats = en.categories || bn.categories || (en.category ? [en.category] : (bn.category ? [bn.category] : ['SaaS']));
                             merged.push({
                                 id: en.id || bn.id || '',
                                 order: en.order ?? bn.order ?? i,
                                 images: en.images || bn.images || [],
                                 link: en.link || bn.link || '',
-                                category: en.category || bn.category || 'SaaS',
+                                categories: Array.isArray(importCats) ? importCats : [importCats],
                                 featured: en.featured ?? bn.featured ?? false,
                                 videoPreview: en.videoPreview || bn.videoPreview || '',
                                 tags: en.tags || bn.tags || [],

@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight, X, ArrowRight } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
 import { Navbar } from '@/components/orbit/Navbar';
@@ -9,8 +9,9 @@ import { Chatbot } from '@/components/orbit/Chatbot';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ensureAbsoluteUrl } from '@/lib/utils';
+import { useProjectTheme, ProjectThemeToggle } from '@/components/orbit/ProjectThemeToggle';
 
-function ImageGallery({ images, title }: { images: string[]; title: string }) {
+function ImageGallery({ images, title, onLightboxChange }: { images: string[]; title: string; onLightboxChange?: (open: boolean) => void }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -22,8 +23,8 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
         setCurrentIndex((prev) => (prev + newDirection + images.length) % images.length);
     };
 
-    const openLightbox = () => setLightboxOpen(true);
-    const closeLightbox = () => setLightboxOpen(false);
+    const openLightbox = () => { setLightboxOpen(true); onLightboxChange?.(true); };
+    const closeLightbox = () => { setLightboxOpen(false); onLightboxChange?.(false); };
 
     const swipePower = (offset: number, velocity: number) => {
         return Math.abs(offset) * velocity;
@@ -66,7 +67,7 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
                 transition={{ duration: 0.6 }}
                 className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8"
             >
-                <div className="relative w-full aspect-video bg-muted/10 rounded-2xl overflow-hidden border border-border shadow-2xl shadow-primary/5 group">
+                <div className="relative w-full aspect-video bg-muted/10 rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_0_40px_rgba(108,92,231,0.1),0_8px_32px_rgba(0,0,0,0.4)] group">
                     {/* Main Image */}
                     <div className="absolute inset-0 cursor-pointer" onClick={openLightbox}>
                         <AnimatePresence initial={false} custom={direction}>
@@ -198,6 +199,8 @@ export default function ProjectDetail() {
     const { id } = useParams<{ id: string }>();
     const { lang } = useLang();
     const { content } = useContent();
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const { isLight, toggle, themeClass } = useProjectTheme();
 
     // Data with Fallback Logic
     const enData = (content.en as any).projects || {};
@@ -263,8 +266,17 @@ export default function ProjectDetail() {
     const ogImage = allImages[0] ? ensureAbsoluteUrl(allImages[0]) : 'https://orbitsaas.cloud/og-banner.png';
     const currentUrl = `https://orbitsaas.cloud/project/${id}`;
 
+
+
     return (
-        <div className="min-h-[100dvh] bg-background text-foreground">
+        <div className={`min-h-[100dvh] relative ${themeClass} transition-colors duration-500`} style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
+            <ProjectThemeToggle isLight={isLight} toggle={toggle} />
+            {/* Neon Background Decorations */}
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.12),transparent_50%)] pointer-events-none z-0" />
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.08),transparent_50%)] pointer-events-none z-0" />
+            <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-neon-purple/10 rounded-full blur-[150px] -translate-y-1/3 translate-x-1/4 pointer-events-none z-0" />
+            <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-neon-cyan/8 rounded-full blur-[130px] translate-y-1/4 -translate-x-1/4 pointer-events-none z-0" />
+            <div className="fixed top-1/2 left-1/2 w-[400px] h-[400px] bg-neon-pink/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0" />
             <Helmet>
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDesc} />
@@ -286,88 +298,186 @@ export default function ProjectDetail() {
                 <meta name="twitter:image" content={ogImage} />
                 <meta name="twitter:image:alt" content={seoTitle} />
             </Helmet>
-            <Navbar />
-            <main className="pt-20">
+            {!lightboxOpen && <Navbar />}
+            <main className="pt-20 relative z-10">
                 {/* Image Gallery */}
-                <ImageGallery images={allImages} title={project.title} />
+                <ImageGallery images={allImages} title={project.title} onLightboxChange={setLightboxOpen} />
 
-                {/* Content */}
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-                    {/* Back link */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4 }}
-                    >
-                        <Link
-                            to="/#projects"
-                            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+                {/* Two-Column Layout: Content + Sidebar */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 flex flex-col lg:flex-row gap-10">
+                    {/* Left: Main Content */}
+                    <div className="flex-1 min-w-0">
+                        {/* Back link */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.4 }}
                         >
-                            <ArrowLeft className="w-4 h-4" /> Back to Projects
-                        </Link>
-                    </motion.div>
+                            <Link
+                                to="/#projects"
+                                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors mb-8"
+                            >
+                                <ArrowLeft className="w-4 h-4" /> Back to Projects
+                            </Link>
+                        </motion.div>
 
-                    {/* Title */}
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                        className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6"
-                    >
-                        {project.title}
-                    </motion.h1>
-
-                    {/* Tags */}
-                    {project.tags && (
+                        {/* Category Badges */}
                         <motion.div
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex flex-wrap gap-2 mb-8"
+                            transition={{ duration: 0.4, delay: 0.05 }}
+                            className="flex flex-wrap gap-2 mb-4"
                         >
-                            {project.tags.map((tag: string, j: number) => (
+                            {(project.categories || (project.category ? [project.category] : [])).map((cat: string, ci: number) => (
                                 <span
-                                    key={j}
-                                    className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium"
+                                    key={ci}
+                                    className="px-3 py-1 rounded-full bg-neon-cyan/10 text-neon-cyan text-xs font-bold uppercase tracking-wider border border-neon-cyan/20 shadow-[0_0_8px_rgba(0,245,255,0.1)]"
                                 >
-                                    {tag}
+                                    {cat}
                                 </span>
                             ))}
                         </motion.div>
-                    )}
 
-                    {/* Description */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="prose-section"
-                    >
-                        <div
-                            className="text-muted-foreground text-base sm:text-lg leading-relaxed space-y-4 [&_b]:font-bold [&_b]:text-foreground [&_i]:italic [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_hr]:my-6 [&_hr]:border-border [&_span]:inline"
-                            dangerouslySetInnerHTML={{ __html: project.desc || '' }}
-                        />
-                    </motion.div>
+                        {/* Title */}
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                            className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6 neon-text"
+                        >
+                            {project.title}
+                        </motion.h1>
 
-                    {/* Live Link Button */}
-                    {project.link && project.link !== '#' && (
+                        {/* Tags */}
+                        {project.tags && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                                className="flex flex-wrap gap-2 mb-8"
+                            >
+                                {project.tags.map((tag: string, j: number) => (
+                                    <span
+                                        key={j}
+                                        className="px-3 py-1.5 rounded-full bg-neon-purple/10 text-neon-purple text-sm font-medium border border-neon-purple/15"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </motion.div>
+                        )}
+
+                        {/* Description */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            className="mt-10"
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="prose-section"
                         >
-                            <a
-                                href={ensureAbsoluteUrl(project.link)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-                            >
-                                <ExternalLink className="w-4 h-4" />
-                                Visit Live Project
-                            </a>
+                            <div
+                                className="text-muted-foreground text-base sm:text-lg leading-relaxed space-y-4 [&_b]:font-bold [&_b]:text-foreground [&_i]:italic [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_hr]:my-6 [&_hr]:border-white/[0.06] [&_span]:inline"
+                                dangerouslySetInnerHTML={{ __html: project.desc || '' }}
+                            />
                         </motion.div>
-                    )}
+
+                        {/* Live Link Button */}
+                        {project.link && project.link !== '#' && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.4 }}
+                                className="mt-10"
+                            >
+                                <a
+                                    href={ensureAbsoluteUrl(project.link)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-neon-purple/20 text-neon-purple font-medium border border-neon-purple/30 hover:bg-neon-purple/30 transition-all shadow-[0_0_20px_rgba(108,92,231,0.2)] hover:shadow-[0_0_30px_rgba(108,92,231,0.35)]"
+                                >
+                                    <ExternalLink className="w-4 h-4" />
+                                    Visit Live Project
+                                </a>
+                            </motion.div>
+                        )}
+                    </div>
+
+                    {/* Right: Suggested Projects Sidebar */}
+                    {(() => {
+                        const currentCats: string[] = project.categories || (project.category ? [project.category] : []);
+                        const buildItem = (enItem: any, i: number) => {
+                            const bnItem = bnItems[i];
+                            const showBn = lang === 'bn' && bnItem && bnItem.title && bnItem.title.trim() !== '';
+                            const displayItem = showBn ? bnItem : enItem;
+                            return { ...displayItem, _id: enItem.id || '', _originalIndex: i };
+                        };
+
+                        let suggested = enItems
+                            .map((enItem: any, i: number) => {
+                                if (i === idx) return null;
+                                const itemCats: string[] = enItem.categories || (enItem.category ? [enItem.category] : []);
+                                const hasShared = currentCats.length > 0 && itemCats.some((c: string) => currentCats.includes(c));
+                                if (!hasShared) return null;
+                                return buildItem(enItem, i);
+                            })
+                            .filter(Boolean)
+                            .slice(0, 8);
+
+                        if (suggested.length === 0) {
+                            suggested = enItems
+                                .map((enItem: any, i: number) => {
+                                    if (i === idx) return null;
+                                    return buildItem(enItem, i);
+                                })
+                                .filter(Boolean)
+                                .slice(0, 8);
+                        }
+
+                        if (suggested.length === 0) return null;
+
+                        return (
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.6, delay: 0.3 }}
+                                className="w-full lg:w-[380px] flex-shrink-0"
+                            >
+                                <div className="lg:sticky lg:top-24">
+                                    <h2 className="font-display text-lg font-bold text-foreground mb-4 neon-text">More Projects</h2>
+                                    <div className="flex flex-col gap-3">
+                                        {suggested.map((item: any) => {
+                                            const routeId = item._id || item._originalIndex;
+                                            const coverImage = item.images?.[0] || item.image || '/placeholder.png';
+                                            const itemCats: string[] = item.categories || (item.category ? [item.category] : []);
+
+                                            return (
+                                                <Link
+                                                    key={routeId}
+                                                    to={`/project/${routeId}`}
+                                                    className="group flex gap-3 rounded-xl overflow-hidden border-2 border-neon-purple/20 hover:border-neon-purple/50 bg-white/[0.03] backdrop-blur-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(108,92,231,0.15)] p-2"
+                                                >
+                                                    <div className="relative w-36 flex-shrink-0 aspect-video rounded-lg overflow-hidden bg-muted">
+                                                        <img
+                                                            src={coverImage}
+                                                            alt={item.title}
+                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col justify-center py-0.5 min-w-0">
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-neon-cyan neon-text-cyan mb-1 line-clamp-1">
+                                                            {itemCats.slice(0, 2).join(' · ')}
+                                                        </span>
+                                                        <h3 className="font-display text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                                                            {item.title}
+                                                        </h3>
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        );
+                    })()}
                 </div>
             </main>
             <OrbitFooter />

@@ -23,7 +23,7 @@ export interface ProjectData {
     tags: string[];
     link: string;
     images: string[];
-    category?: string;
+    categories?: string[];
     featured?: boolean;
     videoPreview?: string;
     id?: number;
@@ -115,9 +115,11 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                                                 Featured
                                             </span>
                                         )}
-                                        <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">
-                                            {project.category || ''}
-                                        </span>
+                                        {(project.categories || []).map((cat, ci) => (
+                                            <span key={ci} className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">
+                                                {cat}
+                                            </span>
+                                        ))}
                                     </div>
 
                                     <h2 className="text-2xl md:text-3xl font-bold font-display text-white mb-2 leading-tight">
