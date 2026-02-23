@@ -77,10 +77,10 @@ export function HeroSection() {
   // Loading Sequence for Hero Title
   const [isHeroLoaded, setIsHeroLoaded] = useState(false);
   useEffect(() => {
-    // Show the dice loader for 2.5 seconds, then reveal text
+    // Show the dice loader for 3.2 seconds, then reveal text
     const timer = setTimeout(() => {
       setIsHeroLoaded(true);
-    }, 2500);
+    }, 3200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -126,12 +126,12 @@ export function HeroSection() {
                 >
                   <div className="dice-container">
                     <div className="dice">
-                      <div className="dice-face dice-face-front dice-face-1"><div className="dice-dot"></div></div>
-                      <div className="dice-face dice-face-back dice-face-2"><div className="dice-dot"></div><div className="dice-dot"></div></div>
-                      <div className="dice-face dice-face-right dice-face-3"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
-                      <div className="dice-face dice-face-left dice-face-4"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
-                      <div className="dice-face dice-face-top dice-face-5"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
-                      <div className="dice-face dice-face-bottom dice-face-6"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
+                      <div className="dice-face dice-face-front">O</div>
+                      <div className="dice-face dice-face-back">R</div>
+                      <div className="dice-face dice-face-right">B</div>
+                      <div className="dice-face dice-face-left">I</div>
+                      <div className="dice-face dice-face-top">T</div>
+                      <div className="dice-face dice-face-bottom">S</div>
                     </div>
                   </div>
                 </motion.div>

@@ -492,8 +492,7 @@ html {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  animation: dice-spell-orbit 2.3s forwards;
-  animation-delay: 0.2s;
+  animation: dice-spell-orbit 2.8s forwards;
 }
 
 .dice-face {
@@ -523,10 +522,10 @@ html {
 .dice-face-bottom { transform: rotateX(-90deg) translateZ(30px); color: #a29bfe; text-shadow: 0 0 15px #a29bfe, 0 0 30px #a29bfe; }
 
 @keyframes dice-spell-orbit {
-  0%, 15% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-  22%, 34% { transform: rotateX(0deg) rotateY(-180deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-  41%, 52% { transform: rotateX(0deg) rotateY(-450deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-  59%, 70% { transform: rotateX(0deg) rotateY(-630deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-  77%, 88% { transform: rotateX(-90deg) rotateY(-720deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
-  95%, 100% { transform: rotateX(-270deg) rotateY(-720deg) rotateZ(0deg); }
+  0%, 25% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+  33%, 43% { transform: rotateX(0deg) rotateY(-180deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+  51%, 60% { transform: rotateX(0deg) rotateY(-450deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+  68%, 76% { transform: rotateX(0deg) rotateY(-630deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+  84%, 92% { transform: rotateX(-90deg) rotateY(-720deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
+  98%, 100% { transform: rotateX(-270deg) rotateY(-720deg) rotateZ(0deg); }
 }
