@@ -44,7 +44,8 @@ export function WhyUsSection() {
 
   return (
     <section id="why-us" className="py-10 sm:py-24 px-3 sm:px-6 lg:px-8 relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(0,245,255,0.05),transparent_70%)]" />
+
+
       <div className="max-w-7xl mx-auto relative" ref={ref}>
         <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <div className="text-center mb-6 sm:mb-10">

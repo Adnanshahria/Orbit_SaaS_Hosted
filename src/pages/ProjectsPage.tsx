@@ -90,12 +90,8 @@ export default function ProjectsPage() {
             <Navbar />
             <main className="pt-24 pb-20">
                 <section className="px-4 sm:px-6 relative overflow-hidden">
-                    {/* Neon Background Decorations */}
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.12),transparent_50%)] pointer-events-none" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.08),transparent_50%)] pointer-events-none" />
-                    <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-neon-purple/10 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-neon-cyan/8 rounded-full blur-[130px] translate-y-1/3 -translate-x-1/4 pointer-events-none" />
-                    <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-neon-pink/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+
 
                     <div className="max-w-7xl mx-auto relative" ref={ref}>
                         {/* Back Link */}

@@ -79,7 +79,8 @@ export function TechStackSection() {
 
   return (
     <section id="tech-stack" className="py-14 sm:py-24 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/10 to-transparent pointer-events-none" />
+
+
       <div className="max-w-7xl mx-auto relative" ref={ref}>
         <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)] overflow-hidden">
           <motion.div
