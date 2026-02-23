@@ -86,7 +86,7 @@ export function HeroSection() {
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-background/90 px-4 sm:px-14 py-10 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)] flex flex-col justify-between items-center min-h-[60dvh] sm:min-h-0">
+        <div className="rounded-2xl border border-neon-purple/40 bg-background/50 backdrop-blur-sm shadow-[0_0_50px_rgba(108,92,231,0.12)] sm:border-0 sm:bg-transparent sm:backdrop-blur-none sm:shadow-none sm:rounded-none px-4 sm:px-14 py-10 sm:py-10 flex flex-col justify-between items-center min-h-[60dvh] sm:min-h-0">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
@@ -157,45 +157,57 @@ export function HeroSection() {
                 whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="inline-flex items-center gap-1.5 px-4 sm:px-10 py-2.5 sm:py-5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer justify-center text-sm sm:text-lg"
+                className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer justify-center text-sm sm:text-base"
                 style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
               >
                 {t.hero.cta}
-                <ChevronDown className={`w-5 h-5 ml-1 transition-transform duration-300 ${isCtaOpen ? 'rotate-180' : ''}`} />
+                <div className="ml-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-white/20 border border-white/10 shadow-inner group-hover:bg-white/30 transition-colors">
+                  <ChevronDown strokeWidth={2.5} className={`w-3.5 h-3.5 text-white transition-transform duration-300 ${isCtaOpen ? 'rotate-180' : ''}`} />
+                </div>
               </motion.button>
 
               <AnimatePresence>
                 {isCtaOpen && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-3 w-full sm:w-[220px] bg-card border border-border rounded-2xl shadow-xl overflow-hidden z-30 flex flex-col"
+                    className="absolute top-full left-0 right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-4 w-full sm:w-[240px] z-30 flex flex-col gap-2"
                   >
-                    <a
+                    <motion.a
                       href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setIsCtaOpen(false)}
-                      className="flex items-center justify-center sm:justify-start gap-3 px-5 py-3.5 hover:bg-secondary transition-colors text-foreground font-semibold active:bg-secondary/80"
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-4 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-8 h-8 rounded-full bg-[#25D366]/10 flex items-center justify-center shrink-0">
-                        <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                      <div className="w-10 h-10 rounded-lg bg-[#25D366]/10 flex items-center justify-center shrink-0 group-hover:bg-[#25D366]/20 transition-colors">
+                        <MessageCircle className="w-5 h-5 text-[#25D366]" />
                       </div>
-                      WhatsApp
-                    </a>
-                    <div className="h-px bg-border/50 w-full" />
-                    <a
+                      <div className="flex flex-col items-start text-left">
+                        <span className="text-sm">WhatsApp</span>
+                        <span className="text-[10px] text-muted-foreground font-normal">Contact directly</span>
+                      </div>
+                    </motion.a>
+
+                    <motion.a
                       href="mailto:contact@orbitsaas.cloud"
                       onClick={() => setIsCtaOpen(false)}
-                      className="flex items-center justify-center sm:justify-start gap-3 px-5 py-3.5 hover:bg-secondary transition-colors text-foreground font-semibold active:bg-secondary/80"
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-4 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <Mail className="w-4 h-4 text-primary" />
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                        <Mail className="w-5 h-5 text-primary" />
                       </div>
-                      Email Us
-                    </a>
+                      <div className="flex flex-col items-start text-left">
+                        <span className="text-sm">Email Us</span>
+                        <span className="text-[10px] text-muted-foreground font-normal">Send a detailed inquiry</span>
+                      </div>
+                    </motion.a>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -205,21 +217,51 @@ export function HeroSection() {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              className="inline-flex items-center gap-1.5 px-4 sm:px-10 py-2.5 sm:py-5 rounded-full font-bold glass-effect text-foreground cursor-pointer justify-center text-sm sm:text-lg"
+              className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-full font-bold glass-effect text-foreground cursor-pointer justify-center text-sm sm:text-base"
             >
               {t.hero.learnMore}
             </motion.a>
           </motion.div>
+          {/* Newsletter Subscribe — Desktop block (inside card for relative flow) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
+            transition={{ type: 'spring', stiffness: 60, damping: 16, delay: showEmailBar ? 0 : 0 }}
+            className={`hidden sm:block relative mt-6 w-[450px] max-w-full mx-auto px-0 z-[100] ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          >
+            <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
+              <input
+                type="email"
+                placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={status === 'loading'}
+                className="w-full bg-secondary/80 border border-border rounded-full py-3.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+              />
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+              >
+                {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
+              </button>
+            </form>
+            {status === 'success' && (
+              <p className="text-green-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+                {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
+              </p>
+            )}
+          </motion.div>
         </div>{/* End Hero Container Card */}
-
       </motion.div>
 
-      {/* Newsletter Subscribe — fixed bottom bar on mobile, inline on desktop */}
+      {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={showEmailBar ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+        animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
         transition={{ type: 'spring', stiffness: 60, damping: 16, delay: showEmailBar ? 0 : 0 }}
-        className={`fixed bottom-[116px] left-4 right-[112px] z-[100] sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:z-auto sm:mt-10 sm:w-[450px] sm:max-w-full sm:mx-auto sm:px-0 ${!showEmailBar ? 'pointer-events-none sm:pointer-events-auto' : ''}`}
+        className={`fixed bottom-[116px] left-4 right-[112px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
       >
         <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
           <input
@@ -228,15 +270,15 @@ export function HeroSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'loading'}
-            className="w-full bg-background/95 sm:bg-secondary/80 border border-neon-purple/30 sm:border-border rounded-full py-3 sm:py-3.5 pl-5 sm:pl-6 pr-[120px] sm:pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+            className="w-full bg-background/95 border border-neon-purple/40 rounded-full py-3 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
           />
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="absolute right-1.5 top-1.5 bottom-1.5 px-3 sm:px-6 rounded-full bg-primary text-primary-foreground font-semibold text-[12px] sm:text-sm flex items-center gap-1.5 sm:gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+            className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-full bg-primary text-primary-foreground font-semibold text-[12px] flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
           >
             {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : 'Join Waitlist'}</span>
+            <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
           </button>
         </form>
         {status === 'success' && (
@@ -245,6 +287,7 @@ export function HeroSection() {
           </p>
         )}
       </motion.div>
+
 
       {/* Scroll indicator — hidden on mobile, shown on desktop */}
       <motion.div

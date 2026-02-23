@@ -163,7 +163,7 @@ export function LeadMagnetPopup() {
                                             <Loader2 className="w-5 h-5 animate-spin" />
                                         ) : (
                                             <>
-                                                {lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হোন' : 'Join Waitlist'}
+                                                {lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হোন' : "Let's Build"}
                                                 <Send className="w-4 h-4" />
                                             </>
                                         )}
