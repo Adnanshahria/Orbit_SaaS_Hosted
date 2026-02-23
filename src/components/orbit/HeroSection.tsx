@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { ArrowRight, ChevronDown, Send, Loader2, Mail, MessageCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
@@ -13,6 +13,7 @@ export function HeroSection() {
   const [isCtaOpen, setIsCtaOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [showEmailBar, setShowEmailBar] = useState(true);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +51,11 @@ export function HeroSection() {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0, 0.5], ['0%', '15%']);
 
+  // Hide email bar when user scrolls past hero on mobile
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    setShowEmailBar(v < 0.15);
+  });
+
   // Staggered word animation for the subtitle
   const subtitle = t.hero.subtitle || '';
   const words = subtitle.split(' ');
@@ -72,7 +78,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-20 pb-32 sm:pt-20 sm:pb-0"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-14 pb-6 sm:pt-20 sm:pb-0"
     >
 
 
@@ -80,7 +86,7 @@ export function HeroSection() {
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-background/90 px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)]">
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/40 bg-background/90 px-4 sm:px-14 py-8 sm:py-10 shadow-[0_0_50px_rgba(108,92,231,0.12)]">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
@@ -206,45 +212,46 @@ export function HeroSection() {
           </motion.div>
         </div>{/* End Hero Container Card */}
 
-        {/* Newsletter Subscribe — outside the card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 60, damping: 16, delay: baseDelay + 1.8 }}
-          className="mt-8 sm:mt-10 w-full max-w-md mx-auto px-4 sm:px-0"
-        >
-          <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
-            <input
-              type="email"
-              placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={status === 'loading'}
-              className="w-full bg-secondary/80 border border-border backdrop-blur-md rounded-full py-3.5 pl-6 pr-[130px] sm:pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
-            />
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="absolute right-1.5 top-1.5 bottom-1.5 px-4 sm:px-6 rounded-full bg-primary text-primary-foreground font-semibold text-[13px] sm:text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-            >
-              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : 'Join Waitlist'}</span>
-            </button>
-          </form>
-          {status === 'success' && (
-            <p className="text-green-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-              {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
-            </p>
-          )}
-        </motion.div>
       </motion.div>
 
-      {/* Scroll indicator — gentle bounce */}
+      {/* Newsletter Subscribe — fixed bottom bar on mobile, inline on desktop */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 60, damping: 16, delay: baseDelay + 1.8 }}
+        className={`fixed bottom-[116px] left-4 right-[112px] z-[100] transition-all duration-300 sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:z-auto sm:mt-10 sm:w-[450px] sm:max-w-full sm:mx-auto sm:px-0 sm:opacity-100 sm:translate-y-0 sm:pointer-events-auto ${showEmailBar ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none sm:opacity-100 sm:translate-y-0 sm:pointer-events-auto'}`}
+      >
+        <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
+          <input
+            type="email"
+            placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={status === 'loading'}
+            className="w-full bg-background/95 sm:bg-secondary/80 border border-neon-purple/30 sm:border-border rounded-full py-3 sm:py-3.5 pl-5 sm:pl-6 pr-[120px] sm:pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+          />
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            className="absolute right-1.5 top-1.5 bottom-1.5 px-3 sm:px-6 rounded-full bg-primary text-primary-foreground font-semibold text-[12px] sm:text-sm flex items-center gap-1.5 sm:gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+          >
+            {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : 'Join Waitlist'}</span>
+          </button>
+        </form>
+        {status === 'success' && (
+          <p className="text-green-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+            {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
+          </p>
+        )}
+      </motion.div>
+
+      {/* Scroll indicator — hidden on mobile, shown on desktop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: baseDelay + 2.5 }}
-        className="absolute bottom-12 sm:bottom-10 left-1/2 -translate-x-1/2"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden sm:block"
       >
         <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}>
           <ChevronDown className="w-6 h-6 text-muted-foreground opacity-50" />
