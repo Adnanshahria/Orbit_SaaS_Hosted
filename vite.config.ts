@@ -7,6 +7,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   base: '/',
+  assetsInclude: ['**/*.lottie'],
   server: {
     host: "::",
     port: 5173,
