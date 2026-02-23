@@ -106,9 +106,10 @@ export function HeroSection() {
           <motion.h1 className="text-foreground leading-[1] mb-10 sm:mb-10">
             <motion.span
               className="block text-[4.5rem] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight"
-              initial={{ opacity: 0, scale: 0.7, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-              transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.4 }}
+              initial={{ opacity: 0, scale: 0, rotateX: 360, rotateY: -360, rotateZ: -90, filter: 'blur(20px)' }}
+              animate={{ opacity: 1, scale: 1, rotateX: 0, rotateY: 0, rotateZ: 0, filter: 'blur(0px)' }}
+              transition={{ type: 'spring', stiffness: 70, damping: 20, mass: 1.2, delay: baseDelay + 0.2 }}
+              style={{ perspective: 1200 }}
             >
               <span className="inline-block animate-text-shimmer-orbit drop-shadow-lg pb-1">ORBIT</span>{' '}
               <span className="inline-block animate-text-shimmer-saas drop-shadow-lg pb-1">SaaS</span>
