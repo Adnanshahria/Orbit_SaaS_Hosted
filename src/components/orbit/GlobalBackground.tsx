@@ -7,7 +7,7 @@ export function GlobalBackground() {
 
     return (
         <div className="fixed inset-0 w-full h-[100dvh] -z-50 overflow-hidden pointer-events-none select-none flex items-center justify-center">
-            <div className="w-[150%] max-w-none opacity-40 transition-opacity duration-700">
+            <div className="w-[250%] sm:w-[150%] max-w-none opacity-40 transition-opacity duration-700">
                 <Lottie
                     lottieRef={lottieRef}
                     animationData={solarSystemData}
