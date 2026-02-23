@@ -29,7 +29,7 @@ export function SolarSystemAnimation() {
             { name: 'Neptune', dist: 850, speed: 0.1, size: 6, color: '0, 20, 255' },
         ];
 
-        const asteroids = Array.from({ length: 800 }).map(() => ({
+        const asteroids = Array.from({ length: 200 }).map(() => ({
             dist: 290 + Math.random() * 80,
             angle: Math.random() * Math.PI * 2,
             speed: 0.5 + Math.random() * 0.3,
@@ -37,7 +37,7 @@ export function SolarSystemAnimation() {
             alpha: Math.random() * 0.3 + 0.05
         }));
 
-        const stars = Array.from({ length: 1500 }).map(() => ({
+        const stars = Array.from({ length: 600 }).map(() => ({
             x: (Math.random() - 0.5) * 5000,
             y: (Math.random() - 0.5) * 5000,
             z: (Math.random() - 0.5) * 5000,
@@ -48,7 +48,7 @@ export function SolarSystemAnimation() {
 
         let t = 0;
         const sunSpeed = 150;
-        const trailPoints = 300;
+        const trailPoints = 150;
         const trailDt = 0.03;
 
         function rotate(x: number, y: number, z: number, pitch: number, yaw: number, roll: number) {
@@ -113,9 +113,8 @@ export function SolarSystemAnimation() {
 
                 ctx.globalAlpha = star.alpha;
                 ctx.fillStyle = `rgb(${star.color})`;
-                ctx.beginPath();
-                ctx.arc(proj.x, proj.y, Math.max(0.1, star.size * proj.s), 0, Math.PI * 2);
-                ctx.fill();
+                const size = Math.max(0.1, star.size * proj.s);
+                ctx.fillRect(proj.x - size, proj.y - size, size * 2, size * 2);
             }
 
             // Render Trails with additive blending
@@ -141,7 +140,7 @@ export function SolarSystemAnimation() {
                         ctx.moveTo(prevProj.x, prevProj.y);
                         ctx.lineTo(proj.x, proj.y);
                         ctx.strokeStyle = `rgba(${p.color}, ${opacity})`;
-                        ctx.lineWidth = Math.max(0.5, 3 * prevProj.s);
+                        ctx.lineWidth = Math.max(0.5, 2.5 * prevProj.s);
                         ctx.stroke();
                     }
                     prevProj = proj;
@@ -177,13 +176,12 @@ export function SolarSystemAnimation() {
                 if (item.type === 'asteroid') {
                     ctx.globalAlpha = item.ast.alpha;
                     ctx.fillStyle = '#1a3a5a';
-                    ctx.beginPath();
-                    ctx.arc(item.proj.x, item.proj.y, Math.max(0.1, item.ast.size * item.proj.s), 0, Math.PI * 2);
-                    ctx.fill();
+                    const size = Math.max(0.1, item.ast.size * item.proj.s);
+                    ctx.fillRect(item.proj.x - size, item.proj.y - size, size * 2, size * 2);
                 } else if (item.type === 'planet') {
                     const { p, proj } = item;
                     ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s * 4), 0, Math.PI * 2);
+                    ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s * 3.5), 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(${p.color}, 0.5)`;
                     ctx.globalAlpha = 1.0;
                     ctx.fill();
@@ -194,35 +192,35 @@ export function SolarSystemAnimation() {
                     ctx.fill();
                 } else if (item.type === 'sun') {
                     const { proj } = item;
-                    const sunRadius = 70 * proj.s;
+                    const sunRadius = 60 * proj.s;
 
                     let sunGlow = ctx.createRadialGradient(
                         proj.x, proj.y, sunRadius,
-                        proj.x, proj.y, sunRadius * 6
+                        proj.x, proj.y, sunRadius * 5
                     );
                     sunGlow.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
                     sunGlow.addColorStop(1, 'rgba(0, 50, 255, 0)');
 
                     ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 6, 0, Math.PI * 2);
+                    ctx.arc(proj.x, proj.y, sunRadius * 5, 0, Math.PI * 2);
                     ctx.fillStyle = sunGlow;
                     ctx.fill();
 
                     let sunGradient = ctx.createRadialGradient(
                         proj.x, proj.y, sunRadius * 0.5,
-                        proj.x, proj.y, sunRadius * 2.5
+                        proj.x, proj.y, sunRadius * 2
                     );
                     sunGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
                     sunGradient.addColorStop(0.4, 'rgba(0, 255, 255, 0.8)');
                     sunGradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
 
                     ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 2.5, 0, Math.PI * 2);
+                    ctx.arc(proj.x, proj.y, sunRadius * 2, 0, Math.PI * 2);
                     ctx.fillStyle = sunGradient;
                     ctx.fill();
 
                     ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 0.8, 0, Math.PI * 2);
+                    ctx.arc(proj.x, proj.y, sunRadius * 0.7, 0, Math.PI * 2);
                     ctx.fillStyle = '#ffffff';
                     ctx.fill();
                 }
