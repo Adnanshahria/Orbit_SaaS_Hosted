@@ -377,3 +377,100 @@ html {
     overflow-x: hidden;
   }
 }
+
+/* Electrical Aura for Chatbot */
+.electric-aura-container {
+  position: absolute;
+  inset: -15px;
+  z-index: -1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.electric-core-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.4), rgba(0, 245, 255, 0.1) 60%, transparent 80%);
+  filter: blur(8px);
+  animation: electric-pulse 0.5s ease-in-out infinite alternate;
+}
+
+.electric-arc-1 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* Create sharp arcs using conic gradient */
+  background: conic-gradient(from 0deg, transparent 0%, rgba(0, 245, 255, 0.9) 2%, transparent 6%, transparent 40%, rgba(124, 58, 237, 0.9) 42%, transparent 46%, transparent 80%, rgba(255, 255, 255, 0.9) 82%, transparent 86%);
+  /* Hollow out the center so it looks like a ring/arcs */
+  mask-image: radial-gradient(transparent 65%, black 68%, black 72%, transparent 75%);
+  -webkit-mask-image: radial-gradient(transparent 65%, black 68%, black 72%, transparent 75%);
+  filter: drop-shadow(0 0 4px rgba(0, 245, 255, 0.8));
+  animation: electric-spin 0.15s steps(3) infinite, electric-flicker 0.08s infinite alternate;
+  mix-blend-mode: screen;
+}
+
+.electric-arc-2 {
+  position: absolute;
+  width: 115%;
+  height: 115%;
+  border-radius: 50%;
+  background: conic-gradient(from 180deg, transparent 0%, rgba(124, 58, 237, 0.9) 1%, transparent 4%, transparent 50%, rgba(0, 245, 255, 0.9) 52%, transparent 55%, transparent 85%, rgba(124, 58, 237, 0.9) 87%, transparent 90%);
+  mask-image: radial-gradient(transparent 66%, black 69%, black 71%, transparent 74%);
+  -webkit-mask-image: radial-gradient(transparent 66%, black 69%, black 71%, transparent 74%);
+  filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.8));
+  animation: electric-spin-reverse 0.2s steps(4) infinite, electric-flicker 0.12s infinite alternate-reverse;
+  mix-blend-mode: color-dodge;
+}
+
+@keyframes electric-spin {
+  0% { transform: rotate(0deg) scale(0.95); }
+  100% { transform: rotate(360deg) scale(1.05); }
+}
+
+@keyframes electric-spin-reverse {
+  0% { transform: rotate(360deg) scale(1.02); }
+  100% { transform: rotate(-360deg) scale(0.98); }
+}
+
+@keyframes electric-flicker {
+  0% { opacity: 1; }
+  25% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+  75% { opacity: 0.2; }
+  100% { opacity: 0.8; }
+}
+
+@keyframes electric-pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes flare-up {
+  0% { transform: scaleY(0.9) scaleX(1.05); opacity: 0.8; }
+  100% { transform: scaleY(1.15) scaleX(0.9); opacity: 1; }
+}
+
+@keyframes flare-up-outer {
+  0% { transform: scaleY(0.85) scaleX(1.1); opacity: 0.5; }
+  100% { transform: scaleY(1.2) scaleX(0.95); opacity: 0.9; }
+}
+
+@keyframes aura-sway {
+  0% { transform: rotate(-3deg) translateX(-2px); }
+  100% { transform: rotate(3deg) translateX(2px); }
+}
+
+@keyframes aura-sway-reverse {
+  0% { transform: rotate(4deg) translateX(3px); }
+  100% { transform: rotate(-4deg) translateX(-3px); }
+}
+
+@keyframes energy-crack {
+  0% { transform: scaleY(0.95) scaleX(1.02) rotate(-1deg); opacity: 0.6; }
+  50% { transform: scaleY(1.05) scaleX(0.98) rotate(1deg); opacity: 1; }
+  100% { transform: scaleY(1) scaleX(1) rotate(0deg); opacity: 0.8; }
+}

@@ -514,12 +514,21 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
         {open ? (
           <X className="w-6 h-6" />
         ) : (
-          <Lottie
-            animationData={helloAnimation}
-            loop
-            autoplay
-            style={{ width: '100%', height: '100%' }}
-          />
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Electrical Arc Aura Layers */}
+            <div className="electric-aura-container">
+              <div className="electric-core-glow" />
+              <div className="electric-arc-1" />
+              <div className="electric-arc-2" />
+            </div>
+
+            <Lottie
+              animationData={helloAnimation}
+              loop
+              autoplay
+              style={{ width: '100%', height: '100%' }}
+            />
+          </div>
         )}
       </motion.button>
 
