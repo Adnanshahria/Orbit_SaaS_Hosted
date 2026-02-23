@@ -143,7 +143,7 @@ export function HeroSection() {
                   transition={{ type: 'spring', stiffness: 80, damping: 18 }}
                   className="flex flex-col items-center"
                 >
-                  <span className="block text-[4.5rem] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight">
+                  <span className="block text-[clamp(2.5rem,13vw,4.5rem)] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight whitespace-nowrap">
                     <span className="inline-block animate-text-shimmer-orbit drop-shadow-lg pb-1">ORBIT</span>{' '}
                     <span className="inline-block animate-text-shimmer-saas drop-shadow-lg pb-1">SaaS</span>
                   </span>
