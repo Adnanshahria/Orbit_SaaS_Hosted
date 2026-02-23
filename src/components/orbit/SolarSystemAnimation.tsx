@@ -1,4 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
+import { Zap, Sparkles, Globe, Bot, Code, Database, Cpu, Smartphone } from 'lucide-react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 export function SolarSystemAnimation() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,15 +21,28 @@ export function SolarSystemAnimation() {
         window.addEventListener('resize', handleResize);
 
         const planets = [
-            { name: 'Mercury', dist: 80, speed: 2.5, size: 2, color: '0, 255, 255' },
-            { name: 'Venus', dist: 130, speed: 1.8, size: 3, color: '0, 200, 255' },
-            { name: 'Earth', dist: 190, speed: 1.2, size: 4, color: '0, 150, 255' },
-            { name: 'Mars', dist: 250, speed: 0.9, size: 3, color: '0, 100, 255' },
-            { name: 'Jupiter', dist: 400, speed: 0.4, size: 10, color: '0, 80, 255' },
-            { name: 'Saturn', dist: 550, speed: 0.25, size: 8, color: '0, 60, 255' },
-            { name: 'Uranus', dist: 700, speed: 0.15, size: 6, color: '0, 40, 255' },
-            { name: 'Neptune', dist: 850, speed: 0.1, size: 6, color: '0, 20, 255' },
+            { name: 'Mercury', dist: 80, speed: 2.5, size: 16, color: '0, 255, 255', Icon: Zap },
+            { name: 'Venus', dist: 130, speed: 1.8, size: 18, color: '100, 210, 255', Icon: Sparkles },
+            { name: 'Earth', dist: 190, speed: 1.2, size: 22, color: '0, 160, 255', Icon: Globe },
+            { name: 'Mars', dist: 250, speed: 0.9, size: 18, color: '160, 110, 255', Icon: Bot },
+            { name: 'Jupiter', dist: 400, speed: 0.4, size: 32, color: '0, 255, 255', Icon: Code },
+            { name: 'Saturn', dist: 550, speed: 0.25, size: 28, color: '110, 255, 255', Icon: Database },
+            { name: 'Uranus', dist: 700, speed: 0.15, size: 24, color: '0, 210, 255', Icon: Cpu },
+            { name: 'Neptune', dist: 850, speed: 0.1, size: 24, color: '160, 255, 255', Icon: Smartphone },
         ];
+
+        // Pre-render icons to textures for performance
+        const iconTextures: Record<string, HTMLImageElement> = {};
+        planets.forEach(p => {
+            const svgString = renderToStaticMarkup(
+                <p.Icon color={`rgb(${p.color})`} size={64} strokeWidth={2.5} />
+            );
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.src = url;
+            iconTextures[p.name] = img;
+        });
 
         const asteroids = Array.from({ length: 200 }).map(() => ({
             dist: 290 + Math.random() * 80,
@@ -70,24 +85,22 @@ export function SolarSystemAnimation() {
         let animationFrameId: number;
 
         function render() {
-            t += 0.02; // Increased from 0.012
+            t += 0.02;
 
-            // Reset state every frame to fix accumulation bug
             ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1.0;
             ctx.fillStyle = '#000510';
             ctx.fillRect(0, 0, width, height);
 
             const currentPitch = 0.35 + Math.sin(t * 0.2) * 0.1;
-            const currentYaw = t * 0.15; // Increased from 0.1
+            const currentYaw = t * 0.15;
             const currentRoll = 0;
 
             const fov = 1000;
             const zOffset = 1500;
 
-            // Calculate dynamic center for movement across the page - Faster drift
-            const driftX = Math.sin(t * 0.25) * (width * 0.3); // Increased frequency and range
-            const driftY = Math.cos(t * 0.2) * (height * 0.2); // Increased frequency and range
+            const driftX = Math.sin(t * 0.25) * (width * 0.3);
+            const driftY = Math.cos(t * 0.2) * (height * 0.2);
             const centerX = width / 2 + driftX;
             const centerY = height / 2.5 + driftY;
 
@@ -102,7 +115,6 @@ export function SolarSystemAnimation() {
                 };
             };
 
-            // Render Stars
             for (const star of stars) {
                 let sy = star.y - t * sunSpeed;
                 sy = sy % 5000;
@@ -117,7 +129,6 @@ export function SolarSystemAnimation() {
                 ctx.fillRect(proj.x - size, proj.y - size, size * 2, size * 2);
             }
 
-            // Render Trails with additive blending
             ctx.globalCompositeOperation = 'screen';
             for (const p of planets) {
                 let prevProj: any = null;
@@ -134,13 +145,13 @@ export function SolarSystemAnimation() {
 
                     if (prevProj) {
                         const progress = i / trailPoints;
-                        const opacity = (1 - progress) * 0.4;
+                        const opacity = (1 - progress) * 0.6;
 
                         ctx.beginPath();
                         ctx.moveTo(prevProj.x, prevProj.y);
                         ctx.lineTo(proj.x, proj.y);
                         ctx.strokeStyle = `rgba(${p.color}, ${opacity})`;
-                        ctx.lineWidth = Math.max(0.5, 2.5 * prevProj.s);
+                        ctx.lineWidth = Math.max(0.5, 3.5 * prevProj.s);
                         ctx.stroke();
                     }
                     prevProj = proj;
@@ -148,7 +159,6 @@ export function SolarSystemAnimation() {
             }
 
             const renderItems: any[] = [];
-
             const sunProj = project(0, 0, 0);
             if (sunProj.s > 0) renderItems.push({ type: 'sun', proj: sunProj, z: sunProj.z });
 
@@ -180,40 +190,42 @@ export function SolarSystemAnimation() {
                     ctx.fillRect(item.proj.x - size, item.proj.y - size, size * 2, size * 2);
                 } else if (item.type === 'planet') {
                     const { p, proj } = item;
-                    ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s * 3.5), 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${p.color}, 0.5)`;
-                    ctx.globalAlpha = 1.0;
-                    ctx.fill();
+                    const texture = iconTextures[p.name];
 
-                    ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, Math.max(0.5, p.size * proj.s), 0, Math.PI * 2);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fill();
+                    if (texture && texture.complete) {
+                        const s = Math.max(12, p.size * proj.s * 2.5);
+
+                        ctx.shadowBlur = 30 * proj.s;
+                        ctx.shadowColor = `rgba(${p.color}, 0.4)`;
+                        ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
+
+                        ctx.shadowBlur = 10 * proj.s;
+                        ctx.shadowColor = `rgba(${p.color}, 0.9)`;
+                        ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
+
+                        ctx.shadowBlur = 0;
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s), 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${p.color}, 0.5)`;
+                        ctx.fill();
+                    }
                 } else if (item.type === 'sun') {
                     const { proj } = item;
                     const sunRadius = 60 * proj.s;
 
-                    let sunGlow = ctx.createRadialGradient(
-                        proj.x, proj.y, sunRadius,
-                        proj.x, proj.y, sunRadius * 5
-                    );
+                    let sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 5);
                     sunGlow.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
                     sunGlow.addColorStop(1, 'rgba(0, 50, 255, 0)');
-
                     ctx.beginPath();
                     ctx.arc(proj.x, proj.y, sunRadius * 5, 0, Math.PI * 2);
                     ctx.fillStyle = sunGlow;
                     ctx.fill();
 
-                    let sunGradient = ctx.createRadialGradient(
-                        proj.x, proj.y, sunRadius * 0.5,
-                        proj.x, proj.y, sunRadius * 2
-                    );
+                    let sunGradient = ctx.createRadialGradient(proj.x, proj.y, sunRadius * 0.5, proj.x, proj.y, sunRadius * 2);
                     sunGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
                     sunGradient.addColorStop(0.4, 'rgba(0, 255, 255, 0.8)');
                     sunGradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
-
                     ctx.beginPath();
                     ctx.arc(proj.x, proj.y, sunRadius * 2, 0, Math.PI * 2);
                     ctx.fillStyle = sunGradient;
@@ -248,7 +260,6 @@ export function SolarSystemAnimation() {
       `}} />
             <div className="absolute inset-0 w-full h-full bg-[#000510] z-0 pointer-events-none select-none overflow-hidden">
                 <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-90" />
-                {/* Vignette */}
                 <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at center, transparent 30%, rgba(0,5,16,0.85) 80%, #000 100%)' }} />
             </div>
         </>
