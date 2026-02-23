@@ -521,6 +521,15 @@ html {
 .dice-face-top    { transform: rotateX(90deg) translateZ(30px); color: #ffffff; text-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff; }
 .dice-face-bottom { transform: rotateX(-90deg) translateZ(30px); color: #a29bfe; text-shadow: 0 0 15px #a29bfe, 0 0 30px #a29bfe; }
 
+/* Disable heavy blurs and shadows on mobile/low-end to save GPU */
+@media (max-width: 639px) {
+  .dice-face {
+    backdrop-filter: none;
+    box-shadow: none;
+    background: rgba(108, 92, 231, 0.15); /* Solid transparent fallback */
+  }
+}
+
 @keyframes dice-spell-orbit {
   0%, 25% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
   33%, 43% { transform: rotateX(0deg) rotateY(-180deg) rotateZ(0deg); animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1); }
