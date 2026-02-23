@@ -129,7 +129,7 @@ export function Navbar() {
         transition={{ duration: 0.8, delay: 0.3 }}
         className="fixed top-0 left-0 right-0 w-full z-[110] px-3 sm:px-4 md:px-6 lg:px-10 pt-3"
       >
-        <div className={`w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 transition-all duration-500 ease-in-out rounded-full border border-neon-purple/30 ${isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'bg-transparent'}`}>
+        <div className={`navbar-gradient-border w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 transition-all duration-500 ease-in-out rounded-full ${isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'bg-transparent'}`}>
           <div className="flex items-center justify-between">
             <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => {
               if (location.pathname === '/') {
@@ -208,7 +208,7 @@ export function Navbar() {
         transition={{ duration: 0.6, delay: 0.8 }}
         className="md:hidden fixed bottom-5 left-4 right-4 z-[120]"
       >
-        <div className="flex items-center gap-0.5 px-3 py-3 rounded-[28px] bg-background/80 border border-neon-purple/30 shadow-[0_10px_30px_rgba(0,0,0,0.3)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
+        <div className="navbar-gradient-border flex items-center gap-0.5 px-3 py-3 rounded-[28px] bg-background/80 shadow-[0_10px_30px_rgba(0,0,0,0.3)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
           {links.map((link) => {
             const isActive = activeSection === link.href;
             // Map href to icon
