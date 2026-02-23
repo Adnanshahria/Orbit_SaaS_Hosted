@@ -478,3 +478,73 @@ html {
   30% { transform: scale(0); opacity: 0; }
   100% { opacity: 0; }
 }
+
+/* ── 3D Dice Loader Animation ── */
+.dice-container {
+  perspective: 1000px;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+}
+
+.dice {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: dice-roll 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite;
+}
+
+.dice-face {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--neon-purple);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 0 15px rgba(108, 92, 231, 0.3), 0 0 10px rgba(108, 92, 231, 0.2);
+}
+
+.dice-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--neon-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.dice-face-front  { transform: rotateY(0deg) translateZ(30px); }
+.dice-face-back   { transform: rotateY(180deg) translateZ(30px); }
+.dice-face-right  { transform: rotateY(90deg) translateZ(30px); }
+.dice-face-left   { transform: rotateY(-90deg) translateZ(30px); }
+.dice-face-top    { transform: rotateX(90deg) translateZ(30px); }
+.dice-face-bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+/* Dot alignments */
+.dice-face-1 { justify-content: center; align-items: center; }
+.dice-face-2 { justify-content: space-between; padding: 10px; flex-direction: column; align-items: flex-end; }
+.dice-face-2 .dice-dot:first-child { align-self: flex-start; }
+.dice-face-3 { justify-content: space-between; padding: 10px; }
+.dice-face-3 .dice-dot:nth-child(1) { align-self: flex-start; }
+.dice-face-3 .dice-dot:nth-child(2) { align-self: center; }
+.dice-face-3 .dice-dot:nth-child(3) { align-self: flex-end; }
+.dice-face-4 { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 15px; place-items: center; }
+.dice-face-5 { padding: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; place-items: center; }
+.dice-face-5 .dice-dot:nth-child(1) { grid-area: 1 / 1 / 2 / 2; }
+.dice-face-5 .dice-dot:nth-child(2) { grid-area: 1 / 3 / 2 / 4; }
+.dice-face-5 .dice-dot:nth-child(3) { grid-area: 2 / 2 / 3 / 3; }
+.dice-face-5 .dice-dot:nth-child(4) { grid-area: 3 / 1 / 4 / 2; }
+.dice-face-5 .dice-dot:nth-child(5) { grid-area: 3 / 3 / 4 / 4; }
+.dice-face-6 { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 5px 15px; place-items: center; }
+
+@keyframes dice-roll {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  25% { transform: rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+  50% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+  75% { transform: rotateX(540deg) rotateY(270deg) rotateZ(135deg); }
+  100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(360deg); }
+}

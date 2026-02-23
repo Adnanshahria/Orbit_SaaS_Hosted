@@ -74,6 +74,16 @@ export function HeroSection() {
   const whatsappNumber = (t.contact as any).whatsapp || '';
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 
+  // Loading Sequence for Hero Title
+  const [isHeroLoaded, setIsHeroLoaded] = useState(false);
+  useEffect(() => {
+    // Show the dice loader for 2.5 seconds, then reveal text
+    const timer = setTimeout(() => {
+      setIsHeroLoaded(true);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section
       ref={sectionRef}
@@ -92,7 +102,7 @@ export function HeroSection() {
             <motion.div
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 100, damping: 20, delay: baseDelay + 0.2 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 3.0 }}
               className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-8 sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               style={{ color: taglineColor }}
             >
@@ -103,27 +113,53 @@ export function HeroSection() {
             </motion.div>
           )}
 
-          <motion.h1 className="text-foreground leading-[1] mb-10 sm:mb-10">
-            <motion.span
-              className="block text-[4.5rem] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight"
-              initial={{ opacity: 0, scale: 0, rotateX: 360, rotateY: -360, rotateZ: -90, filter: 'blur(20px)' }}
-              animate={{ opacity: 1, scale: 1, rotateX: 0, rotateY: 0, rotateZ: 0, filter: 'blur(0px)' }}
-              transition={{ type: 'spring', stiffness: 70, damping: 20, mass: 1.2, delay: baseDelay + 0.2 }}
-              style={{ perspective: 1200 }}
-            >
-              <span className="inline-block animate-text-shimmer-orbit drop-shadow-lg pb-1">ORBIT</span>{' '}
-              <span className="inline-block animate-text-shimmer-saas drop-shadow-lg pb-1">SaaS</span>
-            </motion.span>
-            <motion.span
-              className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
-              style={{ color: titleColor }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 80, damping: 18, delay: baseDelay + 0.7 }}
-            >
-              {t.hero.title}
-            </motion.span>
-          </motion.h1>
+          <div className="text-foreground leading-[1] mb-10 sm:mb-10 min-h-[180px] flex flex-col items-center justify-center relative">
+            <AnimatePresence mode="wait">
+              {!isHeroLoaded ? (
+                <motion.div
+                  key="loader"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 2, filter: 'blur(10px)' }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <div className="dice-container">
+                    <div className="dice">
+                      <div className="dice-face dice-face-front dice-face-1"><div className="dice-dot"></div></div>
+                      <div className="dice-face dice-face-back dice-face-2"><div className="dice-dot"></div><div className="dice-dot"></div></div>
+                      <div className="dice-face dice-face-right dice-face-3"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
+                      <div className="dice-face dice-face-left dice-face-4"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
+                      <div className="dice-face dice-face-top dice-face-5"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
+                      <div className="dice-face dice-face-bottom dice-face-6"><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div><div className="dice-dot"></div></div>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="hero-text"
+                  initial={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  transition={{ type: 'spring', stiffness: 80, damping: 18 }}
+                  className="flex flex-col items-center"
+                >
+                  <span className="block text-[4.5rem] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight">
+                    <span className="inline-block animate-text-shimmer-orbit drop-shadow-lg pb-1">ORBIT</span>{' '}
+                    <span className="inline-block animate-text-shimmer-saas drop-shadow-lg pb-1">SaaS</span>
+                  </span>
+                  <motion.span
+                    className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
+                    style={{ color: titleColor }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.2 }}
+                  >
+                    {t.hero.title}
+                  </motion.span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Subtitle — word-by-word reveal */}
           <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
