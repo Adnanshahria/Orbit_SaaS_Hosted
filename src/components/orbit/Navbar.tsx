@@ -10,7 +10,7 @@ const mobileNavItems = [
   { href: '#services', icon: Layers, label: 'Services' },
   { href: '#tech-stack', icon: Trophy, label: 'Tech' },
   { href: '#why-us', icon: MessageSquare, label: 'Why Us' },
-  { href: '#projects', icon: FolderOpen, label: 'Projects' },
+  { href: '#project', icon: FolderOpen, label: 'Projects' },
   { href: '#leadership', icon: Users, label: 'Team' },
   { href: '#contact', icon: Phone, label: 'Contact' },
 ];
@@ -41,7 +41,7 @@ export function Navbar() {
         if (location.pathname !== '/') {
           setActiveSection('');
         } else {
-          const sections = ['hero', 'services', 'tech-stack', 'why-us', 'projects', 'leadership', 'contact'];
+          const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'contact'];
           let current = 'hero';
           const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
           if (atBottom) {
@@ -96,7 +96,7 @@ export function Navbar() {
     { href: '#services', label: t.nav.services },
     { href: '#tech-stack', label: t.nav.techStack },
     { href: '#why-us', label: t.nav.whyUs },
-    { href: '#projects', label: (t.nav as any).projects ?? 'Projects' },
+    { href: '#project', label: (t.nav as any).projects ?? 'Projects' },
     { href: '#leadership', label: t.nav.leadership },
     { href: '#contact', label: t.nav.contact },
   ];

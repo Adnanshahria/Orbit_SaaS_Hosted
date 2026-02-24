@@ -19,11 +19,11 @@ function buildKnowledgeBase(content: Record<string, any>, lang: string): string 
 
     const projects = content.projects?.items || [];
     if (projects.length > 0) {
-        kb += "PROJECTS:\n";
+        kb += "PROJECTS (USE THESE EXACT LINKS ONLY):\n";
         projects.forEach((p: any, index: number) => {
             const projectId = p.id || index;
             const tags = (p.tags || []).join(', ');
-            kb += `- ${p.title} (${tags}) → ${SITE_BASE_URL}/project/${projectId}\n`;
+            kb += `- ${p.title} (${tags}): ${SITE_BASE_URL}/project/${projectId}\n`;
         });
     }
 
@@ -58,11 +58,11 @@ function buildKnowledgeBase(content: Record<string, any>, lang: string): string 
         }
     }
 
-    kb += `LINKS: Home: ${SITE_BASE_URL}/ | Projects: ${SITE_BASE_URL}/projects\n`;
+    kb += `CORE LINKS: Home: ${SITE_BASE_URL} | Projects: ${SITE_BASE_URL}/project | Contact: ${SITE_BASE_URL}/#contact\n`;
 
     const linksData = content.links?.items || [];
     if (linksData.length > 0) {
-        kb += "EXTRA LINKS: " + linksData.map((l: any) => `${l.title}: ${l.link}`).join(', ') + "\n";
+        kb += "ADDITIONAL LINKS:\n" + linksData.map((l: any) => `- ${l.title}: ${l.link}`).join('\n') + "\n";
     }
 
     return kb;
@@ -87,7 +87,7 @@ async function generateGist(knowledgeBase: string): Promise<string | null> {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are a data compressor. Summarize the following company knowledge base into a SHORT factual reference (~150 words max). PRESERVE ALL: company name, project names with exact URLs, service names, team names, social links, and contact URLs. Use compact notation (dashes, commas). NO marketing fluff, NO opinions. Output ONLY the summary.'
+                        content: 'You are a technical documentator. Summarize the following company knowledge base into a SHORT factual reference (~150 words max). CRITICAL: All URLs and proper names (Project Titles, Service Names) must be preserved EXACTLY as in the source. NEVER synthesize new categories like "PROJECT SHOWCASE" or "AI SERVICES". NEVER abbreviate or abbreviate URLs. If the source says "LifeSolver: https://site.com/project/1", keep it exactly like that. NO marketing fluff. Output ONLY the summary.'
                     },
                     { role: 'user', content: knowledgeBase }
                 ],
@@ -117,6 +117,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const lang = (req.query.lang as string) || 'en';
+    const forceRefresh = req.query.refresh === 'true';
+
+    // Clear gist cache if requested (manual override for hallucination fix)
+    if (forceRefresh) {
+        try {
+            await db.execute({
+                sql: 'DELETE FROM kb_gist WHERE lang = ?',
+                args: [lang],
+            });
+        } catch (e) {
+            console.error('Failed to clear gist:', e);
+        }
+    }
 
     try {
         let content: Record<string, any> = {};
@@ -152,8 +165,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 sql: 'SELECT gist FROM kb_gist WHERE lang = ?',
                 args: [lang],
             });
-            if (gistResult.rows.length > 0 && gistResult.rows[0].gist) {
-                knowledgeBase = gistResult.rows[0].gist as string;
+            if (gistResult.rows.length > 0 && (gistResult.rows[0] as any).gist) {
+                knowledgeBase = (gistResult.rows[0] as any).gist as string;
             }
         } catch {
             // kb_gist table might not exist — will fall through to generation
@@ -209,6 +222,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // 5. Extract Q&A pairs from chatbot config
         const chatbot = content.chatbot || {};
+
+        // Final sanity check on knowledgeBase URL consistency
+        const sanitizedKB = knowledgeBase.replace(/orbitsaas-projects|orbitsaas-team/g, 'orbitsaas.cloud');
+
         const qaPairs = (chatbot.qaPairs || [])
             .map((qa: { question: string; answer: string }) => `Q: ${qa.question}\nA: ${qa.answer}`)
             .join('\n\n');
@@ -218,7 +235,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         return res.status(200).json({
             success: true,
-            knowledgeBase,
+            knowledgeBase: sanitizedKB,
             qaPairs: qaPairs || null,
             systemPrompt: chatbot.systemPrompt || null,
             lang,

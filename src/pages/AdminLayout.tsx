@@ -15,7 +15,7 @@ const navItems = [
     { label: 'Services', path: '/admin/services', icon: ShoppingCart },
     { label: 'Tech Stack', path: '/admin/tech-stack', icon: Cpu },
     { label: 'Why Us', path: '/admin/why-us', icon: Lightbulb },
-    { label: 'Projects', path: '/admin/projects', icon: FolderOpen },
+    { label: 'Projects', path: '/admin/project', icon: FolderOpen },
     { label: 'Leadership', path: '/admin/leadership', icon: Users },
     { label: 'Contact', path: '/admin/contact', icon: Phone },
     { label: 'Footer', path: '/admin/footer', icon: FileText },

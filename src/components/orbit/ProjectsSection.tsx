@@ -79,7 +79,7 @@ export function ProjectsSection() {
   const sectionSubtitle = lang === 'bn' && bnData.subtitle ? bnData.subtitle : (enData.subtitle || 'Real solutions we\'ve built for real businesses.');
 
   return (
-    <section id="projects" className="py-12 sm:py-32 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section id="project" className="py-12 sm:py-32 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
 
 
 
@@ -88,7 +88,7 @@ export function ProjectsSection() {
         <div className="relative rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           {/* Visit Button */}
           <Link
-            to="/projects"
+            to="/project"
             className="absolute top-5 right-5 sm:top-8 sm:right-8 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neon-purple/20 text-neon-purple font-semibold text-sm border border-neon-purple/30 hover:bg-neon-purple/30 transition-all shadow-[0_0_15px_rgba(108,92,231,0.15)] hover:shadow-[0_0_25px_rgba(108,92,231,0.3)] hover:gap-3"
           >
             Visit <ArrowRight className="w-4 h-4" />
@@ -149,7 +149,7 @@ export function ProjectsSection() {
               className="text-center mt-14"
             >
               <Link
-                to="/projects"
+                to="/project"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-neon-purple/20 text-neon-purple font-semibold text-base border border-neon-purple/30 hover:bg-neon-purple/30 transition-all shadow-[0_0_20px_rgba(108,92,231,0.2)] hover:shadow-[0_0_30px_rgba(108,92,231,0.35)] hover:gap-3"
               >
                 View All Projects <ArrowRight className="w-5 h-5" />

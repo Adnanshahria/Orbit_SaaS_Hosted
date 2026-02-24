@@ -1,16 +1,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ElectricLoader } from '@/components/ui/ElectricLoader';
-import { MessageCircle, X, Send, Loader2, Trash2, MoreVertical, ChevronDown, Mail } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Trash2, MoreVertical, ChevronDown, Mail, Bot } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
 import { sendToGroq, ChatMessage } from '@/services/aiService';
 import { translations } from '@/lib/i18n';
-import Lottie from 'lottie-react';
-import helloAnimation from '@/assets/hello-animation.json';
-import chatMessageAnimation from '@/assets/chatbot-message.json';
 
 type Lang = 'en' | 'bn'; // Define Lang type
 
@@ -268,10 +265,10 @@ export function Chatbot() {
         const siteBaseUrl = 'https://orbitsaas.cloud';
         const projects = (activeContent.projects as any)?.items || [];
         if (projects.length > 0) {
-          knowledgeBase += "COMPLETED PORTFOLIO PROJECTS:\n";
+          knowledgeBase += "COMPLETED PORTFOLIO PROJECTS (USE THESE EXACT LINKS):\n";
           projects.forEach((p: any, index: number) => {
             const projectId = p.id || index;
-            knowledgeBase += `- ${p.title}: ${p.desc} (Built with: ${(p.tags || []).join(', ')}) | Case Study Link: ${siteBaseUrl}/project/${projectId}\n`;
+            knowledgeBase += `- ${p.title}: ${p.desc} | URL: ${siteBaseUrl}/project/${projectId}\n`;
           });
           knowledgeBase += "\n";
         }
@@ -285,10 +282,12 @@ export function Chatbot() {
 
         const linksData = (activeContent.links as any)?.items || [];
         if (linksData.length > 0) {
-          knowledgeBase += "IMPORTANT LINKS TO SHARE WITH USERS:\n";
-          linksData.forEach((l: any) => { knowledgeBase += `- Use this link for "${l.title}": ${l.link}\n`; });
+          knowledgeBase += "IMPORTANT LINKS:\n";
+          linksData.forEach((l: any) => { knowledgeBase += `- ${l.title}: ${l.link}\n`; });
           knowledgeBase += "\n";
         }
+
+        knowledgeBase += `CORE LINKS: Home: ${siteBaseUrl}, Projects: ${siteBaseUrl}/project, Contact: ${siteBaseUrl}/#contact\n\n`;
 
         qaContext = (activeT.chatbot.qaPairs || [])
           .map((qa: { question: string; answer: string }) => `Q: ${qa.question}\nA: ${qa.answer}`)
@@ -307,7 +306,7 @@ SERVICES: We build ALL types of software.
 COMMS: Direct contact with PM via Telegram/WhatsApp. Updates every 10% milestone.
 SCOPE: NEVER act as general AI. Redirect off-topic to ORBIT services.
 LEADS: If user asks pricing/consultation/project start AND hasn't given email (see EMAIL STATUS), ask for email first. If already given, answer directly.
-LINKS: ONLY use URLs from knowledge base. Never fabricate URLs. Use markdown: [Text](URL). NEVER say "visit our website" — the user is ALREADY on the website. If no specific URL, say "check our projects page".
+LINKS: Provide a link ONLY if the user specifically asks to see a project, service, or contact info. Do NOT include links in every message. NEVER use generic labels like "PROJECT SHOWCASE" or "AI SERVICES". Instead, use the actual name of the project or service (e.g., [Project Name](URL)). The UI will convert these into compact buttons. NEVER fabricate URLs. If a specific URL isn't provided, just describe it without a link.
 LANG: English only. If user speaks Bangla, prepend "[SUGGEST_SWITCH]".
 STYLE: Casual+professional. HARD LIMIT: 50-80 words max. Count your words. Max 3 bullets or 1 short paragraph. NEVER exceed 80 words. If listing items, use very short bullet points (5-8 words each).
 FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on its OWN NEW LINE starting with "💬". Phrase it FROM THE USER'S PERSPECTIVE. Example: "💬 Tell me about your pricing" or "💬 Show me your AI projects". NEVER phrase as bot question. NEVER skip this.`
@@ -385,8 +384,8 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
       // Strategy 4: If ALL strategies failed, provide a generic follow-up
       if (suggestionLines.length === 0) {
         const fallbacks = chatLang === 'bn'
-          ? ['আরো বিস্তারিত জানাও', 'তোমাদের প্রাইসিং জানাও', 'প্রজেক্টগুলো দেখাও']
-          : ['Tell me more about this', 'Show me your pricing', 'View your projects'];
+          ? ['তোমাদের সেবাগুলো কি?', 'প্রজেক্টগুলো দেখাও', 'প্রাইসিং কেমন?']
+          : ['Tell me more about this', 'Show me your pricing', 'Show me your projects'];
         suggestionLines.push(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
       }
 
@@ -410,13 +409,22 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
       .replace(/\s+([,.?!])/g, '$1')
       .replace(/(\*\*.*?)(([,.?!])\s*)\*\*/g, '$1**$2');
 
-    // 2. Extract ALL markdown links FIRST (before bold splitting can break them)
-    //    Supports bold text inside link labels: [**bold title**](url)
+    // 2. Extract ALL links (markdown and raw)
     const linkPlaceholders: { url: string; text: string }[] = [];
+
+    // First: Markdown links [text](url)
     processed = processed.replace(/\[([^\]]*?)]\(([^)]+)\)/g, (_match, text, url) => {
       const idx = linkPlaceholders.length;
-      // Strip any bold markers from the link text since we won't display it anyway
-      linkPlaceholders.push({ url, text: text.replace(/\*\*/g, '') });
+      linkPlaceholders.push({ url, text: text.replace(/\*\*/g, '').trim() });
+      return `__LINK_${idx}__`;
+    });
+
+    // Second: Raw URLs (that aren't already placeholders)
+    processed = processed.replace(/(https?:\/\/[^\s)]+)/g, (url) => {
+      // Skip if this URL is already inside a placeholder (though the regex above should have consumed it)
+      if (processed.includes(`](${url})`)) return url;
+      const idx = linkPlaceholders.length;
+      linkPlaceholders.push({ url, text: '' });
       return `__LINK_${idx}__`;
     });
 
@@ -445,9 +453,12 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex mt-1 mb-1 items-center px-3 py-1 bg-primary text-primary-foreground font-bold rounded-full text-[11px] uppercase tracking-wider shadow-sm hover:scale-105 active:scale-95 transition-transform"
+              className="inline-flex mt-1.5 mb-1 items-center px-4 py-1.5 bg-primary text-primary-foreground font-black rounded-full text-[9px] uppercase tracking-tighter shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20 group animate-in zoom-in-50 duration-300"
             >
-              {link.text || 'View'}
+              <span className="mr-1">{link.text || 'CLICK HERE'}</span>
+              <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </a>
           );
         }
@@ -521,12 +532,9 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               <ElectricLoader size={140} />
             </div>
 
-            <Lottie
-              animationData={helloAnimation}
-              loop
-              autoplay
-              style={{ width: '100%', height: '100%' }}
-            />
+            <div className="relative z-10 w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-2xl neon-glow border border-white/20">
+              <Bot className="w-8 h-8 text-white" />
+            </div>
           </div>
         )}
       </motion.button>
@@ -637,8 +645,8 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 {messages.length === 0 && !isLoading && (
                   <div className="space-y-4 py-2">
                     <div className="flex gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                        <Lottie animationData={chatMessageAnimation} loop autoplay style={{ width: '120%', height: '120%' }} />
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                        <Bot className="w-4 h-4 text-primary" />
                       </div>
                       <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-xs text-foreground max-w-[85%] shadow-sm leading-relaxed">
                         <p className="font-semibold mb-1 text-primary">
@@ -675,8 +683,8 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                     <div key={i} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                       <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
                         {isAssistant && (
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                            <Lottie animationData={chatMessageAnimation} loop autoplay style={{ width: '120%', height: '120%' }} />
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                            <Bot className="w-4 h-4 text-primary" />
                           </div>
                         )}
                         <div className={`rounded-xl px-3 py-2 text-xs max-w-[85%] shadow-sm ${msg.role === 'user'
@@ -707,8 +715,8 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 {showEmailPrompt && !hasProvidedEmail && (
                   <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div className="flex gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                        <Lottie animationData={chatMessageAnimation} loop autoplay style={{ width: '120%', height: '120%' }} />
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                        <Bot className="w-4 h-4 text-primary" />
                       </div>
                       <div className="bg-secondary rounded-xl rounded-tl-none px-4 py-3 text-sm text-foreground shadow-sm max-w-[90%] border border-primary/20 bg-gradient-to-br from-secondary to-primary/5">
                         <p className="mb-3 text-xs leading-relaxed font-medium">
@@ -745,8 +753,8 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
 
                 {isLoading && (
                   <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
-                      <Lottie animationData={chatMessageAnimation} loop autoplay style={{ width: '120%', height: '120%' }} />
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                      <Bot className="w-4 h-4 text-primary" />
                     </div>
                     <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-sm text-foreground shadow-sm">
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -761,8 +769,8 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             {/* Suggestion Chips */}
             {(() => {
               const defaultChips = chatLang === 'bn'
-                ? ['আমাদের সেবা সমূহ', 'প্রজেক্ট দেখুন', 'মূল্য জানুন', 'যোগাযোগ করুন']
-                : ['Our Services', 'View Projects', 'Get a Quote', 'Contact Us'];
+                ? ['তোমাদের সেবাগুলো কি?', 'প্রজেক্টগুলো দেখাও', 'প্রাইসিং কেমন?', 'যোগাযোগ করতে চাই']
+                : ['What services do you offer?', 'Show me your projects', 'Tell me about pricing', 'I want to contact you'];
               const activeChips = suggestions.length > 0 ? suggestions : (messages.length <= 1 ? defaultChips : []);
               return activeChips.length > 0 && !isLoading ? (
                 <div className={`shrink-0 px-4 pt-2 pb-0 border-t border-border bg-card/80 transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>

@@ -181,7 +181,7 @@ export default function App() {
               <Suspense fallback={<AdminLoading />}>
                 <Routes>
                   <Route path="/" element={<PublicSite />} />
-                  <Route path="/projects" element={<ProjectsPage />} />
+                  <Route path="/project" element={<ProjectsPage />} />
                   <Route path="/project/:id" element={<ProjectDetail />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin" element={<AdminLayout />}>
@@ -190,7 +190,7 @@ export default function App() {
                     <Route path="services" element={<AdminServices />} />
                     <Route path="tech-stack" element={<AdminTechStack />} />
                     <Route path="why-us" element={<AdminWhyUs />} />
-                    <Route path="projects" element={<AdminProjects />} />
+                    <Route path="project" element={<AdminProjects />} />
                     <Route path="leadership" element={<AdminLeadership />} />
                     <Route path="contact" element={<AdminContact />} />
                     <Route path="footer" element={<AdminFooter />} />
