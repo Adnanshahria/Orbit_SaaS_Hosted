@@ -26,7 +26,7 @@ export function ContactSection() {
   }, [isCtaOpen]);
 
   return (
-    <section id="contact" className="py-10 sm:py-20 px-3 sm:px-6 relative scroll-mt-12">
+    <section id="contact" className="py-10 sm:py-20 px-3 sm:px-6 relative z-20 scroll-mt-12">
 
 
       <div className="w-full mx-auto text-center relative" ref={ref}>
@@ -58,7 +58,7 @@ export function ContactSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ type: 'spring', stiffness: 100, damping: 18, delay: 0.5 }}
-              className="relative inline-block"
+              className="relative flex flex-col items-center justify-center w-full"
               ref={ctaRef}
             >
               <motion.button
@@ -84,7 +84,7 @@ export function ContactSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[260px] z-30 flex flex-col gap-2"
+                    className="relative mt-4 w-[260px] z-30 flex flex-col gap-2 mx-auto"
                   >
                     <motion.a
                       href={whatsappUrl}

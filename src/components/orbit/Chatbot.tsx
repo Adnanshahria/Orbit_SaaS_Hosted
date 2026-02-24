@@ -22,8 +22,160 @@ export function Chatbot() {
   const [viewportStyle, setViewportStyle] = useState<React.CSSProperties>({});
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState({ en: 'Chat with ORBIT', bn: 'ORBIT-এর সাথে চ্যাট করুন' });
+  const [hasDismissedPopup, setHasDismissedPopup] = useState(false);
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hidePopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const summarySentRef = useRef(false);
+
+  // Define context-aware dynamic messages
+  const contextMessages: Record<string, Array<{ en: string, bn: string }>> = {
+    hero: [
+      { en: 'Chat with ORBIT!', bn: 'ORBIT-এর সাথে চ্যাট করুন!' },
+      { en: 'Ready to launch your project?', bn: 'প্রজেক্ট শুরু করতে প্রস্তুত?' },
+      { en: 'Need a custom AI solution?', bn: 'কাস্টম এআই সলিউশন লাগবে?' },
+      { en: 'Let’s transform your ideas into reality!', bn: 'আপনার আইডিয়াগুলোকে বাস্তবে রূপ দিই চলুন!' },
+      { en: 'Looking for a reliable tech partner?', bn: 'নির্ভরযোগ্য টেক পার্টনার খুঁজছেন?' },
+    ],
+    services: [
+      { en: 'Need help choosing a service?', bn: 'সঠিক সেবা খুঁজতে সাহায্য লাগবে?' },
+      { en: 'Want to know more about our services?', bn: 'আমাদের সার্ভিস নিয়ে আরও জানতে চান?' },
+      { en: 'We build Web, AI, and Mobile Apps.', bn: 'আমরা ওয়েব, এআই এবং মোবাইল অ্যাপ বানাই।' },
+      { en: 'Looking for End-to-End Development?', bn: 'এন্ড-টু-এন্ড ডেভেলপমেন্ট খুঁজছেন?' },
+      { en: 'Ask me about our tech expertise!', bn: 'আমাদের টেক এক্সপার্টিজ সম্পর্কে জিজ্ঞেস করুন!' },
+    ],
+    project: [
+      { en: "Like our previous work?", bn: 'আমাদের কাজগুলো ভালো লেগেছে?' },
+      { en: "Let's build something like this for you.", bn: 'আপনার জন্যও এমন কিছু বানাতে পারি।' },
+      { en: 'Want a completely custom solution?', bn: 'আপনার জন্য সম্পূর্ণ কাস্টম সলিউশন চাই?' },
+      { en: 'Check out the details of these projects.', bn: 'এই প্রজেক্টগুলোর বিস্তারিত দেখতে পারেন।' },
+      { en: 'Tell me your project requirements!', bn: 'আপনার প্রজেক্টের রিকোয়ারমেন্টগুলো জানান!' },
+    ],
+    'tech-stack': [
+      { en: 'Curious about our technologies?', bn: 'আমাদের প্রযুক্তি সম্পর্কে জানতে চান?' },
+      { en: 'Need a specific tech stack?', bn: 'কোনো নির্দিষ্ট প্রযুক্তির কাজ খুঁজছেন?' },
+      { en: 'We use modern, scalable tech.', bn: 'আমরা আধুনিক এবং স্কেলেবল প্রযুক্তি ব্যবহার করি।' },
+      { en: 'Ask me about any specific tool.', bn: 'কোনো নির্দিষ্ট টুল সম্পর্কে জিজ্ঞেস করতে পারেন।' },
+    ],
+    'why-us': [
+      { en: 'Want to know why clients choose us?', bn: 'ক্লায়েন্টরা কেন আমাদের ভালোবাসে?' },
+      { en: 'We guarantee 100% satisfaction.', bn: 'আমরা ১০০% গ্যারান্টি দিয়ে কাজ করি।' },
+      { en: 'Ask about our communication process.', bn: 'আমাদের কমিউনিকেশন প্রসেস সম্পর্কে জানুন।' },
+      { en: 'We deliver on time, every time.', bn: 'আমরা সবসময় ঠিক সময়ে কাজ ডেলিভারি দিই।' },
+    ],
+    leadership: [
+      { en: 'Want to talk to our leadership team?', bn: 'আমাদের লিডারশিপ টিমের সাথে কথা বলবেন?' },
+      { en: 'Any questions for our founders?', bn: 'আমাদের ফাউন্ডারদের জন্য কোনো প্রশ্ন আছে?' },
+    ],
+    contact: [
+      { en: 'Have a specific question?', bn: 'কোনো নির্দিষ্ট প্রশ্ন আছে?' },
+      { en: 'Drop me a message here!', bn: 'এখানে আমাকে ম্যাসেজ দিন!' },
+      { en: 'Want to book a free consultation?', bn: 'ফ্রি কনসালটেশন বুক করতে চান?' },
+      { en: 'I can connect you to our team.', bn: 'আমি আপনাকে আমাদের টিমের সাথে কানেক্ট করতে পারি।' },
+    ],
+    default: [
+      { en: 'Chat with ORBIT', bn: 'ORBIT-এর সাথে চ্যাট করুন' },
+      { en: 'How can I help you today?', bn: 'কীভাবে সাহায্য করতে পারি?' },
+      { en: 'Still here if you need me!', bn: 'আমি এখানেই আছি, কোনো সাহায্য লাগলে বলবেন!' },
+      { en: 'Have any questions?', bn: 'আপনার কোনো প্রশ্ন আছে?' },
+      { en: 'Let’s discuss your project.', bn: 'চলুন আপনার প্রজেক্ট নিয়ে আলোচনা করি।' },
+      { en: 'Need a quick estimate?', bn: 'দ্রুত প্রজেক্টের খরচ জানতে চান?' },
+    ]
+  };
+
+  // Helper to determine the section currently in view
+  const getActiveSection = () => {
+    const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'contact'];
+    let currentSection = 'default';
+    let maxVisibleHeight = 0;
+
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        // Calculate how much of the element is visible in the viewport
+        const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+        if (visibleHeight > maxVisibleHeight && visibleHeight > window.innerHeight * 0.2) {
+          maxVisibleHeight = visibleHeight;
+          currentSection = id;
+        }
+      }
+    });
+    return currentSection;
+  };
+
+  // Select a random message for a section, ensuring it's not the exact same as the current
+  const getRandomContextMessage = (sectionId: string) => {
+    const msgs = contextMessages[sectionId] || contextMessages['default'];
+    if (msgs.length === 1) return msgs[0];
+
+    // Try to pick one that is different from the current
+    const unused = msgs.filter(m => m.en !== popupMessage.en);
+    if (unused.length > 0) {
+      return unused[Math.floor(Math.random() * unused.length)];
+    }
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  };
+
+  // Idle tracking logic
+  useEffect(() => {
+    if (open || messages.length > 0 || hasDismissedPopup) {
+      setShowWelcomePopup(false);
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
+      return;
+    }
+
+    const resetIdleTimer = () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
+
+      idleTimer.current = setTimeout(() => {
+        // User has been idle for 3 seconds
+        if (!open && messages.length === 0 && !hasDismissedPopup) {
+          const activeSec = getActiveSection();
+          const newMessage = getRandomContextMessage(activeSec);
+          setPopupMessage(newMessage);
+          setShowWelcomePopup(true);
+        }
+      }, 3000); // 3 seconds idle triggers popup instantly
+    };
+
+    const hideAndReset = () => {
+      // Hide popup IMMEDIATELY when user starts interacting heavily (scrolling, clicking)
+      setShowWelcomePopup((prev) => {
+        if (prev) return false;
+        return prev;
+      });
+      resetIdleTimer();
+    };
+
+    // Listeners for user activity
+    // Mousemove only resets the timer, but DOES NOT hide an already open popup (allows user to move mouse to click it)
+    window.addEventListener('mousemove', resetIdleTimer, { passive: true });
+
+    // Heavy interactions that should instantly hide the popup and reset the timer
+    window.addEventListener('scroll', hideAndReset, { passive: true });
+    window.addEventListener('keydown', hideAndReset, { passive: true });
+    window.addEventListener('mousedown', hideAndReset, { passive: true });
+    window.addEventListener('touchstart', hideAndReset, { passive: true });
+
+    // Initial trigger
+    resetIdleTimer();
+
+    return () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
+      window.removeEventListener('mousemove', resetIdleTimer);
+      window.removeEventListener('scroll', hideAndReset);
+      window.removeEventListener('keydown', hideAndReset);
+      window.removeEventListener('mousedown', hideAndReset);
+      window.removeEventListener('touchstart', hideAndReset);
+    };
+  }, [open, messages.length, hasDismissedPopup, popupMessage.en]);
+
 
   // Dynamic chatbot strings with fallbacks to static translations
   const chatContent = {
@@ -645,6 +797,62 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-[190] bg-background/60 backdrop-blur-md md:hidden"
           />
+        )}
+      </AnimatePresence>
+
+      {/* Chatbot Welcome Popup (Speech Bubble) */}
+      <AnimatePresence>
+        {!open && showWelcomePopup && !hasDismissedPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.3, transformOrigin: 'bottom right' }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.5 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="fixed bottom-[14dvh] mb-5 sm:mb-8 md:bottom-28 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
+          >
+            <div className="relative pointer-events-auto cursor-pointer group" onClick={() => setOpen(true)}>
+              {/* Glowing background layer */}
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-cyan-400 to-primary opacity-40 blur-md group-hover:opacity-60 transition-opacity" />
+
+              {/* Main Speech Bubble */}
+              <div className="relative flex flex-col items-start gap-1 bg-secondary/95 backdrop-blur-md border border-primary/30 rounded-2xl rounded-br-sm px-4 py-3 shadow-[0_10px_40px_rgba(124,58,237,0.3)]">
+
+                {/* Close Button X (small, absolute) */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowWelcomePopup(false);
+                    setHasDismissedPopup(true);
+                  }}
+                  className="absolute -top-2 -right-2 bg-background border border-border rounded-full p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer shadow-sm hover:scale-110 active:scale-95"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+
+                {/* Text Content */}
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
+                    <Bot className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-0.5">Orbit AI</p>
+                    <span className="text-sm font-semibold text-foreground tracking-tight whitespace-nowrap drop-shadow-sm transition-all duration-300">
+                      {chatLang === 'bn' ? popupMessage.bn : popupMessage.en}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Pulsing Dot Indicator */}
+                <div className="absolute bottom-2 right-3 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                </div>
+              </div>
+
+              {/* Speech Bubble Tail pointing specifically to the robot icon */}
+              <div className="absolute -bottom-3 right-5 sm:right-7 w-4 h-4 bg-secondary/95 border-b border-r border-primary/30 rotate-45 transform" />
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
