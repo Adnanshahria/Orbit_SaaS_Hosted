@@ -8,7 +8,6 @@ import { Navbar } from '@/components/orbit/Navbar';
 import { OrbitFooter } from '@/components/orbit/OrbitFooter';
 import { Chatbot } from '@/components/orbit/Chatbot';
 import { Helmet } from 'react-helmet-async';
-import { useProjectTheme, ProjectThemeToggle } from '@/components/orbit/ProjectThemeToggle';
 import { ProjectCard } from '@/components/orbit/ProjectCard';
 
 const cardVariants = {
@@ -78,11 +77,9 @@ export default function ProjectsPage() {
 
     const sectionTitle = lang === 'bn' && bnData.title ? bnData.title : (enData.title || 'All Projects');
     const sectionSubtitle = lang === 'bn' && bnData.subtitle ? bnData.subtitle : (enData.subtitle || 'Explore all the projects we\'ve built.');
-    const { isLight, toggle, themeClass } = useProjectTheme();
 
     return (
-        <div className={`min-h-[100dvh] ${themeClass} transition-colors duration-500`} style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
-            <ProjectThemeToggle isLight={isLight} toggle={toggle} />
+        <div className="min-h-[100dvh] bg-background text-foreground">
             <Helmet>
                 <title>All Projects | ORBIT SaaS</title>
                 <meta name="description" content="Browse all projects built by ORBIT SaaS — web apps, AI solutions, mobile apps, and more." />

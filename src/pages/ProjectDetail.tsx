@@ -9,7 +9,6 @@ import { Chatbot } from '@/components/orbit/Chatbot';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ensureAbsoluteUrl } from '@/lib/utils';
-import { useProjectTheme, ProjectThemeToggle } from '@/components/orbit/ProjectThemeToggle';
 
 function ImageGallery({ images, title, onLightboxChange }: { images: string[]; title: string; onLightboxChange?: (open: boolean) => void }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -200,7 +199,6 @@ export default function ProjectDetail() {
     const { lang } = useLang();
     const { content } = useContent();
     const [lightboxOpen, setLightboxOpen] = useState(false);
-    const { isLight, toggle, themeClass } = useProjectTheme();
 
     // Data with Fallback Logic
     const enData = (content.en as any).projects || {};
@@ -269,8 +267,7 @@ export default function ProjectDetail() {
 
 
     return (
-        <div className={`min-h-[100dvh] relative ${themeClass} transition-colors duration-500`} style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
-            <ProjectThemeToggle isLight={isLight} toggle={toggle} />
+        <div className="min-h-[100dvh] relative bg-background text-foreground">
             {/* Neon Background Decorations */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.12),transparent_50%)] pointer-events-none z-0" />
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(0,245,255,0.08),transparent_50%)] pointer-events-none z-0" />

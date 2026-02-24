@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, Home, Layers, MessageSquare, Trophy, Users, Phone, FolderOpen } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Menu, X, Globe, Home, Layers, MessageSquare, Trophy, Users, Phone, FolderOpen, ChevronDown, MessageCircle, Mail } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import orbitLogo from '@/assets/orbit-logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -27,6 +27,19 @@ export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showNavbarCTA, setShowNavbarCTA] = useState(false);
+  const [isNavCtaOpen, setIsNavCtaOpen] = useState(false);
+  const navCtaRef = useRef<HTMLDivElement>(null);
+
+  // Close navbar CTA dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (navCtaRef.current && !navCtaRef.current.contains(e.target as Node)) {
+        setIsNavCtaOpen(false);
+      }
+    };
+    if (isNavCtaOpen) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isNavCtaOpen]);
 
   // Unified scroll handler — single listener with rAF throttling
   useEffect(() => {
@@ -157,18 +170,66 @@ export function Navbar() {
                       stiffness: 400,
                       damping: 30
                     }}
-                    className="flex shrink-0 overflow-hidden"
+                    className="hidden sm:flex shrink-0 overflow-visible relative"
+                    ref={navCtaRef}
                   >
-                    <motion.a
+                    <motion.button
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.96 }}
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"
+                      onClick={() => setIsNavCtaOpen(!isNavCtaOpen)}
+                      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"
                     >
                       {t.nav.bookCall}
-                    </motion.a>
+                      <div className="ml-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-white/20 border border-white/10">
+                        <ChevronDown strokeWidth={2.5} className={`w-3 h-3 text-white transition-transform duration-300 ${isNavCtaOpen ? 'rotate-180' : ''}`} />
+                      </div>
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {isNavCtaOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full right-0 mt-3 w-[220px] z-30 flex flex-col gap-2"
+                        >
+                          <motion.a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setIsNavCtaOpen(false)}
+                            whileHover={{ scale: 1.02, x: 5 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                          >
+                            <div className="w-9 h-9 rounded-lg bg-[#25D366]/10 flex items-center justify-center shrink-0 group-hover:bg-[#25D366]/20 transition-colors">
+                              <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                            </div>
+                            <div className="flex flex-col items-start text-left">
+                              <span className="text-sm">WhatsApp</span>
+                              <span className="text-[10px] text-muted-foreground font-normal">Contact directly</span>
+                            </div>
+                          </motion.a>
+
+                          <motion.a
+                            href="mailto:contact@orbitsaas.cloud"
+                            onClick={() => setIsNavCtaOpen(false)}
+                            whileHover={{ scale: 1.02, x: 5 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                          >
+                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                              <Mail className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="flex flex-col items-start text-left">
+                              <span className="text-sm">Email Us</span>
+                              <span className="text-[10px] text-muted-foreground font-normal">Send a detailed inquiry</span>
+                            </div>
+                          </motion.a>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 )}
               </AnimatePresence>

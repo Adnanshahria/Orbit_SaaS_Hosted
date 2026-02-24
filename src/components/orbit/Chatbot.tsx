@@ -655,13 +655,13 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
         onClick={() => setOpen(!open)}
         className={`fixed bottom-[12dvh] md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
           ? 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary text-primary-foreground neon-glow shadow-2xl hidden md:flex'
-          : 'w-[14vw] h-[14vw] max-w-[72px] max-h-[72px] sm:w-[104px] sm:h-[104px] sm:max-w-[104px] sm:max-h-[104px] bg-transparent'
+          : 'w-[12vw] h-[12vw] max-w-[60px] max-h-[60px] sm:w-[80px] sm:h-[80px] sm:max-w-[80px] sm:max-h-[80px] bg-transparent'
           }`}
       >
         {open ? (
           <X className="w-6 h-6" />
         ) : (
-          <div className="relative w-full h-full flex items-center justify-center drop-shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+          <div className="chatbot-float-icon relative w-full h-full flex items-center justify-center drop-shadow-[0_0_15px_rgba(124,58,237,0.5)]">
             <DotLottieReact
               src="/robot.json"
               loop
