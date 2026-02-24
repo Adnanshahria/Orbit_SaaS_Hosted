@@ -37,5 +37,3 @@ dist-ssr
 temp/
 bun.lockb
 
-# Unused/Garbage files
-Garbage/
