@@ -62,7 +62,7 @@ export function HeroSection() {
 
   // Loader sync: Only delay if this is the absolute first visit (loader runs for 3.5s)
   const [isFirstVisit] = useState(!sessionStorage.getItem('orbit_has_visited'));
-  const baseDelay = isFirstVisit ? 3.6 : 0;
+  const baseDelay = isFirstVisit ? 4.2 : 0;
 
   // Theme Customization from admin
   const taglineColor = (t.hero as any).taglineColor || '#00F5FF';
@@ -74,14 +74,45 @@ export function HeroSection() {
   const whatsappNumber = (t.contact as any).whatsapp || '';
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 
-  // Loading Sequence for Hero Title
+  // Loading Sequence for Hero Title — inline dice deposits letters
+  const [step, setStep] = useState(0);
   const [isHeroLoaded, setIsHeroLoaded] = useState(false);
+  const letters = ['O', 'R', 'B', 'I', 'T'];
+  const letterColors = ['#ffffff', '#00f5ff', '#a29bfe', '#00f5ff', '#ffffff'];
+  const letterGlows = [
+    '0 0 8px rgba(255,255,255,0.5)',
+    '0 0 8px rgba(0,245,255,0.5)',
+    '0 0 8px rgba(162,155,254,0.5)',
+    '0 0 8px rgba(0,245,255,0.5)',
+    '0 0 8px rgba(255,255,255,0.5)',
+  ];
+
+  // Dice rotation for each step — matches the CSS face transforms
+  const diceRotations = [
+    { x: 0, y: 0 },        // O (front face)
+    { x: 0, y: -180 },     // R (back face)
+    { x: 0, y: -450 },     // B (right face — extra full turn for drama)
+    { x: 0, y: -630 },     // I (left face)
+    { x: -90, y: -720 },   // T (top face)
+  ];
+
+  const revealedCount = Math.min(step, letters.length);
+  const showDice = step < letters.length;
+  const showSaaS = step > letters.length;
+  const diceRot = diceRotations[Math.min(step, diceRotations.length - 1)];
+
   useEffect(() => {
-    // Show the dice loader for 3.2 seconds, then reveal text
-    const timer = setTimeout(() => {
-      setIsHeroLoaded(true);
-    }, 3200);
-    return () => clearTimeout(timer);
+    // step 1-5: each letter loads, step 6: SaaS, step 7: hero transition
+    const timings = [600, 1200, 1800, 2400, 3000, 3500, 4100];
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    timings.forEach((ms, i) => {
+      timers.push(setTimeout(() => {
+        if (i < letters.length) setStep(i + 1);
+        else if (i === letters.length) setStep(letters.length + 1);
+        else setIsHeroLoaded(true);
+      }, ms));
+    });
+    return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
   return (
@@ -102,7 +133,7 @@ export function HeroSection() {
             <motion.div
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 3.0 }}
+              transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 4.3 }}
               className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-[2dvh] sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               style={{ color: taglineColor }}
             >
@@ -118,27 +149,95 @@ export function HeroSection() {
               {!isHeroLoaded ? (
                 <motion.div
                   key="loader"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 2, filter: 'blur(10px)' }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <div className="dice-container">
-                    <div className="dice">
-                      <div className="dice-face dice-face-front">O</div>
-                      <div className="dice-face dice-face-back">R</div>
-                      <div className="dice-face dice-face-right">B</div>
-                      <div className="dice-face dice-face-left">I</div>
-                      <div className="dice-face dice-face-top">T</div>
-                      <div className="dice-face dice-face-bottom">S</div>
-                    </div>
+                  {/* Inline row: revealed letters + dice + SaaS */}
+                  <div className="flex items-center justify-center">
+                    {/* Deposited letters */}
+                    {letters.map((letter, i) => (
+                      revealedCount > i && (
+                        <motion.span
+                          key={letter}
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 18,
+                          }}
+                          className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] font-poppins font-black tracking-tight inline-block will-change-transform"
+                          style={{
+                            color: letterColors[i],
+                            textShadow: letterGlows[i],
+                          }}
+                        >
+                          {letter}
+                        </motion.span>
+                      )
+                    ))}
+
+                    {/* The inline dice — rotates to show next letter */}
+                    {showDice && (
+                      <div
+                        className="hero-dice-wrapper inline-flex items-center justify-center mx-0.5 sm:mx-1"
+                      >
+                        <div
+                          className="hero-dice-cube will-change-transform"
+                          style={{
+                            transform: `rotateX(${diceRot.x}deg) rotateY(${diceRot.y}deg)`,
+                            transition: 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
+                          }}
+                        >
+                          {letters.map((l, i) => {
+                            const faces = [
+                              'rotateY(0deg) translateZ(var(--dice-half))',
+                              'rotateY(180deg) translateZ(var(--dice-half))',
+                              'rotateY(90deg) translateZ(var(--dice-half))',
+                              'rotateY(-90deg) translateZ(var(--dice-half))',
+                              'rotateX(90deg) translateZ(var(--dice-half))',
+                            ];
+                            return (
+                              <div
+                                key={l}
+                                className="dice-face hero-dice-face"
+                                style={{ transform: faces[i] }}
+                              >
+                                {l}
+                              </div>
+                            );
+                          })}
+                          <div
+                            className="dice-face hero-dice-face"
+                            style={{ transform: 'rotateX(-90deg) translateZ(var(--dice-half))' }}
+                          >
+                            S
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* "SaaS" pops in after dice finishes */}
+                    {showSaaS && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0, x: -10 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+                        className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4"
+                        style={{ color: '#6c5ce7', textShadow: '0 0 25px rgba(108,92,231,0.6), 0 0 50px rgba(108,92,231,0.3)' }}
+                      >
+                        SaaS
+                      </motion.span>
+                    )}
                   </div>
                 </motion.div>
               ) : (
                 <motion.div
                   key="hero-text"
-                  initial={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
+                  initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
                   animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                   transition={{ type: 'spring', stiffness: 80, damping: 18 }}
                   className="flex flex-col items-center"

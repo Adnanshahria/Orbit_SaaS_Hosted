@@ -478,7 +478,7 @@ html {
 
 /* ── 3D Dice Loader Animation ── */
 .dice-container {
-  perspective: 1000px;
+  perspective: 800px;
   width: 60px;
   height: 60px;
   margin: 0 auto;
@@ -496,14 +496,13 @@ html {
   position: absolute;
   width: 60px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.05);
+  background: #1a1535;
   border: 1.5px solid var(--neon-purple);
   border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(4px);
-  box-shadow: inset 0 0 15px rgba(108, 92, 231, 0.2), 0 0 10px rgba(108, 92, 231, 0.1);
+  box-shadow: 0 0 8px rgba(108, 92, 231, 0.15);
   font-family: 'Poppins', sans-serif;
   font-weight: 800;
   font-size: 32px;
@@ -514,46 +513,101 @@ html {
 .dice-face-front {
   transform: rotateY(0deg) translateZ(30px);
   color: #ffffff;
-  text-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
+  text-shadow: 0 0 12px #ffffff;
 }
 
 .dice-face-back {
   transform: rotateY(180deg) translateZ(30px);
   color: var(--neon-cyan);
-  text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+  text-shadow: 0 0 12px var(--neon-cyan);
 }
 
 .dice-face-right {
   transform: rotateY(90deg) translateZ(30px);
   color: #a29bfe;
-  text-shadow: 0 0 15px #a29bfe, 0 0 30px #a29bfe;
+  text-shadow: 0 0 12px #a29bfe;
 }
 
 .dice-face-left {
   transform: rotateY(-90deg) translateZ(30px);
   color: var(--neon-cyan);
-  text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+  text-shadow: 0 0 12px var(--neon-cyan);
 }
 
 .dice-face-top {
   transform: rotateX(90deg) translateZ(30px);
   color: #ffffff;
-  text-shadow: 0 0 15px #ffffff, 0 0 30px #ffffff;
+  text-shadow: 0 0 12px #ffffff;
 }
 
 .dice-face-bottom {
   transform: rotateX(-90deg) translateZ(30px);
   color: #a29bfe;
-  text-shadow: 0 0 15px #a29bfe, 0 0 30px #a29bfe;
+  text-shadow: 0 0 12px #a29bfe;
 }
 
-/* Disable heavy blurs and shadows on mobile/low-end to save GPU */
+/* ── Responsive Inline Hero Dice ── */
+.hero-dice-wrapper {
+  --dice-size: 40px;
+  --dice-half: 20px;
+  perspective: 600px;
+  width: var(--dice-size);
+  height: var(--dice-size);
+}
+
+.hero-dice-cube {
+  width: var(--dice-size);
+  height: var(--dice-size);
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.hero-dice-face {
+  width: var(--dice-size) !important;
+  height: var(--dice-size) !important;
+  font-size: calc(var(--dice-size) * 0.48) !important;
+  background: #1a1535 !important;
+  border: 1.5px solid var(--neon-purple);
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(108, 92, 231, 0.2);
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .hero-dice-wrapper {
+    --dice-size: 55px;
+    --dice-half: 27.5px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .hero-dice-wrapper {
+    --dice-size: 75px;
+    --dice-half: 37.5px;
+  }
+
+  .hero-dice-face {
+    border-radius: 8px;
+    border-width: 2px;
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.2);
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1024px) {
+  .hero-dice-wrapper {
+    --dice-size: 90px;
+    --dice-half: 45px;
+  }
+}
+
+/* Mobile: remove text-shadow glow for performance */
 @media (max-width: 639px) {
-  .dice-face {
-    backdrop-filter: none;
+  .hero-dice-face {
+    text-shadow: none !important;
     box-shadow: none;
-    background: rgba(108, 92, 231, 0.15);
-    /* Solid transparent fallback */
+    border-radius: 5px;
   }
 }
 
