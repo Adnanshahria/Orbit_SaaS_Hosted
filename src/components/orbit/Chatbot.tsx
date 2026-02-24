@@ -1,6 +1,5 @@
-
 import { motion, AnimatePresence } from 'framer-motion';
-import { ElectricLoader } from '@/components/ui/ElectricLoader';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { MessageCircle, X, Send, Loader2, Trash2, MoreVertical, ChevronDown, Mail, Bot } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -526,15 +525,13 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
         {open ? (
           <X className="w-6 h-6" />
         ) : (
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Electric Loader Aura */}
-            <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
-              <ElectricLoader size={140} />
-            </div>
-
-            <div className="relative z-10 w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-2xl neon-glow border border-white/20">
-              <Bot className="w-8 h-8 text-white" />
-            </div>
+          <div className="relative w-full h-full flex items-center justify-center drop-shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+            <DotLottieReact
+              src="/robot.json"
+              loop
+              autoplay
+              className="w-full h-full object-contain scale-[1.2]"
+            />
           </div>
         )}
       </motion.button>
@@ -645,7 +642,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 {messages.length === 0 && !isLoading && (
                   <div className="space-y-4 py-2">
                     <div className="flex gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                         <Bot className="w-4 h-4 text-primary" />
                       </div>
                       <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-xs text-foreground max-w-[85%] shadow-sm leading-relaxed">
@@ -683,7 +680,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                     <div key={i} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                       <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
                         {isAssistant && (
-                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                             <Bot className="w-4 h-4 text-primary" />
                           </div>
                         )}
@@ -753,7 +750,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
 
                 {isLoading && (
                   <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                       <Bot className="w-4 h-4 text-primary" />
                     </div>
                     <div className="bg-secondary rounded-xl rounded-tl-none px-3 py-2 text-sm text-foreground shadow-sm">
