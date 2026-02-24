@@ -78,14 +78,6 @@ export function HeroSection() {
   const [step, setStep] = useState(0);
   const [isHeroLoaded, setIsHeroLoaded] = useState(false);
   const letters = ['O', 'R', 'B', 'I', 'T'];
-  const letterColors = ['#ffffff', '#00f5ff', '#a29bfe', '#00f5ff', '#ffffff'];
-  const letterGlows = [
-    '0 0 8px rgba(255,255,255,0.5)',
-    '0 0 8px rgba(0,245,255,0.5)',
-    '0 0 8px rgba(162,155,254,0.5)',
-    '0 0 8px rgba(0,245,255,0.5)',
-    '0 0 8px rgba(255,255,255,0.5)',
-  ];
 
   // Dice rotation for each step — matches the CSS face transforms
   const diceRotations = [
@@ -145,117 +137,92 @@ export function HeroSection() {
           )}
 
           <div className="text-foreground leading-[1] mb-[2.5dvh] sm:mb-10 min-h-[20dvh] sm:min-h-[180px] flex flex-col items-center justify-center relative">
-            <AnimatePresence mode="wait">
-              {!isHeroLoaded ? (
-                <motion.div
-                  key="loader"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
-                  transition={{ duration: 0.35, ease: "easeInOut" }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  {/* Inline row: revealed letters + dice + SaaS */}
-                  <div className="flex items-center justify-center">
-                    {/* Deposited letters */}
-                    {letters.map((letter, i) => (
-                      revealedCount > i && (
-                        <motion.span
-                          key={letter}
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{
-                            type: 'spring',
-                            stiffness: 300,
-                            damping: 18,
-                          }}
-                          className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] font-poppins font-black tracking-tight inline-block will-change-transform"
-                          style={{
-                            color: letterColors[i],
-                            textShadow: letterGlows[i],
-                          }}
-                        >
-                          {letter}
-                        </motion.span>
-                      )
-                    ))}
-
-                    {/* The inline dice — rotates to show next letter */}
-                    {showDice && (
-                      <div
-                        className="hero-dice-wrapper inline-flex items-center justify-center mx-0.5 sm:mx-1"
-                      >
-                        <div
-                          className="hero-dice-cube will-change-transform"
-                          style={{
-                            transform: `rotateX(${diceRot.x}deg) rotateY(${diceRot.y}deg)`,
-                            transition: 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
-                          }}
-                        >
-                          {letters.map((l, i) => {
-                            const faces = [
-                              'rotateY(0deg) translateZ(var(--dice-half))',
-                              'rotateY(180deg) translateZ(var(--dice-half))',
-                              'rotateY(90deg) translateZ(var(--dice-half))',
-                              'rotateY(-90deg) translateZ(var(--dice-half))',
-                              'rotateX(90deg) translateZ(var(--dice-half))',
-                            ];
-                            return (
-                              <div
-                                key={l}
-                                className="dice-face hero-dice-face"
-                                style={{ transform: faces[i] }}
-                              >
-                                {l}
-                              </div>
-                            );
-                          })}
-                          <div
-                            className="dice-face hero-dice-face"
-                            style={{ transform: 'rotateX(-90deg) translateZ(var(--dice-half))' }}
-                          >
-                            S
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* "SaaS" pops in after dice finishes */}
-                    {showSaaS && (
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0, x: -10 }}
-                        animate={{ opacity: 1, scale: 1, x: 0 }}
-                        transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-                        className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4"
-                        style={{ color: '#6c5ce7', textShadow: '0 0 25px rgba(108,92,231,0.6), 0 0 50px rgba(108,92,231,0.3)' }}
-                      >
-                        SaaS
-                      </motion.span>
-                    )}
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="hero-text"
-                  initial={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                  transition={{ type: 'spring', stiffness: 80, damping: 18 }}
-                  className="flex flex-col items-center"
-                >
-                  <span className="block text-[clamp(2.5rem,13vw,4.5rem)] leading-[1] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight whitespace-nowrap">
-                    <span className="inline-block animate-text-shimmer-orbit drop-shadow-lg pb-1">ORBIT</span>{' '}
-                    <span className="inline-block animate-text-shimmer-saas drop-shadow-lg pb-1">SaaS</span>
-                  </span>
+            {/* ORBIT SaaS title — dice deposits letters inline, they stay as the final title */}
+            <div className="flex items-center justify-center whitespace-nowrap">
+              {/* Deposited letters */}
+              {letters.map((letter, i) => (
+                revealedCount > i && (
                   <motion.span
-                    className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
-                    style={{ color: titleColor }}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.2 }}
+                    key={letter}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 200,
+                      damping: 20,
+                    }}
+                    className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit drop-shadow-lg pb-1"
                   >
-                    {t.hero.title}
+                    {letter}
                   </motion.span>
-                </motion.div>
+                )
+              ))}
+
+              {/* The inline dice — rotates to show next letter */}
+              {showDice && (
+                <div
+                  className="hero-dice-wrapper inline-flex items-center justify-center mx-0.5 sm:mx-1"
+                >
+                  <div
+                    className="hero-dice-cube will-change-transform"
+                    style={{
+                      transform: `rotateX(${diceRot.x}deg) rotateY(${diceRot.y}deg)`,
+                      transition: 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
+                    }}
+                  >
+                    {letters.map((l, i) => {
+                      const faces = [
+                        'rotateY(0deg) translateZ(var(--dice-half))',
+                        'rotateY(180deg) translateZ(var(--dice-half))',
+                        'rotateY(90deg) translateZ(var(--dice-half))',
+                        'rotateY(-90deg) translateZ(var(--dice-half))',
+                        'rotateX(90deg) translateZ(var(--dice-half))',
+                      ];
+                      return (
+                        <div
+                          key={l}
+                          className="dice-face hero-dice-face"
+                          style={{ transform: faces[i] }}
+                        >
+                          {l}
+                        </div>
+                      );
+                    })}
+                    <div
+                      className="dice-face hero-dice-face"
+                      style={{ transform: 'rotateX(-90deg) translateZ(var(--dice-half))' }}
+                    >
+                      S
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* "SaaS" pops in after dice finishes */}
+              {showSaaS && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0, x: -10 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+                  className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas drop-shadow-lg pb-1"
+                >
+                  SaaS
+                </motion.span>
+              )}
+            </div>
+
+            {/* Subtitle — smoothly appears after dice animation completes */}
+            <AnimatePresence>
+              {isHeroLoaded && (
+                <motion.span
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.15 }}
+                  className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
+                  style={{ color: titleColor }}
+                >
+                  {t.hero.title}
+                </motion.span>
               )}
             </AnimatePresence>
           </div>

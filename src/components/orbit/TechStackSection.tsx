@@ -37,8 +37,8 @@ function MarqueeRow({
 
       {/* Scrolling pills */}
       <div className="relative w-full overflow-hidden">
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-transparent to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-transparent to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-r from-[#0a0a12] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-l from-[#0a0a12] to-transparent z-10 pointer-events-none" />
         <div
           className="flex w-max gap-4 py-1"
           style={{
@@ -51,7 +51,7 @@ function MarqueeRow({
           {items.map((item, i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 rounded-full px-5 py-2.5 border border-border/50 bg-card/70 hover:border-foreground/25 gentle-animation whitespace-nowrap group cursor-default"
+              className="flex items-center gap-2.5 rounded-full px-5 py-2.5 border border-[#2a2a3e] bg-[#12121a] hover:border-[#3a3a50] gentle-animation whitespace-nowrap group cursor-default"
             >
               <span
                 className="w-2.5 h-2.5 rounded-full flex-shrink-0 group-hover:scale-125 gentle-animation"

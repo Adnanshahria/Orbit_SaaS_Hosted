@@ -648,3 +648,13 @@ html {
     transform: rotateX(-270deg) rotateY(-720deg) rotateZ(0deg);
   }
 }
+
+/* ── Marquee / Tech Stack Scroll ── */
+@keyframes marquee {
+  0% {
+    transform: translateX(0) translateZ(0);
+  }
+  100% {
+    transform: translateX(-33.333%) translateZ(0);
+  }
+}
