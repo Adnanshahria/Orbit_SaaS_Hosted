@@ -96,14 +96,14 @@ export function HeroSection() {
         style={{ y: contentY }}
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
-        <div className="px-4 sm:px-14 py-10 sm:py-10 flex flex-col justify-between items-center min-h-[60dvh] sm:min-h-0">
+        <div className="px-4 sm:px-14 py-[3dvh] sm:py-10 flex flex-col justify-between items-center min-h-[55dvh] sm:min-h-0">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 3.0 }}
-              className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-8 sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+              className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-[2dvh] sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               style={{ color: taglineColor }}
             >
               <span
@@ -113,7 +113,7 @@ export function HeroSection() {
             </motion.div>
           )}
 
-          <div className="text-foreground leading-[1] mb-10 sm:mb-10 min-h-[180px] flex flex-col items-center justify-center relative">
+          <div className="text-foreground leading-[1] mb-[2.5dvh] sm:mb-10 min-h-[20dvh] sm:min-h-[180px] flex flex-col items-center justify-center relative">
             <AnimatePresence mode="wait">
               {!isHeroLoaded ? (
                 <motion.div
@@ -162,7 +162,7 @@ export function HeroSection() {
           </div>
 
           {/* Subtitle — word-by-word reveal */}
-          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-10 sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
+          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-[2.5dvh] sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
             {words.map((word, i) => (
               <motion.span
                 key={i}
@@ -298,7 +298,7 @@ export function HeroSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
         transition={{ type: 'spring', stiffness: 60, damping: 16, delay: showEmailBar ? 0 : 0 }}
-        className={`fixed bottom-[116px] left-4 right-[112px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+        className={`fixed bottom-[15dvh] left-4 right-[112px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
       >
         <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
           <input

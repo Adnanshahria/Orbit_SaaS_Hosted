@@ -115,8 +115,8 @@ export function SolarSystemAnimation() {
         let t = 0;
         const sunSpeed = 150;
         // Reduced trail points but compensated by faster speed
-        const trailPoints = isMobile ? 20 : (lowEnd ? 35 : 60);
-        const trailDt = 0.03;
+        const trailPoints = isMobile ? 30 : (lowEnd ? 50 : 85);
+        const trailDt = 0.025;
         // Target animation speed: t units per second (matches original 60fps * 0.02 = 1.2/s)
         const animSpeed = 1.2;
 
