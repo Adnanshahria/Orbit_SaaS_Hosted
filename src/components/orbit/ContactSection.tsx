@@ -95,7 +95,7 @@ export function ContactSection() {
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-4 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-[#25D366]/10 flex items-center justify-center shrink-0 group-hover:bg-[#25D366]/20 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-[#1a2e24] flex items-center justify-center shrink-0 group-hover:bg-[#1f3a2b] transition-colors">
                         <MessageCircle className="w-5 h-5 text-[#25D366]" />
                       </div>
                       <div className="flex flex-col items-start text-left">
@@ -111,7 +111,7 @@ export function ContactSection() {
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-4 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-[#211e38] flex items-center justify-center shrink-0 group-hover:bg-[#2a2445] transition-colors">
                         <Mail className="w-5 h-5 text-primary" />
                       </div>
                       <div className="flex flex-col items-start text-left">
