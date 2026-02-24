@@ -201,32 +201,32 @@ export function Navbar() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => setIsNavCtaOpen(false)}
-                            whileHover={{ scale: 1.02, x: 5 }}
+                            whileHover={{ scale: 1.02, x: 3 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                            className="flex items-center gap-3 px-3 py-2.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
                           >
-                            <div className="w-9 h-9 rounded-lg bg-[#1a2e24] flex items-center justify-center shrink-0 group-hover:bg-[#1f3a2b] transition-colors">
-                              <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                            <div className="w-7 h-7 rounded-md bg-[#1a2e24] flex items-center justify-center shrink-0 group-hover:bg-[#1f3a2b] transition-colors">
+                              <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
                             </div>
-                            <div className="flex flex-col items-start text-left">
+                            <div className="flex flex-col items-start">
                               <span className="text-sm">WhatsApp</span>
-                              <span className="text-[10px] text-muted-foreground font-normal">Contact directly</span>
+                              <span className="text-[10px] text-muted-foreground font-normal leading-tight">Direct inquiry</span>
                             </div>
                           </motion.a>
 
                           <motion.a
                             href="mailto:contact@orbitsaas.cloud"
                             onClick={() => setIsNavCtaOpen(false)}
-                            whileHover={{ scale: 1.02, x: 5 }}
+                            whileHover={{ scale: 1.02, x: 3 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex items-center gap-3 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                            className="flex items-center gap-3 px-3 py-2.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
                           >
-                            <div className="w-9 h-9 rounded-lg bg-[#211e38] flex items-center justify-center shrink-0 group-hover:bg-[#2a2445] transition-colors">
-                              <Mail className="w-4 h-4 text-primary" />
+                            <div className="w-7 h-7 rounded-md bg-[#211e38] flex items-center justify-center shrink-0 group-hover:bg-[#2a2445] transition-colors">
+                              <Mail className="w-3.5 h-3.5 text-primary" />
                             </div>
-                            <div className="flex flex-col items-start text-left">
+                            <div className="flex flex-col items-start">
                               <span className="text-sm">Email Us</span>
-                              <span className="text-[10px] text-muted-foreground font-normal">Send a detailed inquiry</span>
+                              <span className="text-[10px] text-muted-foreground font-normal leading-tight">Send a detailed inquiry</span>
                             </div>
                           </motion.a>
                         </motion.div>
