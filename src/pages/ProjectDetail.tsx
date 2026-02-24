@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight, X, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, X, ArrowRight } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
 import { Navbar } from '@/components/orbit/Navbar';
@@ -194,6 +194,113 @@ function stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
 }
 
+function CollapsibleCards({ blocks }: { blocks: string[] }) {
+    // First card expanded, rest collapsed by default
+    const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+    const toggle = (i: number) => {
+        setExpanded(prev => {
+            const next = new Set(prev);
+            if (next.has(i)) next.delete(i);
+            else next.add(i);
+            return next;
+        });
+    };
+
+    return (
+        <div className="space-y-4 sm:space-y-6">
+            {blocks.map((block: string, i: number) => {
+                // Extract heading from block if present
+                const headingMatch = block.match(/^<h3([^>]*)>(.*?)<\/h3>/i);
+                const heading = headingMatch ? headingMatch[2].replace(/<[^>]*>/g, '').trim() : '';
+                const headingColor = headingMatch ? (headingMatch[1].match(/data-color="([^"]*)"/i)?.[1] || '') : '';
+                const bodyHtml = headingMatch ? block.replace(/^<h3[^>]*>.*?<\/h3>/i, '').trim() : block;
+                const isExpanded = expanded.has(i);
+
+                // For cards without heading, show a text preview
+                const label = heading || `Section ${i + 1}`;
+                const preview = !heading ? stripHtml(bodyHtml).slice(0, 60) : '';
+
+                return (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
+                        className="rounded-xl sm:rounded-2xl border border-[#2a2a3e] bg-[#0e0e18]/80 overflow-hidden"
+                    >
+                        {/* Clickable heading bar - Premium styling */}
+                        <button
+                            type="button"
+                            onClick={() => toggle(i)}
+                            className={`w-full flex items-center gap-4 px-6 sm:px-8 py-5 sm:py-6 text-left transition-all duration-500 relative group/toggle ${isExpanded ? 'bg-white/[0.04]' : 'hover:bg-white/[0.02]'
+                                }`}
+                        >
+                            {/* Left accent border that glows when expanded */}
+                            <div
+                                className={`absolute left-0 top-0 bottom-0 w-1 transition-all duration-500 rounded-r-full ${isExpanded ? 'opacity-100 shadow-[2px_0_15px_rgba(108,92,231,0.4)]' : 'opacity-0'
+                                    }`}
+                                style={{ backgroundColor: headingColor || '#6c5ce7' }}
+                            />
+
+                            <div className="relative flex-shrink-0 group-hover/toggle:scale-105 transition-transform duration-500">
+                                {/* Glowing outer ring - highly reduced */}
+                                <div
+                                    className={`absolute -inset-[1px] rounded-full opacity-30 blur-[1px] transition-all duration-500 ${isExpanded ? 'opacity-60' : 'group-hover/toggle:opacity-50'}`}
+                                    style={{
+                                        background: `linear-gradient(135deg, ${headingColor || '#6c5ce7'}20, transparent, ${headingColor || '#00f5ff'}20)`
+                                    }}
+                                />
+                                {/* Main circle */}
+                                <div
+                                    className="relative flex items-center justify-center w-9 h-9 rounded-full border border-white/5 bg-[#0e0e18] shadow-inner"
+                                >
+                                    <ChevronDown
+                                        className={`w-4 h-4 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isExpanded ? '' : '-rotate-90'}`}
+                                        style={{ color: headingColor || '#a29bfe' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-1 min-w-0">
+                                <h3
+                                    className={`text-lg sm:text-2xl font-bold tracking-tight transition-all duration-500`}
+                                    style={{
+                                        color: headingColor || 'inherit',
+                                        textShadow: isExpanded && headingColor ? `0 0 8px ${headingColor}30` : undefined
+                                    }}
+                                >
+                                    {label}
+                                </h3>
+                                {!isExpanded && preview && (
+                                    <span className="text-sm text-muted-foreground/50 truncate font-medium tracking-wide">{preview}…</span>
+                                )}
+                            </div>
+                        </button>
+                        {/* Collapsible body */}
+                        <AnimatePresence initial={false}>
+                            {isExpanded && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                                    className="overflow-hidden"
+                                >
+                                    <div
+                                        className="px-5 sm:px-8 pb-5 sm:pb-7 pt-2 text-muted-foreground text-base sm:text-lg leading-relaxed space-y-4 [&_b]:font-bold [&_b]:text-foreground [&_i]:italic [&_span]:inline"
+                                        dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                );
+            })}
+        </div>
+    );
+}
+
 export default function ProjectDetail() {
     const { id } = useParams<{ id: string }>();
     const { lang } = useLang();
@@ -304,78 +411,65 @@ export default function ProjectDetail() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 flex flex-col lg:flex-row gap-10">
                     {/* Left: Main Content */}
                     <div className="flex-1 min-w-0">
-                        {/* Back link */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.4 }}
-                        >
-                            <Link
-                                to="/#projects"
-                                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors mb-8"
-                            >
-                                <ArrowLeft className="w-4 h-4" /> Back to Projects
-                            </Link>
-                        </motion.div>
 
-                        {/* Category Badges */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: 0.05 }}
-                            className="flex flex-wrap gap-2 mb-4"
-                        >
-                            {(project.categories || (project.category ? [project.category] : [])).map((cat: string, ci: number) => (
-                                <span
-                                    key={ci}
-                                    className="px-3 py-1 rounded-full bg-neon-cyan/10 text-neon-cyan text-xs font-bold uppercase tracking-wider border border-neon-cyan/20 shadow-[0_0_8px_rgba(0,245,255,0.1)]"
-                                >
-                                    {cat}
-                                </span>
-                            ))}
-                        </motion.div>
 
-                        {/* Title */}
-                        <motion.h1
+
+                        {/* Project Title Card — Premium hero card */}
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6 neon-text"
+                            transition={{ duration: 0.5, delay: 0.05 }}
+                            className="rounded-2xl border border-[#2a2a3e] bg-[#0e0e18]/80 px-6 sm:px-10 py-8 sm:py-10 mb-6 relative overflow-hidden"
                         >
-                            {project.title}
-                        </motion.h1>
+                            {/* Subtle gradient accent */}
+                            <div className="absolute top-0 left-0 w-48 h-48 bg-[radial-gradient(circle,rgba(108,92,231,0.12),transparent_70%)] pointer-events-none" />
+                            <div className="absolute bottom-0 right-0 w-32 h-32 bg-[radial-gradient(circle,rgba(0,245,255,0.06),transparent_70%)] pointer-events-none" />
 
-                        {/* Tags */}
-                        {project.tags && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                                className="flex flex-wrap gap-2 mb-8"
-                            >
-                                {project.tags.map((tag: string, j: number) => (
+                            {/* Title — Centered */}
+                            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6 neon-text relative z-10 text-center">
+                                {project.title}
+                            </h1>
+
+                            {/* Tags + Categories combined */}
+                            <div className="flex flex-wrap justify-center gap-2 relative z-10">
+                                {(project.categories || (project.category ? [project.category] : [])).map((cat: string, ci: number) => (
                                     <span
-                                        key={j}
+                                        key={`cat-${ci}`}
+                                        className="px-3 py-1.5 rounded-full bg-neon-cyan/10 text-neon-cyan text-sm font-bold uppercase tracking-wider border border-neon-cyan/20 shadow-[0_0_8px_rgba(0,245,255,0.1)]"
+                                    >
+                                        {cat}
+                                    </span>
+                                ))}
+                                {project.tags && project.tags.map((tag: string, j: number) => (
+                                    <span
+                                        key={`tag-${j}`}
                                         className="px-3 py-1.5 rounded-full bg-neon-purple/10 text-neon-purple text-sm font-medium border border-neon-purple/15"
                                     >
                                         {tag}
                                     </span>
                                 ))}
-                            </motion.div>
-                        )}
+                            </div>
 
-                        {/* Description */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="prose-section"
-                        >
-                            <div
-                                className="text-muted-foreground text-base sm:text-lg leading-relaxed space-y-4 [&_b]:font-bold [&_b]:text-foreground [&_i]:italic [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_hr]:my-6 [&_hr]:border-white/[0.06] [&_span]:inline"
-                                dangerouslySetInnerHTML={{ __html: project.desc || '' }}
-                            />
+                            {/* Bottom accent line */}
+                            <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[#6c5ce7]/20 to-transparent" />
                         </motion.div>
+
+                        {/* Description — each paragraph section in its own collapsible card */}
+                        {(() => {
+                            const html = project.desc || '';
+                            // Split by <hr> (admin separator), then further by <h3> headings
+                            let blocks: string[] = [];
+                            const hrParts = html.split(/<hr\s*\/?>/i).filter((b: string) => b.trim());
+                            if (hrParts.length > 1) {
+                                blocks = hrParts;
+                            } else {
+                                const h3Parts = html.split(/(?=<h3[^>]*>)/i).filter((b: string) => b.trim());
+                                blocks = h3Parts.length > 0 ? h3Parts : [html];
+                            }
+                            const renderBlocks = blocks.filter((b: string) => b.trim());
+
+                            return <CollapsibleCards blocks={renderBlocks} />;
+                        })()}
 
                         {/* Live Link Button */}
                         {project.link && project.link !== '#' && (

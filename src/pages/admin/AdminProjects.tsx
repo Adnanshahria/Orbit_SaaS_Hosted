@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle, JsonPanel } from '@/components/admin/EditorComponents';
-import { Upload, Trash2, X, Plus, Layers, Settings2 } from 'lucide-react';
+import { Upload, Trash2, X, Plus, Layers, Settings2, ChevronDown } from 'lucide-react';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { useContent } from '@/contexts/ContentContext';
 import { uploadToImgBB } from '@/lib/imgbb';
@@ -203,6 +203,16 @@ const DEFAULT_PROJECT: UnifiedProject = {
 
 function ProjectEditor({ item, update, categories: availableCategories }: { item: UnifiedProject; update: (i: UnifiedProject) => void; categories: string[] }) {
     const [tab, setTab] = useState<'en' | 'bn'>('en');
+    const [collapsedSections, setCollapsedSections] = useState<Set<number>>(new Set());
+
+    const toggleSection = (index: number) => {
+        setCollapsedSections(prev => {
+            const next = new Set(prev);
+            if (next.has(index)) next.delete(index);
+            else next.add(index);
+            return next;
+        });
+    };
 
     // Helper to update localized content
     const updateLoc = (lang: 'en' | 'bn', field: keyof LocalizedContent, value: any) => {
@@ -256,8 +266,8 @@ function ProjectEditor({ item, update, categories: availableCategories }: { item
                                             update({ ...item, categories: updated.length > 0 ? updated : [cat] });
                                         }}
                                         className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${isSelected
-                                                ? 'bg-primary text-white shadow-sm'
-                                                : 'bg-background/50 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border/50'
+                                            ? 'bg-primary text-white shadow-sm'
+                                            : 'bg-background/50 text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border/50'
                                             }`}
                                     >
                                         {cat}
@@ -365,12 +375,188 @@ function ProjectEditor({ item, update, categories: availableCategories }: { item
                         lang={tab}
                     />
 
-                    <RichTextEditor
-                        label={tab === 'en' ? "Description" : "বিবরণ"}
-                        value={item[tab].description || ''}
-                        onChange={v => updateLoc(tab, 'description', v)}
-                        lang={tab}
-                    />
+                    {/* Multi-Paragraph Description Editor */}
+                    {(() => {
+                        // Parse existing description into paragraph blocks: split by <h3>
+                        const rawDesc = item[tab].description || '';
+                        const parseParagraphs = (html: string): { heading: string; body: string; color: string }[] => {
+                            if (!html.trim()) return [{ heading: '', body: '', color: '' }];
+                            // First split by <hr>, then further split by <h3> within each part
+                            const hrParts = html.split(/<hr\s*\/?>/i).filter(p => p.trim());
+                            if (hrParts.length === 0) return [{ heading: '', body: html, color: '' }];
+                            const result: { heading: string; body: string; color: string }[] = [];
+                            for (const hrPart of hrParts) {
+                                // Check if this part starts with <h3>
+                                const h3Parts = hrPart.split(/(?=<h3[^>]*>)/i).filter(p => p.trim());
+                                for (const part of h3Parts) {
+                                    const headingMatch = part.match(/^<h3([^>]*)>(.*?)<\/h3>/i);
+                                    if (headingMatch) {
+                                        const attrs = headingMatch[1];
+                                        const colorMatch = attrs.match(/data-color="([^"]*)"/i);
+                                        result.push({
+                                            heading: headingMatch[2].replace(/<[^>]*>/g, '').trim(),
+                                            body: part.replace(/^<h3[^>]*>.*?<\/h3>/i, '').trim(),
+                                            color: colorMatch ? colorMatch[1] : ''
+                                        });
+                                    } else {
+                                        result.push({ heading: '', body: part.trim(), color: '' });
+                                    }
+                                }
+                            }
+                            return result.length > 0 ? result : [{ heading: '', body: html, color: '' }];
+                        };
+
+                        const paragraphs = parseParagraphs(rawDesc);
+
+                        // Join paragraphs back into a single HTML string using <hr> separator
+                        const joinParagraphs = (paras: { heading: string; body: string; color: string }[]) => {
+                            return paras.map(p => {
+                                if (!p.heading.trim()) return p.body || '<p><br></p>';
+                                const colorAttr = p.color ? ` data-color="${p.color}"` : '';
+                                return `<h3${colorAttr}>${p.heading.trim()}</h3>` + (p.body || '<p><br></p>');
+                            }).join('<hr>');
+                        };
+
+                        const updateParagraphs = (newParas: { heading: string; body: string; color: string }[]) => {
+                            updateLoc(tab, 'description', joinParagraphs(newParas));
+                        };
+
+                        return (
+                            <div className="space-y-3">
+                                <label className="text-sm font-medium text-foreground block">
+                                    {tab === 'en' ? 'Description Paragraphs' : 'বিবরণ অনুচ্ছেদ'}
+                                    <span className="text-xs text-muted-foreground ml-2">({paragraphs.length} sections — each becomes a card)</span>
+                                </label>
+                                {paragraphs.map((para, pi) => {
+                                    const isCollapsed = collapsedSections.has(pi);
+                                    return (
+                                        <div key={pi} className="rounded-xl border border-border bg-secondary/30 overflow-hidden relative group">
+                                            <div
+                                                className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-secondary/50 transition-colors"
+                                                onClick={() => toggleSection(pi)}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`} />
+                                                    {para.color && <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: para.color }} />}
+                                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                                                        Section {pi + 1}
+                                                    </span>
+                                                    {isCollapsed && para.heading && (
+                                                        <span className="text-xs text-foreground/60 ml-1 truncate max-w-[200px]">
+                                                            — {para.heading}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                                                    {pi > 0 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const updated = [...paragraphs];
+                                                                [updated[pi - 1], updated[pi]] = [updated[pi], updated[pi - 1]];
+                                                                updateParagraphs(updated);
+                                                            }}
+                                                            className="p-1 rounded bg-secondary hover:bg-primary/20 text-xs"
+                                                            title="Move up"
+                                                        >↑</button>
+                                                    )}
+                                                    {pi < paragraphs.length - 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const updated = [...paragraphs];
+                                                                [updated[pi], updated[pi + 1]] = [updated[pi + 1], updated[pi]];
+                                                                updateParagraphs(updated);
+                                                            }}
+                                                            className="p-1 rounded bg-secondary hover:bg-primary/20 text-xs"
+                                                            title="Move down"
+                                                        >↓</button>
+                                                    )}
+                                                    {paragraphs.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const updated = paragraphs.filter((_, j) => j !== pi);
+                                                                updateParagraphs(updated);
+                                                            }}
+                                                            className="p-1 rounded bg-secondary hover:bg-red-500/20 hover:text-red-400 text-muted-foreground"
+                                                            title="Remove section"
+                                                        ><Trash2 className="w-3.5 h-3.5" /></button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {!isCollapsed && (
+                                                <div className="px-4 pb-4 space-y-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder={tab === 'en' ? "Section heading (optional, e.g. 'How We Solved the Problem')" : "শিরোনাম (ঐচ্ছিক)"}
+                                                            value={para.heading}
+                                                            onChange={e => {
+                                                                const updated = [...paragraphs];
+                                                                updated[pi] = { ...updated[pi], heading: e.target.value };
+                                                                updateParagraphs(updated);
+                                                            }}
+                                                            className="flex-1 bg-background rounded-lg px-4 py-2.5 text-sm text-foreground font-semibold outline-none border border-border placeholder:font-normal placeholder:text-muted-foreground"
+                                                        />
+                                                        <div className="relative flex items-center gap-1.5">
+                                                            <label className="flex items-center gap-1.5 cursor-pointer px-2 py-1.5 rounded-lg border border-border bg-background hover:bg-secondary/50 transition-colors" title="Title color">
+                                                                <span
+                                                                    className="w-5 h-5 rounded-full border border-border/50 flex-shrink-0"
+                                                                    style={{ backgroundColor: para.color || '#ffffff' }}
+                                                                />
+                                                                <input
+                                                                    type="color"
+                                                                    value={para.color || '#ffffff'}
+                                                                    onChange={e => {
+                                                                        const updated = [...paragraphs];
+                                                                        updated[pi] = { ...updated[pi], color: e.target.value };
+                                                                        updateParagraphs(updated);
+                                                                    }}
+                                                                    className="sr-only"
+                                                                />
+                                                            </label>
+                                                            {para.color && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const updated = [...paragraphs];
+                                                                        updated[pi] = { ...updated[pi], color: '' };
+                                                                        updateParagraphs(updated);
+                                                                    }}
+                                                                    className="p-1 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400 transition-colors"
+                                                                    title="Reset color"
+                                                                >
+                                                                    <X className="w-3 h-3" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <RichTextEditor
+                                                        label=""
+                                                        value={para.body}
+                                                        onChange={v => {
+                                                            const updated = [...paragraphs];
+                                                            updated[pi] = { ...updated[pi], body: v };
+                                                            updateParagraphs(updated);
+                                                        }}
+                                                        lang={tab}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                                <button
+                                    type="button"
+                                    onClick={() => updateParagraphs([...paragraphs, { heading: '', body: '', color: '' }])}
+                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-border hover:border-primary/50 text-muted-foreground hover:text-primary text-sm font-medium transition-colors"
+                                >
+                                    <Plus className="w-4 h-4" /> Add Paragraph Section
+                                </button>
+                            </div>
+                        );
+                    })()}
                 </div>
             </div>
         </div>
