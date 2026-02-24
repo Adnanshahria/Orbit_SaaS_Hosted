@@ -77,8 +77,8 @@ export default function AdminFooter() {
 
     const [loading, setLoading] = useState(true);
     const [sectionInfo, setSectionInfo] = useState({
-        en: { rights: '', tagline: '' },
-        bn: { rights: '', tagline: '' },
+        en: { brandName: '', rights: '', tagline: '' },
+        bn: { brandName: '', rights: '', tagline: '' },
     });
     const [socials, setSocials] = useState<SocialLink[]>(DEFAULT_SOCIALS);
 
@@ -99,8 +99,8 @@ export default function AdminFooter() {
         const bnF = (content.bn.footer as any) || {};
 
         setSectionInfo({
-            en: { rights: enF.rights || '', tagline: enF.tagline || '' },
-            bn: { rights: bnF.rights || '', tagline: bnF.tagline || '' },
+            en: { brandName: enF.brandName || '', rights: enF.rights || '', tagline: enF.tagline || '' },
+            bn: { brandName: bnF.brandName || '', rights: bnF.rights || '', tagline: bnF.tagline || '' },
         });
 
         // Prefer EN socials, fallback to BN, then defaults
@@ -126,12 +126,14 @@ export default function AdminFooter() {
 
         try {
             const enOk = await updateSection('footer', 'en', {
+                brandName: sectionInfo.en.brandName,
                 rights: sectionInfo.en.rights,
                 tagline: sectionInfo.en.tagline,
                 socials,
             });
 
             const bnOk = await updateSection('footer', 'bn', {
+                brandName: sectionInfo.bn.brandName,
                 rights: sectionInfo.bn.rights,
                 tagline: sectionInfo.bn.tagline,
                 socials,
@@ -188,6 +190,14 @@ export default function AdminFooter() {
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary">English Footer Text</h3>
                     <TextField
+                        label="Brand Name"
+                        value={sectionInfo.en.brandName}
+                        onChange={(v) =>
+                            setSectionInfo({ ...sectionInfo, en: { ...sectionInfo.en, brandName: v } })
+                        }
+                        lang="en"
+                    />
+                    <TextField
                         label="Rights Text"
                         value={sectionInfo.en.rights}
                         onChange={(v) =>
@@ -206,6 +216,14 @@ export default function AdminFooter() {
                 </div>
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary">Bangla Footer Text</h3>
+                    <TextField
+                        label="ব্র্যান্ড নাম (Brand Name)"
+                        value={sectionInfo.bn.brandName}
+                        onChange={(v) =>
+                            setSectionInfo({ ...sectionInfo, bn: { ...sectionInfo.bn, brandName: v } })
+                        }
+                        lang="bn"
+                    />
                     <TextField
                         label="রাইটস টেক্সট (Rights)"
                         value={sectionInfo.bn.rights}
@@ -279,11 +297,13 @@ export default function AdminFooter() {
                 <JsonPanel
                     data={{
                         en: {
+                            brandName: sectionInfo.en.brandName,
                             rights: sectionInfo.en.rights,
                             tagline: sectionInfo.en.tagline,
                             socials,
                         },
                         bn: {
+                            brandName: sectionInfo.bn.brandName,
                             rights: sectionInfo.bn.rights,
                             tagline: sectionInfo.bn.tagline,
                             socials,
@@ -295,8 +315,8 @@ export default function AdminFooter() {
                             return;
                         }
                         setSectionInfo({
-                            en: { rights: parsed.en.rights || '', tagline: parsed.en.tagline || '' },
-                            bn: { rights: parsed.bn.rights || '', tagline: parsed.bn.tagline || '' },
+                            en: { brandName: parsed.en.brandName || '', rights: parsed.en.rights || '', tagline: parsed.en.tagline || '' },
+                            bn: { brandName: parsed.bn.brandName || '', rights: parsed.bn.rights || '', tagline: parsed.bn.tagline || '' },
                         });
                         // Socials are usually shared, so we take from EN if present
                         if (parsed.en.socials) {

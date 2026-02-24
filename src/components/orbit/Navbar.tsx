@@ -73,13 +73,15 @@ export function Navbar() {
           setActiveSection(`#${current}`);
         }
 
-        // CTA visibility based on Hero button position
+        // CTA visibility — show after hero CTA scrolls away, hide when contact section is visible
         const heroBtn = document.getElementById('hero-book-appointment');
+        const contactEl = document.getElementById('contact');
+        const contactVisible = contactEl ? contactEl.getBoundingClientRect().top < window.innerHeight * 0.75 : false;
         if (heroBtn) {
           const rect = heroBtn.getBoundingClientRect();
-          setShowNavbarCTA(rect.top < -50);
+          setShowNavbarCTA(rect.top < -50 && !contactVisible);
         } else {
-          setShowNavbarCTA(true);
+          setShowNavbarCTA(!contactVisible);
         }
       });
     };

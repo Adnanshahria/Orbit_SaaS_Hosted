@@ -92,6 +92,7 @@ export const translations = {
       whatsapp: '+8801853452264',
     },
     footer: {
+      brandName: 'ORBIT SaaS',
       rights: '© 2025 ORBIT SaaS. All rights reserved.',
       tagline: 'Full-Service Software & AI Agency — Web, AI, Mobile & Beyond.',
       socials: [
@@ -204,6 +205,7 @@ export const translations = {
       whatsapp: '+8801853452264',
     },
     footer: {
+      brandName: 'ORBIT SaaS',
       rights: '© ২০২৫ ORBIT SaaS। সমস্ত অধিকার সংরক্ষিত।',
       tagline: 'ফুল-সার্ভিস সফটওয়্যার ও এআই এজেন্সি — ওয়েব, এআই, মোবাইল এবং আরও অনেক কিছু।',
       socials: [

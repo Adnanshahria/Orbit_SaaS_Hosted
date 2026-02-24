@@ -48,8 +48,6 @@ export function HeroSection() {
     offset: ['start start', 'end start'],
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const contentY = useTransform(scrollYProgress, [0, 0.5], ['0%', '15%']);
 
   // Hide email bar when user scrolls past hero on mobile
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
@@ -111,12 +109,11 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-x-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
     >
 
 
-      <motion.div
-        style={{ y: contentY }}
+      <div
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       >
         <div className="px-4 sm:px-14 py-[3dvh] sm:py-10 flex flex-col justify-between items-center min-h-[55dvh] sm:min-h-0">
@@ -357,7 +354,7 @@ export function HeroSection() {
             )}
           </motion.div>
         </div>{/* End Hero Container Card */}
-      </motion.div>
+      </div>
 
       {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
       <motion.div
