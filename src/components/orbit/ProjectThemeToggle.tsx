@@ -28,7 +28,7 @@ export function ProjectThemeToggle({ isLight, toggle }: { isLight: boolean; togg
     return (
         <button
             onClick={toggle}
-            className={`fixed bottom-6 left-6 z-50 p-3 rounded-full backdrop-blur-xl border transition-all duration-500 group ${isLight
+            className={`fixed bottom-20 md:bottom-6 left-4 md:left-6 z-[130] p-3 rounded-full backdrop-blur-xl border transition-all duration-500 cursor-pointer group ${isLight
                 ? 'bg-white/80 border-gray-200 text-gray-700 hover:bg-white shadow-lg shadow-gray-200/50'
                 : 'bg-white/[0.05] border-white/[0.1] text-white/80 hover:bg-white/[0.1] hover:border-neon-purple/40 shadow-[0_0_15px_rgba(108,92,231,0.15)]'
                 }`}

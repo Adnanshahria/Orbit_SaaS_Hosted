@@ -122,19 +122,16 @@ export default function ProjectsPage() {
                                 <div className="inline-block px-4 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-xs font-bold uppercase tracking-widest mb-4 neon-text">
                                     Our Portfolio
                                 </div>
-                                <h1 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
-                                    {sectionTitle}
-                                </h1>
                                 <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                                     {sectionSubtitle}
                                 </p>
 
-                                <div className="flex flex-wrap justify-center gap-2 mt-6 sm:mt-8">
+                                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mt-4 sm:mt-8">
                                     {ALL_CATEGORIES.map((cat) => (
                                         <button
                                             key={cat}
                                             onClick={() => setActiveCategory(cat)}
-                                            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${activeCategory === cat
+                                            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 border cursor-pointer ${activeCategory === cat
                                                 ? 'bg-neon-purple/20 text-neon-purple border-neon-purple/40 shadow-[0_0_15px_rgba(108,92,231,0.25)] scale-105'
                                                 : 'bg-white/[0.03] text-muted-foreground border-white/10 hover:bg-white/[0.06] hover:text-foreground hover:border-white/20 backdrop-blur-sm'
                                                 }`}
