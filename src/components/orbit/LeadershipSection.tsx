@@ -46,26 +46,25 @@ export function LeadershipSection() {
   const tagline = t.leadership.tagline;
 
   return (
-    <section id="leadership" className="py-10 sm:py-24 px-3 sm:px-6 relative">
+    <section id="leadership" className="py-10 sm:py-20 px-3 sm:px-6 relative scroll-mt-12">
 
-
-      <div className="max-w-7xl mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+      <div className="w-full mx-auto relative" ref={ref}>
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <motion.div
             initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
             animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ type: 'spring', stiffness: 80, damping: 20 }}
-            className="text-center mb-6 sm:mb-10"
+            className="text-center mb-5 sm:mb-8"
           >
-            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4">{t.leadership.title}</h2>
-            <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto">{t.leadership.subtitle}</p>
+            <h2 className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-3">{t.leadership.title}</h2>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">{t.leadership.subtitle}</p>
           </motion.div>
 
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate={inView ? 'visible' : 'hidden'}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
           >
             {sortedMembers.map((member: any, i: number) => {
               const style = fallbackStyles[i % fallbackStyles.length];
@@ -76,15 +75,15 @@ export function LeadershipSection() {
                   key={i}
                   variants={memberVariants}
                   whileHover={{
-                    y: -8,
-                    boxShadow: '0 20px 40px rgba(108, 92, 231, 0.15)',
+                    y: -6,
+                    boxShadow: '0 16px 32px rgba(108, 92, 231, 0.15)',
                     transition: { type: 'spring', stiffness: 300, damping: 20 },
                   }}
-                  className="glass-effect bg-card/40 backdrop-blur-md rounded-xl sm:rounded-2xl sm:rounded-[2.5rem] p-3 sm:p-6 lg:p-8 text-center group hover:border-primary/40 transition-colors duration-300"
+                  className="glass-effect bg-card/40 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group hover:border-primary/40 transition-colors duration-300"
                 >
                   {/* Circular photo or fallback icon */}
                   <motion.div
-                    className="w-20 h-20 sm:w-40 sm:h-40 lg:w-48 lg:h-48 rounded-full mx-auto mb-3 sm:mb-6 lg:mb-8 overflow-hidden flex items-center justify-center bg-secondary/30 border-2 sm:border-4 border-background shadow-xl lg:shadow-2xl relative"
+                    className="w-20 h-20 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-full mx-auto mb-3 sm:mb-4 lg:mb-5 overflow-hidden flex items-center justify-center bg-secondary/30 border-2 sm:border-3 border-background shadow-xl relative"
                     style={
                       hasImage
                         ? { boxShadow: style.shadow }

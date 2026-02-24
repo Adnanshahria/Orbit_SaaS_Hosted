@@ -79,11 +79,11 @@ export function ProjectsSection() {
   const sectionSubtitle = lang === 'bn' && bnData.subtitle ? bnData.subtitle : (enData.subtitle || 'Real solutions we\'ve built for real businesses.');
 
   return (
-    <section id="project" className="py-12 sm:py-32 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section id="project" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12">
 
 
 
-      <div className="max-w-7xl mx-auto relative" ref={ref}>
+      <div className="w-full mx-auto relative" ref={ref}>
         {/* Big Container Card */}
         <div className="relative rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           {/* Visit Button */}
