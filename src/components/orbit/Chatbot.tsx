@@ -65,6 +65,9 @@ export function Chatbot() {
       document.body.style.right = '0';
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
+      // Also lock the html element
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.height = '100%';
     } else {
       // Restore body position and scroll
       const savedY = scrollYRef.current;
@@ -74,6 +77,8 @@ export function Chatbot() {
       document.body.style.right = '';
       document.body.style.width = '';
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
       if (savedY) {
         window.scrollTo(0, savedY);
       }
@@ -86,6 +91,8 @@ export function Chatbot() {
       document.body.style.right = '';
       document.body.style.width = '';
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
       if (savedY) {
         window.scrollTo(0, savedY);
       }
@@ -221,22 +228,26 @@ export function Chatbot() {
 
     const updateViewport = () => {
       if (window.visualViewport) {
-        const isKbOpen = window.visualViewport.height < window.innerHeight * 0.8;
+        const isKbOpen = window.visualViewport.height < window.innerHeight * 0.75;
         setIsKeyboardOpen(isKbOpen);
 
         if (window.innerWidth < 768) {
-          // Mobile: use visual viewport height
-          const height = isKbOpen ? window.visualViewport.height : window.visualViewport.height * 0.9;
+          if (isKbOpen) {
+            // Keyboard is open: use exact visual viewport height, pin to top
+            const vvHeight = window.visualViewport.height;
+            setViewportStyle({
+              height: `${vvHeight}px`,
+              top: '0px',
+              bottom: 'auto',
+              transition: 'height 0.25s cubic-bezier(0.32, 0.72, 0, 1)'
+            });
+          } else {
+            // Keyboard closed: clear inline styles, let CSS h-[100dvh] handle it
+            setViewportStyle({});
+          }
 
-          setViewportStyle({
-            height: `${height}px`,
-            bottom: '0px',
-            top: isKbOpen ? '0px' : 'auto',
-            transition: 'height 0.35s cubic-bezier(0.32, 0.72, 0, 1), bottom 0.35s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.35s cubic-bezier(0.32, 0.72, 0, 1)'
-          });
-
-          // Prevent the page from scrolling when keyboard opens/closes
-          if (open && isKbOpen) {
+          // Always prevent scroll when chatbot is open on mobile
+          if (open) {
             window.scrollTo(0, 0);
           }
         } else {
@@ -678,7 +689,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
               transformOrigin: 'bottom',
               boxShadow: '0 0 10px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3), 0 0 60px rgba(124, 58, 237, 0.15), inset 0 0 10px rgba(124, 58, 237, 0.05)'
             }}
-            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-background/95 md:bg-card/90 backdrop-blur-3xl shadow-2xl flex flex-col h-[100dvh] md:h-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-background md:bg-card/90 backdrop-blur-3xl shadow-2xl flex flex-col h-[100dvh] md:h-auto top-0 md:top-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
           >
             {/* Header */}
             <div className="shrink-0 px-5 py-3.5 bg-primary/20 border-b border-border flex items-center justify-between relative">
@@ -939,8 +950,18 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSend()}
+                  onFocus={(e) => {
+                    // Prevent the browser from scrolling the page to bring input into view
+                    if (window.innerWidth < 768) {
+                      e.target.scrollIntoView({ block: 'nearest' });
+                      setTimeout(() => window.scrollTo(0, 0), 50);
+                      setTimeout(() => window.scrollTo(0, 0), 150);
+                      setTimeout(() => window.scrollTo(0, 0), 300);
+                    }
+                  }}
                   placeholder={chatContent.placeholder}
                   disabled={isLoading}
+                  enterKeyHint="send"
                   // Prevent auto-focus on open to stop keyboard jumping
                   autoFocus={false}
                   className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-all"

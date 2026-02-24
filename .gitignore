@@ -32,6 +32,11 @@ dist-ssr
 # Recordings & media
 *.mp4
 *.webm
+*.mov
+*.avi
+*.mkv
+*.wmv
+*.flv
 
 # Temp files
 temp/
