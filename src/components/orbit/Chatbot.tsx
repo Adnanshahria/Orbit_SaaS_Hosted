@@ -52,14 +52,43 @@ export function Chatbot() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
 
+  const scrollYRef = useRef(0);
+
   useEffect(() => {
     if (open && window.innerWidth < 768) {
+      // Save current scroll position
+      scrollYRef.current = window.scrollY;
+      // Fully lock the body to prevent any content shifting
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
+      // Restore body position and scroll
+      const savedY = scrollYRef.current;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
       document.body.style.overflow = 'unset';
+      if (savedY) {
+        window.scrollTo(0, savedY);
+      }
     }
     return () => {
+      const savedY = scrollYRef.current;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
       document.body.style.overflow = 'unset';
+      if (savedY) {
+        window.scrollTo(0, savedY);
+      }
     };
   }, [open]);
 
@@ -198,13 +227,18 @@ export function Chatbot() {
         if (window.innerWidth < 768) {
           // Mobile: use visual viewport height
           const height = isKbOpen ? window.visualViewport.height : window.visualViewport.height * 0.9;
-          const bottom = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
 
           setViewportStyle({
             height: `${height}px`,
-            bottom: `${bottom}px`,
+            bottom: '0px',
+            top: isKbOpen ? '0px' : 'auto',
             transition: 'height 0.35s cubic-bezier(0.32, 0.72, 0, 1), bottom 0.35s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.35s cubic-bezier(0.32, 0.72, 0, 1)'
           });
+
+          // Prevent the page from scrolling when keyboard opens/closes
+          if (open && isKbOpen) {
+            window.scrollTo(0, 0);
+          }
         } else {
           // Desktop: use actual visible height minus bottom padding (toggle button area ~100px)
           const availableHeight = window.visualViewport.height - 100;
@@ -226,7 +260,7 @@ export function Chatbot() {
       window.visualViewport?.removeEventListener('scroll', updateViewport);
       window.removeEventListener('resize', updateViewport);
     };
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     scrollToBottom();
