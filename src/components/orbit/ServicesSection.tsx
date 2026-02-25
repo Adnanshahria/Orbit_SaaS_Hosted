@@ -62,7 +62,7 @@ export function ServicesSection() {
     <section id="services" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12">
 
       <div className="w-full mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           {/* Section Header */}
           <div className="text-center mb-5 sm:mb-8">
             <motion.h2
@@ -115,10 +115,7 @@ export function ServicesSection() {
                     y: -4,
                     transition: { type: 'spring', stiffness: 400, damping: 25 },
                   }}
-                  className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-7 group cursor-default border sm:border-2 overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md hover:border-primary/50`}
-                  style={{
-                    borderColor: border?.startsWith('border-') ? undefined : (border || 'rgba(108, 92, 231, 0.4)'),
-                  }}
+                  className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-7 group cursor-default premium-card-sub overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md`}
                 >
                   {/* Hover glow */}
                   <div

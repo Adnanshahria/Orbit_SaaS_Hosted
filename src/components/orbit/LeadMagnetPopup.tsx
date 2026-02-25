@@ -103,7 +103,7 @@ export function LeadMagnetPopup() {
                             stiffness: 300,
                             layout: { duration: 0.3, ease: 'easeOut' }
                         }}
-                        className="relative z-10 w-full max-w-[95%] sm:max-w-md md:max-w-lg lg:max-w-2xl rounded-2xl bg-card border border-border shadow-2xl overflow-hidden"
+                        className="relative z-10 w-full max-w-[95%] sm:max-w-md md:max-w-lg lg:max-w-2xl rounded-2xl bg-card shadow-2xl overflow-hidden premium-card"
                     >
                         <button
                             onClick={handleClose}

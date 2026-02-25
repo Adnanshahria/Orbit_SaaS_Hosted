@@ -227,7 +227,7 @@ export function HeroSection() {
                 whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer justify-center text-sm sm:text-base"
+                className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-2 sm:py-2.5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer justify-center text-sm sm:text-base border-[0.5px] border-amber-400/60"
                 style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
               >
                 {t.hero.cta}
@@ -252,10 +252,10 @@ export function HeroSection() {
                       onClick={() => setIsCtaOpen(false)}
                       whileHover={{ scale: 1.02, x: 3 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-3 px-3 py-2.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                      className="flex items-center gap-2.5 px-3 py-1.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-7 h-7 rounded-md bg-[#0d2818] flex items-center justify-center shrink-0 group-hover:bg-[#143d24] transition-colors">
-                        <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                      <div className="w-6 h-6 rounded-md bg-[#0d2818] flex items-center justify-center shrink-0 group-hover:bg-[#143d24] transition-colors">
+                        <MessageCircle className="w-3 h-3 text-[#25D366]" />
                       </div>
                       <div className="flex flex-col items-start">
                         <span className="text-sm">WhatsApp</span>
@@ -268,10 +268,10 @@ export function HeroSection() {
                       onClick={() => setIsCtaOpen(false)}
                       whileHover={{ scale: 1.02, x: 3 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-3 px-3 py-2.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                      className="flex items-center gap-2.5 px-3 py-1.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-7 h-7 rounded-md bg-[#1a2a1e] flex items-center justify-center shrink-0 group-hover:bg-[#243a28] transition-colors">
-                        <Mail className="w-3.5 h-3.5 text-primary" />
+                      <div className="w-6 h-6 rounded-md bg-[#1a2a1e] flex items-center justify-center shrink-0 group-hover:bg-[#243a28] transition-colors">
+                        <Mail className="w-3 h-3 text-primary" />
                       </div>
                       <div className="flex flex-col items-start">
                         <span className="text-sm">Email Us</span>
@@ -287,7 +287,7 @@ export function HeroSection() {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-full font-bold glass-effect text-foreground cursor-pointer justify-center text-sm sm:text-base"
+              className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-2 sm:py-2.5 rounded-full font-bold glass-effect text-foreground cursor-pointer justify-center text-sm sm:text-base border-[0.5px] border-amber-400/60"
             >
               {t.hero.learnMore}
             </motion.a>
@@ -306,12 +306,12 @@ export function HeroSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={status === 'loading'}
-                className="w-full bg-secondary/80 border border-border rounded-full py-3.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+                className="w-full bg-secondary/80 border-[0.5px] border-amber-500/40 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
               />
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer border-[0.5px] border-amber-400/40"
               >
                 {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
@@ -340,7 +340,7 @@ export function HeroSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'loading'}
-            className="w-full bg-background/95 border border-neon-emerald/40 rounded-full py-3 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+            className="w-full bg-background/95 border-[0.5px] border-amber-500/40 rounded-full py-2 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
           />
           <button
             type="submit"

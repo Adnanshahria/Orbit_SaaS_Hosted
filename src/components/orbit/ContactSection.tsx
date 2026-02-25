@@ -69,11 +69,11 @@ export function ContactSection() {
                   transition: { type: 'spring', stiffness: 400, damping: 15 },
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg text-primary-foreground bg-primary shadow-lg cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 sm:px-8 py-2 sm:py-2.5 rounded-full font-bold text-base sm:text-lg text-primary-foreground bg-primary shadow-lg cursor-pointer"
               >
                 {t.contact.cta}
-                <div className="ml-1 flex items-center justify-center w-7 h-7 rounded-full bg-white/20 border border-white/10">
-                  <ChevronDown strokeWidth={2.5} className={`w-4 h-4 text-white transition-transform duration-300 ${isCtaOpen ? 'rotate-180' : ''}`} />
+                <div className="ml-1 flex items-center justify-center w-6 h-6 rounded-full bg-white/20 border border-white/10 shadow-inner group-hover:bg-white/30 transition-colors">
+                  <ChevronDown strokeWidth={2.5} className={`w-3.5 h-3.5 text-white transition-transform duration-300 ${isCtaOpen ? 'rotate-180' : ''}`} />
                 </div>
               </motion.button>
 
@@ -93,10 +93,10 @@ export function ContactSection() {
                       onClick={() => setIsCtaOpen(false)}
                       whileHover={{ scale: 1.02, x: 5 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-4 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                      className="flex items-center gap-2.5 px-3 py-1.5 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-[#1a2e24] flex items-center justify-center shrink-0 group-hover:bg-[#1f3a2b] transition-colors">
-                        <MessageCircle className="w-5 h-5 text-[#25D366]" />
+                      <div className="w-7 h-7 rounded-lg bg-[#1a2e24] flex items-center justify-center shrink-0 group-hover:bg-[#1f3a2b] transition-colors shadow-sm">
+                        <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
                       </div>
                       <div className="flex flex-col items-start text-left">
                         <span className="text-sm">WhatsApp</span>
@@ -109,10 +109,10 @@ export function ContactSection() {
                       onClick={() => setIsCtaOpen(false)}
                       whileHover={{ scale: 1.02, x: 5 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-4 px-4 py-3 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
+                      className="flex items-center gap-2.5 px-3 py-1.5 bg-secondary border border-border rounded-xl shadow-xl hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-[#211e38] flex items-center justify-center shrink-0 group-hover:bg-[#2a2445] transition-colors">
-                        <Mail className="w-5 h-5 text-primary" />
+                      <div className="w-7 h-7 rounded-lg bg-[#211e38] flex items-center justify-center shrink-0 group-hover:bg-[#2a2445] transition-colors shadow-sm">
+                        <Mail className="w-3.5 h-3.5 text-primary" />
                       </div>
                       <div className="flex flex-col items-start text-left">
                         <span className="text-sm">Email Us</span>

@@ -49,7 +49,7 @@ export function LeadershipSection() {
     <section id="leadership" className="py-10 sm:py-20 px-3 sm:px-6 relative scroll-mt-12">
 
       <div className="w-full mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <motion.div
             initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
             animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
@@ -79,7 +79,7 @@ export function LeadershipSection() {
                     boxShadow: '0 16px 32px rgba(108, 92, 231, 0.15)',
                     transition: { type: 'spring', stiffness: 300, damping: 20 },
                   }}
-                  className="glass-effect bg-card/40 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group hover:border-primary/40 transition-colors duration-300"
+                  className="glass-effect bg-card/40 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group transition-colors duration-300 premium-card-sub"
                 >
                   {/* Circular photo or fallback icon */}
                   <motion.div
@@ -117,7 +117,7 @@ export function LeadershipSection() {
               transition={{ delay: 0.5, type: 'spring', stiffness: 60 }}
               className="mt-12 sm:mt-16 max-w-4xl mx-auto"
             >
-              <div className="glass-effect rounded-2xl sm:rounded-[2rem] p-6 sm:p-10 text-center border border-border bg-card/40 backdrop-blur-md hover:border-primary/30 transition-colors duration-500">
+              <div className="glass-effect rounded-2xl sm:rounded-[2rem] p-6 sm:p-10 text-center bg-card/40 backdrop-blur-md transition-colors duration-500 premium-card">
                 <p className="text-lg sm:text-2xl lg:text-3xl font-display font-medium text-foreground leading-relaxed italic relative z-10">
                   <span className="text-primary/40 text-4xl leading-none absolute -top-4 -left-2 sm:-left-6">"</span>
                   {tagline}

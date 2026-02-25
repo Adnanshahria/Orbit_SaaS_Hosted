@@ -85,7 +85,7 @@ export function ProjectsSection() {
 
       <div className="w-full mx-auto relative" ref={ref}>
         {/* Big Container Card */}
-        <div className="relative rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="relative rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           {/* Visit Button */}
           <Link
             to="/project"

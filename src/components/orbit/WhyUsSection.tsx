@@ -47,7 +47,7 @@ export function WhyUsSection() {
 
 
       <div className="w-full mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <div className="text-center mb-6 sm:mb-10">
             <motion.h2
               className="inline-flex px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 text-[clamp(1.8rem,3vw,2.4rem)] font-bold text-foreground mb-3 flex-wrap justify-center gap-[0.3em]"
@@ -122,7 +122,7 @@ export function WhyUsSection() {
                     boxShadow: `0 12px 40px ${accentColor}25`,
                     transition: { type: 'spring', stiffness: 300, damping: 20 },
                   }}
-                  className={`bg-card/60 backdrop-blur-md border ${borderColor} rounded-2xl p-5 sm:pt-9 sm:px-7 sm:pb-8 text-center transition-all duration-300 group`}
+                  className={`bg-card/60 backdrop-blur-md premium-card-sub rounded-2xl p-5 sm:pt-9 sm:px-7 sm:pb-8 text-center transition-all duration-300 group`}
                   style={{ backgroundImage: item.bg?.includes('gradient') || item.bg?.includes('url') ? item.bg : undefined }}
                 >
                   <div
