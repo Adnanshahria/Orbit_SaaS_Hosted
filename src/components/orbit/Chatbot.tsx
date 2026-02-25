@@ -823,18 +823,6 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 }}
                 className="relative flex flex-col items-start gap-0.5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rounded-xl rounded-br-sm px-3.5 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.6)] transition-all duration-300 group-hover:-translate-y-1"
               >
-                {/* Close Button X (small, absolute) */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowWelcomePopup(false);
-                    setHasDismissedPopup(true);
-                  }}
-                  className="absolute -top-1.5 -right-1.5 bg-[#1a1a24] border border-primary/30 rounded-full p-1 text-muted-foreground hover:text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-lg hover:scale-110 active:scale-95 z-10"
-                >
-                  <X className="w-2.5 h-2.5" />
-                </button>
-
                 {/* Text Content */}
                 <div className="flex flex-col items-start pr-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-0 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
