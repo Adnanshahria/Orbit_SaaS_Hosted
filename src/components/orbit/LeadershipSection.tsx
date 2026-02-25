@@ -49,14 +49,14 @@ export function LeadershipSection() {
     <section id="leadership" className="py-10 sm:py-20 px-3 sm:px-6 relative scroll-mt-12">
 
       <div className="w-full mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <motion.div
             initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
             animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
             transition={{ type: 'spring', stiffness: 80, damping: 20 }}
             className="text-center mb-5 sm:mb-8"
           >
-            <h2 className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-3">{t.leadership.title}</h2>
+            <h2 className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-3">{t.leadership.title}</h2>
             <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">{t.leadership.subtitle}</p>
           </motion.div>
 
@@ -103,7 +103,7 @@ export function LeadershipSection() {
                     <div className="absolute inset-0 rounded-full border border-white/10 pointer-events-none" />
                   </motion.div>
                   <h3 className="font-display text-sm sm:text-xl lg:text-2xl font-bold text-foreground mb-0.5 sm:mb-1.5 leading-tight">{member.name}</h3>
-                  <p className="text-neon-cyan text-[10px] sm:text-sm lg:text-base font-bold tracking-wide uppercase">{member.role}</p>
+                  <p className="text-neon-amber text-[10px] sm:text-sm lg:text-base font-bold tracking-wide uppercase">{member.role}</p>
                 </motion.div>
               );
             })}

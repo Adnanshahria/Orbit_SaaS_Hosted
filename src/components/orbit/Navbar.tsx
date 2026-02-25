@@ -154,7 +154,7 @@ export function Navbar() {
                   href={l.href}
                   onClick={(e) => scrollToSection(e, l.href)}
                   className={`px-4 py-1.5 rounded-full border font-medium gentle-animation text-sm ${activeSection === l.href
-                    ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(108,92,231,0.3)]'
+                    ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(16,185,129,0.3)]'
                     : 'border-[#2a2a3e] text-[#b0b0c0] hover:text-foreground hover:border-[#3a3a50] hover:bg-[#141420]'
                     }`}>{l.label}</a>
               ))}
@@ -179,10 +179,10 @@ export function Navbar() {
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.96 }}
                       onClick={() => setIsNavCtaOpen(!isNavCtaOpen)}
-                      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-[#6c5ce7] to-[#3b82f6] dark:to-[#4facfe] shadow-[0_5px_15px_rgba(108,92,231,0.3)] hover:shadow-[0_8px_25px_rgba(108,92,231,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-semibold text-sm text-primary-foreground bg-gradient-to-r from-primary to-amber-500/80 shadow-[0_5px_15px_rgba(16,185,129,0.3)] hover:shadow-[0_8px_25px_rgba(16,185,129,0.5)] gentle-animation cursor-pointer mr-1 sm:mr-2 transform-gpu whitespace-nowrap"
                     >
                       {t.nav.bookCall}
-                      <div className="ml-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-[#5a4cc0] border border-[#4a3db0]">
+                      <div className="ml-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-white/20 border border-white/30">
                         <ChevronDown strokeWidth={2.5} className={`w-3 h-3 text-white transition-transform duration-300 ${isNavCtaOpen ? 'rotate-180' : ''}`} />
                       </div>
                     </motion.button>
@@ -272,7 +272,7 @@ export function Navbar() {
                 <motion.div
                   layout
                   className={`flex items-center gap-2 rounded-full gentle-animation cursor-pointer ${isActive
-                    ? 'bg-[#1a1535] px-3 py-2 border border-[#4a3db0] shadow-[0_0_12px_rgba(108,92,231,0.3)]'
+                    ? 'bg-primary/20 px-3 py-2 border border-primary/50 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
                     : 'px-2 py-2 hover:bg-[#141420] border border-transparent'
                     }`}
                 >

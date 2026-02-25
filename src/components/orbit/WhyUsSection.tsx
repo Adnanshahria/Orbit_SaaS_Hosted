@@ -47,10 +47,10 @@ export function WhyUsSection() {
 
 
       <div className="w-full mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <div className="text-center mb-6 sm:mb-10">
             <motion.h2
-              className="inline-flex px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 text-[clamp(1.8rem,3vw,2.4rem)] font-bold text-foreground mb-3 flex-wrap justify-center gap-[0.3em]"
+              className="inline-flex px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 text-[clamp(1.8rem,3vw,2.4rem)] font-bold text-foreground mb-3 flex-wrap justify-center gap-[0.3em]"
               variants={{
                 hidden: { opacity: 0 },
                 visible: {

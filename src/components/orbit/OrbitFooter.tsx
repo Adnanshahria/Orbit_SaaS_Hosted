@@ -37,7 +37,7 @@ export function OrbitFooter() {
     <footer className="relative w-full pt-16 pb-24 sm:pb-12 mt-16 overflow-hidden">
       {/* Dynamic Glowing Top Divider */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent shadow-[0_0_15px_rgba(108,92,231,0.5)]" />
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
 
       {/* Faint Upward Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-t from-primary/[0.03] to-transparent pointer-events-none" />
@@ -47,7 +47,7 @@ export function OrbitFooter() {
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-cyan-400 opacity-30 blur-sm mix-blend-screen" />
+              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-amber-400 opacity-30 blur-sm mix-blend-screen" />
               <img
                 src={orbitLogo}
                 alt={brandName}

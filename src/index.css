@@ -9,35 +9,41 @@
   --font-size: 16px;
   --radius: 0.75rem;
 
-  /* Default (Dark mode) */
-  --background: #0a0a0f;
+  /* Default (Dark mode) — Emerald & Rose Gold Theme */
+  --background: #08080f;
   --foreground: #e8e8f0;
-  --card: #12121a;
+  --card: #10101a;
   --card-foreground: #e8e8f0;
-  --popover: #12121a;
+  --popover: #10101a;
   --popover-foreground: #e8e8f0;
-  --primary: #6c5ce7;
+  --primary: #10b981;
   --primary-foreground: #ffffff;
-  --secondary: #1a1a2e;
+  --secondary: #141420;
   --secondary-foreground: #e8e8f0;
-  --muted: #1a1a2e;
+  --muted: #141420;
   --muted-foreground: #8888a0;
-  --accent: #1a1a2e;
+  --accent: #141420;
   --accent-foreground: #e8e8f0;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #2a2a3e;
-  --input: #1a1a2e;
-  --input-background: #12121a;
-  --switch-background: #2a2a3e;
+  --border: #1e2a24;
+  --input: #141420;
+  --input-background: #10101a;
+  --switch-background: #1e2a24;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #6c5ce7;
+  --ring: #10b981;
 
-  --neon-cyan: #00f5ff;
-  --neon-purple: #6c5ce7;
-  --neon-pink: #ff6bcb;
-  --neon-blue: #4facfe;
+  --neon-emerald: #10b981;
+  --neon-amber: #f59e0b;
+  --neon-teal: #14b8a6;
+  --neon-rose: #ec4899;
+
+  /* Legacy aliases for any remaining references */
+  --neon-cyan: #14b8a6;
+  --neon-purple: #10b981;
+  --neon-pink: #ec4899;
+  --neon-blue: #f59e0b;
 }
 
 
@@ -63,6 +69,10 @@
   --color-input-background: var(--input-background);
   --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
+  --color-neon-emerald: var(--neon-emerald);
+  --color-neon-amber: var(--neon-amber);
+  --color-neon-teal: var(--neon-teal);
+  --color-neon-rose: var(--neon-rose);
   --color-neon-cyan: var(--neon-cyan);
   --color-neon-purple: var(--neon-purple);
   --color-neon-pink: var(--neon-pink);
@@ -79,12 +89,12 @@
 
   0%,
   100% {
-    text-shadow: 0 0 10px rgba(108, 92, 231, 0.3), 0 0 20px rgba(108, 92, 231, 0.15);
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3), 0 0 20px rgba(16, 185, 129, 0.15);
     filter: brightness(1);
   }
 
   50% {
-    text-shadow: 0 0 20px rgba(108, 92, 231, 0.6), 0 0 40px rgba(108, 92, 231, 0.3), 0 0 60px rgba(108, 92, 231, 0.1);
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3), 0 0 60px rgba(16, 185, 129, 0.1);
     filter: brightness(1.1);
   }
 }
@@ -103,8 +113,8 @@
 .animate-text-shimmer-orbit {
   background: linear-gradient(to right,
       var(--foreground) 30%,
-      var(--neon-cyan) 40%,
-      var(--primary) 45%,
+      var(--neon-amber) 40%,
+      var(--neon-emerald) 45%,
       var(--foreground) 55%,
       var(--foreground) 100%);
   background-size: 200% auto;
@@ -117,17 +127,71 @@
 
 .animate-text-shimmer-saas {
   background: linear-gradient(to right,
-      var(--primary) 30%,
+      var(--neon-emerald) 30%,
       var(--foreground) 40%,
-      var(--neon-cyan) 45%,
-      var(--primary) 55%,
-      var(--primary) 100%);
+      var(--neon-amber) 45%,
+      var(--neon-emerald) 55%,
+      var(--neon-emerald) 100%);
   background-size: 200% auto;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
   animation: textShimmerSweep 5s linear infinite;
   display: inline-block;
+}
+
+/* ── Holographic Ring Portal ── */
+@keyframes ringPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 30px rgba(16, 185, 129, 0.3),
+      0 0 60px rgba(20, 184, 166, 0.15),
+      inset 0 0 20px rgba(245, 158, 11, 0.1);
+    transform: rotate(0deg);
+  }
+  50% {
+    box-shadow:
+      0 0 50px rgba(16, 185, 129, 0.5),
+      0 0 100px rgba(20, 184, 166, 0.25),
+      inset 0 0 35px rgba(245, 158, 11, 0.2);
+    transform: rotate(180deg);
+  }
+}
+
+.orbit-ring-portal {
+  width: clamp(180px, 45vw, 420px);
+  height: clamp(180px, 45vw, 420px);
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#06060c, #06060c) padding-box,
+    linear-gradient(135deg, #10b981, #14b8a6, #f59e0b, #ec4899, #10b981) border-box;
+  animation: ringPulse 3s ease-in-out infinite;
+  position: relative;
+}
+
+.orbit-ring-portal::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(225deg, rgba(16, 185, 129, 0.4), transparent 40%, rgba(245, 158, 11, 0.4)) border-box;
+  pointer-events: none;
+}
+
+.orbit-ring-portal::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(45deg, rgba(20, 184, 166, 0.3), transparent 40%, rgba(236, 72, 153, 0.3)) border-box;
+  pointer-events: none;
 }
 
 /* ── Performance: disable GPU-heavy blur effects on tablets and below ── */
@@ -147,7 +211,7 @@
   .bg-white\/\[0\.03\],
   .bg-white\/\[0\.05\],
   .bg-background\/90 {
-    background-color: #0a0a0f !important;
+    background-color: #08080f !important;
   }
 
   /* Hide massive decorative blur orbs that tank GPU */
@@ -161,7 +225,7 @@
   .glass-effect {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: rgba(18, 18, 26, 0.9) !important;
+    background: rgba(16, 16, 26, 0.9) !important;
   }
 }
 
@@ -177,7 +241,7 @@ html.low-perf .backdrop-blur-sm {
 html.low-perf .glass-effect {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background: rgba(18, 18, 26, 0.9) !important;
+  background: rgba(16, 16, 26, 0.9) !important;
 }
 
 html.low-perf .blur-\[120px\],
@@ -263,7 +327,7 @@ html.low-perf .neon-text-cyan {
     inset: 0;
     border-radius: inherit;
     padding: 1.5px;
-    background: linear-gradient(135deg, rgba(108, 92, 231, 0.8), rgba(79, 172, 254, 0.8));
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(20, 184, 166, 0.8));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -272,23 +336,23 @@ html.low-perf .neon-text-cyan {
   }
 
   .dark .navbar-gradient-border::before {
-    background: linear-gradient(135deg, rgba(108, 92, 231, 0.8), rgba(79, 172, 254, 0.8));
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(20, 184, 166, 0.8));
   }
 
   .neon-glow {
-    box-shadow: 0 0 12px rgba(108, 92, 231, 0.25), 0 0 30px rgba(108, 92, 231, 0.08);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), 0 0 30px rgba(16, 185, 129, 0.08);
   }
 
   .neon-glow-cyan {
-    box-shadow: 0 0 12px rgba(0, 245, 255, 0.25), 0 0 30px rgba(0, 245, 255, 0.08);
+    box-shadow: 0 0 12px rgba(20, 184, 166, 0.25), 0 0 30px rgba(20, 184, 166, 0.08);
   }
 
   .neon-text {
-    text-shadow: 0 0 8px rgba(108, 92, 231, 0.3), 0 0 20px rgba(108, 92, 231, 0.1);
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.3), 0 0 20px rgba(16, 185, 129, 0.1);
   }
 
   .neon-text-cyan {
-    text-shadow: 0 0 8px rgba(0, 245, 255, 0.3), 0 0 20px rgba(0, 245, 255, 0.1);
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.3), 0 0 20px rgba(20, 184, 166, 0.1);
   }
 
   @keyframes float-gentle {
@@ -307,11 +371,11 @@ html.low-perf .neon-text-cyan {
 
     0%,
     100% {
-      box-shadow: 0 0 8px rgba(108, 92, 231, 0.12);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.12);
     }
 
     50% {
-      box-shadow: 0 0 16px rgba(108, 92, 231, 0.22);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.22);
     }
   }
 
@@ -368,12 +432,12 @@ html.low-perf .neon-text-cyan {
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, var(--neon-purple), var(--neon-blue));
+    background: linear-gradient(to bottom, var(--neon-emerald), var(--neon-amber));
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #5b4cc4, #2563eb);
+    background: linear-gradient(to bottom, #059669, #d97706);
   }
 
   .scrollbar-hide {
@@ -481,177 +545,6 @@ html {
     max-width: 100vw;
   }
 }
-
-/* ── 3D Dice Loader Animation ── */
-.dice-container {
-  perspective: 800px;
-  width: 60px;
-  height: 60px;
-  margin: 0 auto;
-}
-
-.dice {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  animation: dice-spell-orbit 2.8s forwards;
-}
-
-.dice-face {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  background: #1a1535;
-  border: 1.5px solid var(--neon-purple);
-  border-radius: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 8px rgba(108, 92, 231, 0.15);
-  font-family: 'Poppins', sans-serif;
-  font-weight: 800;
-  font-size: 32px;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 10px var(--neon-cyan);
-}
-
-.dice-face-front {
-  transform: rotateY(0deg) translateZ(30px);
-  color: #ffffff;
-  text-shadow: 0 0 12px #ffffff;
-}
-
-.dice-face-back {
-  transform: rotateY(180deg) translateZ(30px);
-  color: var(--neon-cyan);
-  text-shadow: 0 0 12px var(--neon-cyan);
-}
-
-.dice-face-right {
-  transform: rotateY(90deg) translateZ(30px);
-  color: #a29bfe;
-  text-shadow: 0 0 12px #a29bfe;
-}
-
-.dice-face-left {
-  transform: rotateY(-90deg) translateZ(30px);
-  color: var(--neon-cyan);
-  text-shadow: 0 0 12px var(--neon-cyan);
-}
-
-.dice-face-top {
-  transform: rotateX(90deg) translateZ(30px);
-  color: #ffffff;
-  text-shadow: 0 0 12px #ffffff;
-}
-
-.dice-face-bottom {
-  transform: rotateX(-90deg) translateZ(30px);
-  color: #a29bfe;
-  text-shadow: 0 0 12px #a29bfe;
-}
-
-/* ── Responsive Inline Hero Dice ── */
-.hero-dice-wrapper {
-  --dice-size: 40px;
-  --dice-half: 20px;
-  perspective: 600px;
-  width: var(--dice-size);
-  height: var(--dice-size);
-}
-
-.hero-dice-cube {
-  width: var(--dice-size);
-  height: var(--dice-size);
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-.hero-dice-face {
-  width: var(--dice-size) !important;
-  height: var(--dice-size) !important;
-  font-size: calc(var(--dice-size) * 0.48) !important;
-  background: #1a1535 !important;
-  border: 1.5px solid var(--neon-purple);
-  border-radius: 6px;
-  box-shadow: 0 0 6px rgba(108, 92, 231, 0.2);
-}
-
-/* Tablet */
-@media (min-width: 640px) {
-  .hero-dice-wrapper {
-    --dice-size: 55px;
-    --dice-half: 27.5px;
-  }
-}
-
-/* Desktop */
-@media (min-width: 768px) {
-  .hero-dice-wrapper {
-    --dice-size: 75px;
-    --dice-half: 37.5px;
-  }
-
-  .hero-dice-face {
-    border-radius: 8px;
-    border-width: 2px;
-    box-shadow: 0 0 10px rgba(108, 92, 231, 0.2);
-  }
-}
-
-/* Large desktop */
-@media (min-width: 1024px) {
-  .hero-dice-wrapper {
-    --dice-size: 90px;
-    --dice-half: 45px;
-  }
-}
-
-/* Mobile: remove text-shadow glow for performance */
-@media (max-width: 639px) {
-  .hero-dice-face {
-    text-shadow: none !important;
-    box-shadow: none;
-    border-radius: 5px;
-  }
-}
-
-@keyframes dice-spell-orbit {
-
-  0%,
-  25% {
-    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  33%,
-  43% {
-    transform: rotateX(0deg) rotateY(-180deg) rotateZ(0deg);
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  51%,
-  60% {
-    transform: rotateX(0deg) rotateY(-450deg) rotateZ(0deg);
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  68%,
-  76% {
-    transform: rotateX(0deg) rotateY(-630deg) rotateZ(0deg);
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  84%,
-  92% {
-    transform: rotateX(-90deg) rotateY(-720deg) rotateZ(0deg);
-    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  98%,
-  100% {
-    transform: rotateX(-270deg) rotateY(-720deg) rotateZ(0deg);
   }
 }
 

@@ -28,7 +28,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
 
     return (
         <div
-            className="group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full bg-white/[0.03] backdrop-blur-xl border border-neon-purple/30 sm:border-2 sm:border-neon-purple/40 hover:border-neon-purple/70 transition-all duration-500 hover:shadow-[0_0_30px_rgba(108,92,231,0.2),0_0_60px_rgba(108,92,231,0.08)]"
+            className="group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full bg-white/[0.03] backdrop-blur-xl border border-neon-emerald/30 sm:border-2 sm:border-neon-emerald/40 hover:border-neon-emerald/70 transition-all duration-500 hover:shadow-[0_0_30px_rgba(108,92,231,0.2),0_0_60px_rgba(108,92,231,0.08)]"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
@@ -49,7 +49,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-30 flex items-center justify-center gap-4 backdrop-blur-[2px]">
                     <span
-                        className="p-3 rounded-full bg-white/10 hover:bg-neon-cyan/20 text-white hover:text-neon-cyan backdrop-blur-md border border-white/20 hover:border-neon-cyan/40 transition-all transform hover:scale-110 hover:shadow-[0_0_15px_rgba(0,245,255,0.3)] flex items-center justify-center pointer-events-auto"
+                        className="p-3 rounded-full bg-white/10 hover:bg-neon-amber/20 text-white hover:text-neon-amber backdrop-blur-md border border-white/20 hover:border-neon-amber/40 transition-all transform hover:scale-110 hover:shadow-[0_0_15px_rgba(0,245,255,0.3)] flex items-center justify-center pointer-events-auto"
                         title="View Details"
                     >
                         <Eye className="w-5 h-5" />
@@ -60,7 +60,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-3 rounded-full bg-neon-purple/80 hover:bg-neon-purple text-white shadow-[0_0_20px_rgba(108,92,231,0.4)] transition-all transform hover:scale-110 flex items-center justify-center pointer-events-auto"
+                            className="p-3 rounded-full bg-neon-emerald/80 hover:bg-neon-emerald text-white shadow-[0_0_20px_rgba(108,92,231,0.4)] transition-all transform hover:scale-110 flex items-center justify-center pointer-events-auto"
                             title="Visit Live"
                         >
                             <ExternalLink className="w-5 h-5" />
@@ -80,7 +80,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
             <div className="p-4 sm:p-6 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-3">
                     <div>
-                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neon-cyan neon-text-cyan mb-1 block">
+                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neon-amber neon-text mb-1 block">
                             {categories.join(' · ')}
                         </span>
                         <Link to={`/project/${routeId}`}>
@@ -99,12 +99,12 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
                 <div className="pt-3 sm:pt-4 border-t border-white/[0.06] flex items-center justify-between mt-auto">
                     <div className="flex -space-x-2">
                         {item.tags?.slice(0, 3).map((tag: string, j: number) => (
-                            <div key={j} className="w-6 h-6 rounded-full bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-[10px] text-neon-purple" title={tag}>
+                            <div key={j} className="w-6 h-6 rounded-full bg-neon-emerald/10 border border-neon-emerald/20 flex items-center justify-center text-[10px] text-neon-emerald" title={tag}>
                                 {tag[0]}
                             </div>
                         ))}
                         {item.tags?.length > 3 && (
-                            <div className="w-6 h-6 rounded-full bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-[8px] text-neon-purple">
+                            <div className="w-6 h-6 rounded-full bg-neon-emerald/10 border border-neon-emerald/20 flex items-center justify-center text-[8px] text-neon-emerald">
                                 +{item.tags.length - 3}
                             </div>
                         )}

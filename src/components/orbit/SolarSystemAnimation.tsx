@@ -1,13 +1,10 @@
 import React, { useRef, useEffect } from 'react';
-import { Zap, Sparkles, Globe, Bot, Code, Database, Cpu, Smartphone } from 'lucide-react';
-import { renderToStaticMarkup } from 'react-dom/server';
 
 // Detect low-end device based on hardware hints
 function isLowEndDevice(): boolean {
     const cores = navigator.hardwareConcurrency || 2;
     const memory = (navigator as any).deviceMemory || 4;
     const isMobile = window.innerWidth < 768;
-    // Low-end: <=4 cores, <=4GB RAM, or mobile
     return cores <= 4 || memory <= 4 || isMobile;
 }
 
@@ -23,7 +20,6 @@ export function SolarSystemAnimation() {
         const isMobile = window.innerWidth < 768;
         const lowEnd = isLowEndDevice();
 
-        // Cap DPI to 1 on mobile to reduce pixel count significantly
         const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
 
         let width = window.innerWidth;
@@ -34,12 +30,12 @@ export function SolarSystemAnimation() {
         canvas.style.height = height + 'px';
         ctx.scale(dpr, dpr);
 
-        // Frame rate throttling: 20fps mobile, 30fps desktop
+        // Frame rate throttling
         const targetFPS = isMobile ? 20 : (lowEnd ? 24 : 30);
         const frameDuration = 1000 / targetFPS;
         let lastFrameTime = 0;
 
-        // Visibility tracking - pause when not visible
+        // Visibility tracking
         let isVisible = true;
         let isTabActive = true;
 
@@ -66,75 +62,59 @@ export function SolarSystemAnimation() {
         };
         window.addEventListener('resize', handleResize);
 
-        // Planet speeds boosted slightly for a more dynamic, realistic feel
-        const planets = [
-            { name: 'Mercury', dist: 80, speed: 3.0, size: 16, color: '0, 255, 255', Icon: Zap },
-            { name: 'Venus', dist: 130, speed: 2.2, size: 18, color: '100, 210, 255', Icon: Sparkles },
-            { name: 'Earth', dist: 190, speed: 1.5, size: 22, color: '0, 160, 255', Icon: Globe },
-            { name: 'Mars', dist: 250, speed: 1.1, size: 18, color: '160, 110, 255', Icon: Bot },
-            { name: 'Jupiter', dist: 400, speed: 0.55, size: 32, color: '0, 255, 255', Icon: Code },
-            { name: 'Saturn', dist: 550, speed: 0.35, size: 28, color: '110, 255, 255', Icon: Database },
-            { name: 'Uranus', dist: 700, speed: 0.22, size: 24, color: '0, 210, 255', Icon: Cpu },
-            { name: 'Neptune', dist: 850, speed: 0.15, size: 24, color: '160, 255, 255', Icon: Smartphone },
-        ];
-
-        // Pre-render icons to textures
-        const iconTextures: Record<string, HTMLImageElement> = {};
-        planets.forEach(p => {
-            const svgString = renderToStaticMarkup(
-                <p.Icon color={`rgb(${p.color})`} size={isMobile ? 48 : 64} strokeWidth={isMobile ? 2 : 2.5} />
-            );
-            const blob = new Blob([svgString], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            const img = new Image();
-            img.src = url;
-            iconTextures[p.name] = img;
-        });
-
-        // Reduced particle counts for performance
-        const starCount = isMobile ? 120 : (lowEnd ? 200 : 350);
-        const asteroidCount = isMobile ? 40 : (lowEnd ? 60 : 120);
-
-        const asteroids = Array.from({ length: asteroidCount }).map(() => ({
-            dist: 290 + Math.random() * 80,
-            angle: Math.random() * Math.PI * 2,
-            speed: 0.5 + Math.random() * 0.3,
-            size: Math.random() * 1.2 + 0.3,
-            alpha: Math.random() * 0.3 + 0.05
+        // ─── Stars ───────────────────────────────────────────────
+        const starCount = isMobile ? 100 : (lowEnd ? 180 : 320);
+        const stars = Array.from({ length: starCount }).map(() => ({
+            x: Math.random() * 4000 - 2000,
+            y: Math.random() * 4000 - 2000,
+            size: Math.random() * 1.8 + 0.3,
+            baseAlpha: Math.random() * 0.5 + 0.15,
+            twinkleSpeed: Math.random() * 2 + 0.5,
+            twinkleOffset: Math.random() * Math.PI * 2,
+            // Gold / warm-white mix
+            color: Math.random() > 0.7
+                ? `${200 + Math.floor(Math.random() * 55)}, ${170 + Math.floor(Math.random() * 60)}, ${80 + Math.floor(Math.random() * 50)}`
+                : `${220 + Math.floor(Math.random() * 35)}, ${220 + Math.floor(Math.random() * 35)}, ${220 + Math.floor(Math.random() * 35)}`
         }));
 
-        const stars = Array.from({ length: starCount }).map(() => ({
-            x: (Math.random() - 0.5) * 5000,
-            y: (Math.random() - 0.5) * 5000,
-            z: (Math.random() - 0.5) * 5000,
-            size: Math.random() * 2 + 0.5,
-            alpha: Math.random() * 0.6 + 0.1,
-            color: Math.random() > 0.8 ? '100, 200, 255' : '255, 255, 255'
+        // ─── Floating dust motes (rising golden particles) ──────
+        const dustCount = isMobile ? 30 : (lowEnd ? 50 : 90);
+        const dustMotes = Array.from({ length: dustCount }).map(() => ({
+            x: Math.random() * 3000 - 1500,
+            y: Math.random() * 3000 - 1500,
+            size: Math.random() * 1.5 + 0.5,
+            speedY: -(Math.random() * 15 + 5), // drift upward
+            speedX: (Math.random() - 0.5) * 8,
+            alpha: Math.random() * 0.4 + 0.1,
+            color: Math.random() > 0.5
+                ? '245, 158, 11'   // amber
+                : '16, 185, 129'   // emerald
+        }));
+
+        // ─── Nebula clouds ──────────────────────────────────────
+        const nebulaCount = lowEnd ? 2 : (isMobile ? 3 : 5);
+        const nebulae = Array.from({ length: nebulaCount }).map((_, i) => ({
+            // Spread nebulae across the canvas
+            x: (i / nebulaCount) * width + (Math.random() - 0.5) * width * 0.4,
+            y: (Math.random()) * height,
+            radius: (isMobile ? 150 : 250) + Math.random() * (isMobile ? 100 : 200),
+            driftSpeedX: (Math.random() - 0.5) * 12,
+            driftSpeedY: (Math.random() - 0.5) * 8,
+            pulseSpeed: Math.random() * 0.3 + 0.15,
+            pulseOffset: Math.random() * Math.PI * 2,
+            baseAlpha: 0.04 + Math.random() * 0.04,
+            // Cycle through emerald, teal, amber, rose
+            colors: [
+                ['16, 185, 129', '20, 184, 166'],   // emerald → teal
+                ['245, 158, 11', '236, 72, 153'],    // amber → rose
+                ['20, 184, 166', '16, 185, 129'],    // teal → emerald
+                ['236, 72, 153', '245, 158, 11'],    // rose → amber
+                ['16, 185, 129', '245, 158, 11'],    // emerald → amber
+            ][i % 5]
         }));
 
         let t = 0;
-        const sunSpeed = 150;
-        // Reduced trail points but compensated by faster speed
-        const trailPoints = isMobile ? 30 : (lowEnd ? 50 : 85);
-        const trailDt = 0.025;
-        // Target animation speed: t units per second (matches original 60fps * 0.02 = 1.2/s)
-        const animSpeed = 1.2;
-
-        function rotate(x: number, y: number, z: number, pitch: number, yaw: number, roll: number) {
-            const cosa = Math.cos(pitch), sina = Math.sin(pitch);
-            const y1 = y * cosa - z * sina;
-            const z1 = y * sina + z * cosa;
-
-            const cosb = Math.cos(yaw), sinb = Math.sin(yaw);
-            const x2 = x * cosb + z1 * sinb;
-            const z2 = -x * sinb + z1 * cosb;
-
-            const cosc = Math.cos(roll), sinc = Math.sin(roll);
-            const x3 = x2 * cosc - y1 * sinc;
-            const y3 = x2 * sinc + y1 * cosc;
-
-            return { x: x3, y: y3, z: z2 };
-        }
+        const animSpeed = 1.0;
 
         let animationFrameId: number;
         let prevTime = 0;
@@ -142,182 +122,141 @@ export function SolarSystemAnimation() {
         function render(now: number) {
             animationFrameId = requestAnimationFrame(render);
 
-            // Skip frames if not visible or tab inactive
             if (!isVisible || !isTabActive) {
                 prevTime = now;
                 return;
             }
 
-            // Frame rate throttling
             const elapsed = now - lastFrameTime;
             if (elapsed < frameDuration) return;
             lastFrameTime = now - (elapsed % frameDuration);
 
-            // Delta-time based animation: speed is independent of frame rate
-            const dt = Math.min((now - prevTime) / 1000, 0.1); // cap at 100ms to avoid jumps
+            const dt = Math.min((now - prevTime) / 1000, 0.1);
             prevTime = now;
             t += dt * animSpeed;
 
+            // ─── Background fill ────────────────────────────────
             ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1.0;
-            ctx.fillStyle = '#000510';
+            ctx.fillStyle = '#06060c';
             ctx.fillRect(0, 0, width, height);
 
-            const currentPitch = 0.35 + Math.sin(t * 0.2) * 0.1;
-            const currentYaw = t * 0.15;
-            const currentRoll = 0;
-
-            const fov = 1000;
-            const zOffset = 1500;
-
-            const driftX = Math.sin(t * 0.25) * (width * 0.3);
-            const driftY = Math.cos(t * 0.2) * (height * 0.2);
-            const centerX = width / 2 + driftX;
-            const centerY = height / 2.5 + driftY;
-
-            const project = (x: number, y: number, z: number) => {
-                const pt = rotate(x, y, z, currentPitch, currentYaw, currentRoll);
-                const scale = fov / (fov + pt.z + zOffset);
-                return {
-                    x: centerX + pt.x * scale,
-                    y: centerY + pt.y * scale,
-                    s: scale,
-                    z: pt.z
-                };
-            };
-
-            // Stars
-            for (const star of stars) {
-                let sy = star.y - t * sunSpeed;
-                sy = sy % 5000;
-                if (sy < -2500) sy += 5000;
-
-                const proj = project(star.x, sy, star.z);
-                if (proj.s < 0) continue;
-
-                ctx.globalAlpha = star.alpha;
-                ctx.fillStyle = `rgb(${star.color})`;
-                const size = Math.max(0.1, star.size * proj.s);
-                ctx.fillRect(proj.x - size, proj.y - size, size * 2, size * 2);
+            // Subtle warm gradient overlay at bottom
+            if (!lowEnd) {
+                const warmOverlay = ctx.createRadialGradient(
+                    width * 0.5, height * 0.85, 0,
+                    width * 0.5, height * 0.85, height * 0.7
+                );
+                warmOverlay.addColorStop(0, 'rgba(245, 158, 11, 0.025)');
+                warmOverlay.addColorStop(0.5, 'rgba(16, 185, 129, 0.015)');
+                warmOverlay.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = warmOverlay;
+                ctx.fillRect(0, 0, width, height);
             }
 
-            // Planet trails — no shadowBlur used
+            // ─── Nebula clouds ──────────────────────────────────
             ctx.globalCompositeOperation = 'screen';
-            for (const p of planets) {
-                let prevProj: any = null;
-                for (let i = 0; i < trailPoints; i++) {
-                    const histTime = t - i * trailDt;
-                    const angle = histTime * p.speed;
+            for (const neb of nebulae) {
+                const cx = neb.x + Math.sin(t * 0.1 + neb.driftSpeedX) * (width * 0.15);
+                const cy = neb.y + Math.cos(t * 0.08 + neb.driftSpeedY) * (height * 0.1);
+                const pulse = Math.sin(t * neb.pulseSpeed + neb.pulseOffset) * 0.5 + 0.5;
+                const alpha = neb.baseAlpha + pulse * 0.03;
 
-                    const hx = Math.cos(angle) * p.dist;
-                    const hz = Math.sin(angle) * p.dist;
-                    const hy = (sunSpeed * i * trailDt);
+                const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, neb.radius);
+                grad.addColorStop(0, `rgba(${neb.colors[0]}, ${alpha})`);
+                grad.addColorStop(0.4, `rgba(${neb.colors[1]}, ${alpha * 0.5})`);
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-                    const proj = project(hx, hy, hz);
-                    if (proj.s < 0) continue;
-
-                    if (prevProj) {
-                        const progress = i / trailPoints;
-                        const opacity = (1 - progress) * 0.6;
-
-                        ctx.beginPath();
-                        ctx.moveTo(prevProj.x, prevProj.y);
-                        ctx.lineTo(proj.x, proj.y);
-                        ctx.strokeStyle = `rgba(${p.color}, ${opacity})`;
-                        ctx.lineWidth = Math.max(0.5, 3.5 * prevProj.s);
-                        ctx.stroke();
-                    }
-                    prevProj = proj;
-                }
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, neb.radius, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            // Collect items for depth-sorted rendering
-            const renderItems: any[] = [];
-            const sunProj = project(0, 0, 0);
-            if (sunProj.s > 0) renderItems.push({ type: 'sun', proj: sunProj, z: sunProj.z });
+            // ─── Central core glow (emerald/teal breathing) ────
+            ctx.globalCompositeOperation = 'screen';
+            const corePulse = Math.sin(t * 0.4) * 0.3 + 0.7;
+            const coreX = width * 0.5 + Math.sin(t * 0.12) * width * 0.05;
+            const coreY = height * 0.42 + Math.cos(t * 0.1) * height * 0.03;
+            const coreRadius = (isMobile ? 120 : 220) * corePulse;
 
-            for (const p of planets) {
-                const angle = t * p.speed;
-                const px = Math.cos(angle) * p.dist;
-                const pz = Math.sin(angle) * p.dist;
-                const py = 0;
-                const proj = project(px, py, pz);
-                if (proj.s > 0) renderItems.push({ type: 'planet', p, proj, z: proj.z });
+            if (!lowEnd) {
+                // Outer aura
+                const outerAura = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, coreRadius * 2.5);
+                outerAura.addColorStop(0, `rgba(20, 184, 166, ${0.06 * corePulse})`);
+                outerAura.addColorStop(0.3, `rgba(16, 185, 129, ${0.03 * corePulse})`);
+                outerAura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = outerAura;
+                ctx.beginPath();
+                ctx.arc(coreX, coreY, coreRadius * 2.5, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            for (const ast of asteroids) {
-                const angle = ast.angle + t * ast.speed;
-                const px = Math.cos(angle) * ast.dist;
-                const pz = Math.sin(angle) * ast.dist;
-                const py = 0;
-                const proj = project(px, py, pz);
-                if (proj.s > 0) renderItems.push({ type: 'asteroid', ast, proj, z: proj.z });
-            }
+            // Inner core
+            const coreGrad = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, coreRadius);
+            coreGrad.addColorStop(0, `rgba(255, 255, 255, ${0.12 * corePulse})`);
+            coreGrad.addColorStop(0.2, `rgba(20, 184, 166, ${0.08 * corePulse})`);
+            coreGrad.addColorStop(0.6, `rgba(16, 185, 129, ${0.04 * corePulse})`);
+            coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = coreGrad;
+            ctx.beginPath();
+            ctx.arc(coreX, coreY, coreRadius, 0, Math.PI * 2);
+            ctx.fill();
 
-            renderItems.sort((a, b) => b.z - a.z);
+            // ─── Stars ──────────────────────────────────────────
+            ctx.globalCompositeOperation = 'screen';
+            for (const star of stars) {
+                // Parallax: stars far away barely move
+                const parallax = 0.02;
+                const sx = ((star.x + t * 5) % (width * 2)) - width * 0.5;
+                const sy = ((star.y + t * 3) % (height * 2)) - height * 0.5;
 
-            for (const item of renderItems) {
-                if (item.type === 'asteroid') {
-                    ctx.globalAlpha = item.ast.alpha;
-                    ctx.fillStyle = '#1a3a5a';
-                    const size = Math.max(0.1, item.ast.size * item.proj.s);
-                    ctx.fillRect(item.proj.x - size, item.proj.y - size, size * 2, size * 2);
-                } else if (item.type === 'planet') {
-                    const { p, proj } = item;
-                    const texture = iconTextures[p.name];
+                // Skip off-screen
+                if (sx < -10 || sx > width + 10 || sy < -10 || sy > height + 10) continue;
 
-                    if (texture && texture.complete) {
-                        const s = Math.max(12, p.size * proj.s * (isMobile ? 2.0 : 2.5));
-                        // No shadowBlur — replaced with a simple glow circle for desktop only
-                        if (!isMobile && !lowEnd) {
-                            ctx.globalAlpha = 0.15;
-                            ctx.fillStyle = `rgb(${p.color})`;
-                            ctx.beginPath();
-                            ctx.arc(proj.x, proj.y, s * 0.8, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        ctx.globalAlpha = 1.0;
-                        ctx.drawImage(texture, proj.x - s / 2, proj.y - s / 2, s, s);
-                    } else {
-                        ctx.beginPath();
-                        ctx.arc(proj.x, proj.y, Math.max(1, p.size * proj.s), 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(${p.color}, 0.5)`;
-                        ctx.fill();
-                    }
-                } else if (item.type === 'sun') {
-                    const { proj } = item;
-                    const sunRadius = 60 * proj.s;
+                const twinkle = Math.sin(t * star.twinkleSpeed + star.twinkleOffset) * 0.3 + 0.7;
+                ctx.globalAlpha = star.baseAlpha * twinkle;
+                ctx.fillStyle = `rgb(${star.color})`;
+                const size = star.size;
 
-                    // Simplified sun — no outer glow gradient on low-end
-                    if (!lowEnd) {
-                        const sunGlow = ctx.createRadialGradient(proj.x, proj.y, sunRadius, proj.x, proj.y, sunRadius * 3);
-                        sunGlow.addColorStop(0, 'rgba(255, 200, 0, 0.3)');
-                        sunGlow.addColorStop(1, 'rgba(255, 100, 0, 0)');
-                        ctx.beginPath();
-                        ctx.arc(proj.x, proj.y, sunRadius * 3, 0, Math.PI * 2);
-                        ctx.fillStyle = sunGlow;
-                        ctx.fill();
-                    }
-
-                    const sunGradient = ctx.createRadialGradient(proj.x, proj.y, sunRadius * 0.5, proj.x, proj.y, sunRadius * 1.5);
-                    sunGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-                    sunGradient.addColorStop(0.4, 'rgba(255, 220, 0, 0.8)');
-                    sunGradient.addColorStop(1, 'rgba(255, 150, 0, 0)');
+                // Draw a soft cross for brighter stars, dot for dimmer
+                if (star.size > 1.2 && !lowEnd) {
+                    // Tiny glow dot
                     ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, sunRadius * 1.5, 0, Math.PI * 2);
-                    ctx.fillStyle = sunGradient;
+                    ctx.arc(sx, sy, size * 0.8, 0, Math.PI * 2);
                     ctx.fill();
-
-                    if (!lowEnd) {
-                        ctx.beginPath();
-                        ctx.arc(proj.x, proj.y, sunRadius * 0.7, 0, Math.PI * 2);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fill();
-                    }
+                    // Cross rays
+                    ctx.globalAlpha = star.baseAlpha * twinkle * 0.3;
+                    ctx.fillRect(sx - size * 2, sy - 0.3, size * 4, 0.6);
+                    ctx.fillRect(sx - 0.3, sy - size * 2, 0.6, size * 4);
+                } else {
+                    ctx.fillRect(sx - size * 0.5, sy - size * 0.5, size, size);
                 }
+            }
+
+            // ─── Floating dust motes ────────────────────────────
+            ctx.globalCompositeOperation = 'screen';
+            for (const dust of dustMotes) {
+                // Animate position
+                let dx = dust.x + Math.sin(t * 0.3 + dust.speedX) * 50 + t * dust.speedX * 0.5;
+                let dy = dust.y + t * dust.speedY;
+
+                // Wrap vertically
+                dy = ((dy % (height * 2)) + height * 2) % (height * 2) - height * 0.5;
+                dx = ((dx % (width * 2)) + width * 2) % (width * 2) - width * 0.5;
+
+                if (dx < -20 || dx > width + 20 || dy < -20 || dy > height + 20) continue;
+
+                const flicker = Math.sin(t * 3 + dust.speedX * 10) * 0.3 + 0.7;
+                ctx.globalAlpha = dust.alpha * flicker;
+                ctx.fillStyle = `rgb(${dust.color})`;
+                ctx.beginPath();
+                ctx.arc(dx, dy, dust.size, 0, Math.PI * 2);
+                ctx.fill();
             }
 
             ctx.globalAlpha = 1.0;
+            ctx.globalCompositeOperation = 'source-over';
         }
 
         animationFrameId = requestAnimationFrame(render);
@@ -331,17 +270,14 @@ export function SolarSystemAnimation() {
     }, []);
 
     return (
-        <>
-            <style dangerouslySetInnerHTML={{
-                __html: `
-        body, a, button, [role="button"] {
-          cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext x='0' y='24' font-size='24' style='transform: rotate(-30deg); transform-origin: center; filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.8));'%3E🛸%3C/text%3E%3C/svg%3E") 16 16, auto !important;
-        }
-      `}} />
-            <div className="absolute inset-0 w-full h-full bg-[#000510] z-0 pointer-events-none select-none overflow-hidden">
-                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-100" />
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at center, transparent 40%, rgba(0,5,16,0.7) 85%, #000 100%)' }} />
-            </div>
-        </>
+        <div className="absolute inset-0 w-full h-full bg-[#06060c] z-0 pointer-events-none select-none overflow-hidden">
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-100" />
+            <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                    background: 'radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(6,6,12,0.6) 70%, #06060c 100%)'
+                }}
+            />
+        </div>
     );
 }

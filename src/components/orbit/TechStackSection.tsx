@@ -84,14 +84,14 @@ export function TechStackSection() {
 
 
       <div className="w-full mx-auto relative" ref={ref}>
-        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)] overflow-hidden">
+        <div className="rounded-2xl sm:rounded-3xl border sm:border-2 border-neon-emerald/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)] overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7 }}
             className="text-center mb-8"
           >
-            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-purple/25 bg-neon-purple/5 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.techStack.title}</h2>
+            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.techStack.title}</h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t.techStack.subtitle}</p>
           </motion.div>
 

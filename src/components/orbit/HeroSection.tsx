@@ -32,7 +32,7 @@ export function HeroSection() {
       if (res.ok) {
         setStatus('success');
         localStorage.setItem('orbit_chatbot_email_provided', 'true');
-        toast.success(lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হয়েছেন!' : 'Joined waitlist successfully!');
+        toast.success(lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হয়েছেন!' : 'Joined waitlist successfully!');
         setEmail('');
         setTimeout(() => setStatus('idle'), 3000);
       } else {
@@ -62,43 +62,37 @@ export function HeroSection() {
   const [isFirstVisit] = useState(!sessionStorage.getItem('orbit_has_visited'));
   const baseDelay = isFirstVisit ? 4.2 : 0;
 
-  // Theme Customization from admin
-  const taglineColor = (t.hero as any).taglineColor || '#00F5FF';
-  const titleColor = (t.hero as any).titleColor || '#FF00A8';
-  const ctaGradientStart = (t.hero as any).ctaGradientStart || '#6c5ce7';
-  const ctaGradientEnd = (t.hero as any).ctaGradientEnd || '#3b82f6';
+  // Theme Customization: Forcing Emerald & Gold for this redesign
+  const taglineColor = '#10b981'; // Emerald
+  const titleColor = '#f59e0b';   // Amber/Gold
+  const ctaGradientStart = '#10b981';
+  const ctaGradientEnd = '#14b8a6';
 
   // Dynamic WhatsApp URL from admin settings
   const whatsappNumber = (t.contact as any).whatsapp || '';
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 
-  // Loading Sequence for Hero Title — inline dice deposits letters
+  // ─── Loading Sequence: Holographic Ring Portal ────────────────
   const [step, setStep] = useState(0);
   const [isHeroLoaded, setIsHeroLoaded] = useState(false);
+  const [ringDissolved, setRingDissolved] = useState(false);
   const letters = ['O', 'R', 'B', 'I', 'T'];
 
-  // Dice rotation for each step — matches the CSS face transforms
-  const diceRotations = [
-    { x: 0, y: 0 },        // O (front face)
-    { x: 0, y: -180 },     // R (back face)
-    { x: 0, y: -450 },     // B (right face — extra full turn for drama)
-    { x: 0, y: -630 },     // I (left face)
-    { x: -90, y: -720 },   // T (top face)
-  ];
-
   const revealedCount = Math.min(step, letters.length);
-  const showDice = step < letters.length;
+  const showRing = step > 0 && step <= letters.length;
   const showSaaS = step > letters.length;
-  const diceRot = diceRotations[Math.min(step, diceRotations.length - 1)];
 
   useEffect(() => {
-    // step 1-5: each letter loads, step 6: SaaS, step 7: hero transition
-    const timings = [600, 1200, 1800, 2400, 3000, 3500, 4100];
+    // step 1-5: each letter materializes, step 6: SaaS, step 7: hero loaded
+    const timings = [500, 1000, 1500, 2100, 2700, 3300, 4100];
     const timers: ReturnType<typeof setTimeout>[] = [];
     timings.forEach((ms, i) => {
       timers.push(setTimeout(() => {
         if (i < letters.length) setStep(i + 1);
-        else if (i === letters.length) setStep(letters.length + 1);
+        else if (i === letters.length) {
+          setStep(letters.length + 1);
+          setRingDissolved(true);
+        }
         else setIsHeroLoaded(true);
       }, ms));
     });
@@ -127,26 +121,42 @@ export function HeroSection() {
               style={{ color: taglineColor }}
             >
               <span
-                className="w-2.5 h-2.5 rounded-full animate-pulse bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)]"
+                className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]"
               />
               {t.hero.tagline}
             </motion.div>
           )}
 
           <div className="text-foreground leading-[1] mb-[2.5dvh] sm:mb-10 min-h-[20dvh] sm:min-h-[180px] flex flex-col items-center justify-center relative">
-            {/* ORBIT SaaS title — dice deposits letters inline, they stay as the final title */}
-            <div className="flex items-center justify-center whitespace-nowrap">
-              {/* Deposited letters */}
+
+            {/* ─── Holographic Ring Portal ────────────────── */}
+            <AnimatePresence>
+              {showRing && !ringDissolved && (
+                <motion.div
+                  initial={{ scale: 0.3, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 2.5, opacity: 0 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+                >
+                  <div className="orbit-ring-portal" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ORBIT SaaS title — letters materialize inside the ring */}
+            <div className="flex items-center justify-center whitespace-nowrap relative z-10">
+              {/* Materialized letters */}
               {letters.map((letter, i) => (
                 revealedCount > i && (
                   <motion.span
                     key={letter}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, scale: 0.3, y: 20, filter: 'blur(8px)' }}
+                    animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{
                       type: 'spring',
-                      stiffness: 200,
-                      damping: 20,
+                      stiffness: 180,
+                      damping: 18,
                     }}
                     className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit drop-shadow-lg pb-1"
                   >
@@ -155,51 +165,11 @@ export function HeroSection() {
                 )
               ))}
 
-              {/* The inline dice — rotates to show next letter */}
-              {showDice && (
-                <div
-                  className="hero-dice-wrapper inline-flex items-center justify-center mx-0.5 sm:mx-1"
-                >
-                  <div
-                    className="hero-dice-cube will-change-transform"
-                    style={{
-                      transform: `rotateX(${diceRot.x}deg) rotateY(${diceRot.y}deg)`,
-                      transition: 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
-                    }}
-                  >
-                    {letters.map((l, i) => {
-                      const faces = [
-                        'rotateY(0deg) translateZ(var(--dice-half))',
-                        'rotateY(180deg) translateZ(var(--dice-half))',
-                        'rotateY(90deg) translateZ(var(--dice-half))',
-                        'rotateY(-90deg) translateZ(var(--dice-half))',
-                        'rotateX(90deg) translateZ(var(--dice-half))',
-                      ];
-                      return (
-                        <div
-                          key={l}
-                          className="dice-face hero-dice-face"
-                          style={{ transform: faces[i] }}
-                        >
-                          {l}
-                        </div>
-                      );
-                    })}
-                    <div
-                      className="dice-face hero-dice-face"
-                      style={{ transform: 'rotateX(-90deg) translateZ(var(--dice-half))' }}
-                    >
-                      S
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* "SaaS" pops in after dice finishes */}
+              {/* "SaaS" materializes after ring dissolves */}
               {showSaaS && (
                 <motion.span
-                  initial={{ opacity: 0, scale: 0, x: -10 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  initial={{ opacity: 0, scale: 0.3, x: -10, filter: 'blur(8px)' }}
+                  animate={{ opacity: 1, scale: 1, x: 0, filter: 'blur(0px)' }}
                   transition={{ type: 'spring', stiffness: 150, damping: 20 }}
                   className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas drop-shadow-lg pb-1"
                 >
@@ -208,7 +178,7 @@ export function HeroSection() {
               )}
             </div>
 
-            {/* Subtitle — smoothly appears after dice animation completes */}
+            {/* Subtitle — smoothly appears after loading completes */}
             <AnimatePresence>
               {isHeroLoaded && (
                 <motion.span
@@ -284,7 +254,7 @@ export function HeroSection() {
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-3 px-3 py-2.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-7 h-7 rounded-md bg-[#1a2e24] flex items-center justify-center shrink-0 group-hover:bg-[#1f3a2b] transition-colors">
+                      <div className="w-7 h-7 rounded-md bg-[#0d2818] flex items-center justify-center shrink-0 group-hover:bg-[#143d24] transition-colors">
                         <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
                       </div>
                       <div className="flex flex-col items-start">
@@ -300,7 +270,7 @@ export function HeroSection() {
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-3 px-3 py-2.5 bg-secondary border border-border rounded-lg shadow-lg hover:border-primary/50 transition-colors text-foreground font-semibold group"
                     >
-                      <div className="w-7 h-7 rounded-md bg-[#211e38] flex items-center justify-center shrink-0 group-hover:bg-[#2a2445] transition-colors">
+                      <div className="w-7 h-7 rounded-md bg-[#1a2a1e] flex items-center justify-center shrink-0 group-hover:bg-[#243a28] transition-colors">
                         <Mail className="w-3.5 h-3.5 text-primary" />
                       </div>
                       <div className="flex flex-col items-start">
@@ -348,7 +318,7 @@ export function HeroSection() {
               </button>
             </form>
             {status === 'success' && (
-              <p className="text-green-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+              <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
                 {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
               </p>
             )}
@@ -370,7 +340,7 @@ export function HeroSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'loading'}
-            className="w-full bg-background/95 border border-neon-purple/40 rounded-full py-3 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+            className="w-full bg-background/95 border border-neon-emerald/40 rounded-full py-3 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
           />
           <button
             type="submit"
@@ -382,7 +352,7 @@ export function HeroSection() {
           </button>
         </form>
         {status === 'success' && (
-          <p className="text-green-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+          <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
             {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
           </p>
         )}
