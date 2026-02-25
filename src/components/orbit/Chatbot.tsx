@@ -808,7 +808,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.5 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed bottom-[14dvh] mb-5 sm:mb-8 md:bottom-28 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
+            className="fixed bottom-[22dvh] mb-5 sm:mb-8 md:bottom-28 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
           >
             <div className="relative pointer-events-auto cursor-pointer group" onClick={() => setOpen(true)}>
               {/* Main Speech Bubble */}
@@ -821,7 +821,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="relative flex flex-col items-start gap-0.5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rounded-2xl rounded-br-sm px-4 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.6)] transition-all duration-300 group-hover:-translate-y-1"
+                className="relative flex flex-col items-start gap-0.5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rounded-xl rounded-br-sm px-3.5 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.6)] transition-all duration-300 group-hover:-translate-y-1"
               >
                 {/* Close Button X (small, absolute) */}
                 <button
@@ -830,9 +830,9 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                     setShowWelcomePopup(false);
                     setHasDismissedPopup(true);
                   }}
-                  className="absolute -top-2 -right-2 bg-[#1a1a24] border border-primary/30 rounded-full p-1.5 text-muted-foreground hover:text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-lg hover:scale-110 active:scale-95 z-10"
+                  className="absolute -top-1.5 -right-1.5 bg-[#1a1a24] border border-primary/30 rounded-full p-1 text-muted-foreground hover:text-white hover:bg-neutral-800 transition-all cursor-pointer shadow-lg hover:scale-110 active:scale-95 z-10"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-2.5 h-2.5" />
                 </button>
 
                 {/* Text Content */}
@@ -840,7 +840,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-0 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
                     <span className="text-emerald-400">ORBIT </span><span className="text-amber-500">AI</span>
                   </p>
-                  <span className="text-[13px] font-medium text-white/90 tracking-wide whitespace-nowrap drop-shadow-md transition-all duration-300">
+                  <span className="text-[12px] font-medium text-white/90 tracking-wide whitespace-nowrap drop-shadow-md transition-all duration-300">
                     {chatLang === 'bn' ? popupMessage.bn : popupMessage.en}
                   </span>
                 </div>
@@ -857,7 +857,19 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   ease: "easeInOut"
                 }}
                 className="absolute -bottom-3 right-5 sm:right-7 w-5 h-5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rotate-45 transform shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all duration-300 flex items-center justify-center"
-              />
+              >
+                <motion.div
+                  animate={{
+                    backgroundColor: ["rgba(16, 185, 129, 0.8)", "rgba(245, 158, 11, 0.8)", "rgba(16, 185, 129, 0.8)"],
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="w-1.5 h-1.5 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.5)]"
+                />
+              </motion.div>
             </div>
           </motion.div>
         )}
@@ -868,7 +880,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setOpen(!open)}
-        className={`fixed bottom-[12dvh] md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
+        className={`fixed bottom-[14dvh] md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
           ? 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary text-primary-foreground neon-glow shadow-2xl hidden md:flex'
           : 'w-[12vw] h-[12vw] max-w-[60px] max-h-[60px] sm:w-[80px] sm:h-[80px] sm:max-w-[80px] sm:max-h-[80px] bg-transparent'
           }`}
