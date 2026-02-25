@@ -1,0 +1,1209 @@
+﻿import { motion, AnimatePresence } from 'framer-motion';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { MessageCircle, X, Send, Loader2, Trash2, MoreVertical, ChevronDown, Mail, Bot } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
+import { useLang } from '@/contexts/LanguageContext';
+import { useContent } from '@/contexts/ContentContext';
+import { sendToGroq, ChatMessage } from '@/services/aiService';
+import { translations } from '@/lib/i18n';
+
+type Lang = 'en' | 'bn'; // Define Lang type
+
+export function Chatbot() {
+  const { t, lang: siteLang, toggleLang } = useLang();
+  const { content } = useContent(); // Access dynamic content
+  const [open, setOpen] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatLang, setChatLang] = useState<Lang>('en'); // Independent chat language
+  const [viewportStyle, setViewportStyle] = useState<React.CSSProperties>({});
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState({ en: 'Chat with ORBIT', bn: 'ORBIT-αªÅαª░ αª╕αª╛αªÑαºç αªÜαºìαª»αª╛αªƒ αªòαª░αºüαª¿' });
+  const [hasDismissedPopup, setHasDismissedPopup] = useState(false);
+  const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hidePopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const summarySentRef = useRef(false);
+
+  // Define context-aware dynamic messages
+  const contextMessages: Record<string, Array<{ en: string, bn: string }>> = {
+    hero: [
+      { en: 'Chat with ORBIT!', bn: 'ORBIT-αªÅαª░ αª╕αª╛αªÑαºç αªÜαºìαª»αª╛αªƒ αªòαª░αºüαª¿!' },
+      { en: 'Ready to launch your project?', bn: 'αª¬αºìαª░αª£αºçαªòαºìαªƒ αª╢αºüαª░αºü αªòαª░αªñαºç αª¬αºìαª░αª╕αºìαªñαºüαªñ?' },
+      { en: 'Need a custom AI solution?', bn: 'αªòαª╛αª╕αºìαªƒαª« αªÅαªåαªç αª╕αª▓αª┐αªëαª╢αª¿ αª▓αª╛αªùαª¼αºç?' },
+      { en: 'LetΓÇÖs transform your ideas into reality!', bn: 'αªåαª¬αª¿αª╛αª░ αªåαªçαªíαª┐αºƒαª╛αªùαºüαª▓αºïαªòαºç αª¼αª╛αª╕αºìαªñαª¼αºç αª░αºéαª¬ αªªαª┐αªç αªÜαª▓αºüαª¿!' },
+      { en: 'Looking for a reliable tech partner?', bn: 'αª¿αª┐αª░αºìαª¡αª░αª»αºïαªùαºìαª» αªƒαºçαªò αª¬αª╛αª░αºìαªƒαª¿αª╛αª░ αªûαºüαªüαª£αª¢αºçαª¿?' },
+    ],
+    services: [
+      { en: 'Need help choosing a service?', bn: 'αª╕αªáαª┐αªò αª╕αºçαª¼αª╛ αªûαºüαªüαª£αªñαºç αª╕αª╛αª╣αª╛αª»αºìαª» αª▓αª╛αªùαª¼αºç?' },
+      { en: 'Want to know more about our services?', bn: 'αªåαª«αª╛αªªαºçαª░ αª╕αª╛αª░αºìαª¡αª┐αª╕ αª¿αª┐αºƒαºç αªåαª░αªô αª£αª╛αª¿αªñαºç αªÜαª╛αª¿?' },
+      { en: 'We build Web, AI, and Mobile Apps.', bn: 'αªåαª«αª░αª╛ αªôαºƒαºçαª¼, αªÅαªåαªç αªÅαª¼αªé αª«αºïαª¼αª╛αªçαª▓ αªàαºìαª»αª╛αª¬ αª¼αª╛αª¿αª╛αªçαÑñ' },
+      { en: 'Looking for End-to-End Development?', bn: 'αªÅαª¿αºìαªí-αªƒαºü-αªÅαª¿αºìαªí αªíαºçαª¡αºçαª▓αª¬αª«αºçαª¿αºìαªƒ αªûαºüαªüαª£αª¢αºçαª¿?' },
+      { en: 'Ask me about our tech expertise!', bn: 'αªåαª«αª╛αªªαºçαª░ αªƒαºçαªò αªÅαªòαºìαª╕αª¬αª╛αª░αºìαªƒαª┐αª£ αª╕αª«αºìαª¬αª░αºìαªòαºç αª£αª┐αª£αºìαª₧αºçαª╕ αªòαª░αºüαª¿!' },
+    ],
+    project: [
+      { en: "Like our previous work?", bn: 'αªåαª«αª╛αªªαºçαª░ αªòαª╛αª£αªùαºüαª▓αºï αª¡αª╛αª▓αºï αª▓αºçαªùαºçαª¢αºç?' },
+      { en: "Let's build something like this for you.", bn: 'αªåαª¬αª¿αª╛αª░ αª£αª¿αºìαª»αªô αªÅαª«αª¿ αªòαª┐αª¢αºü αª¼αª╛αª¿αª╛αªñαºç αª¬αª╛αª░αª┐αÑñ' },
+      { en: 'Want a completely custom solution?', bn: 'αªåαª¬αª¿αª╛αª░ αª£αª¿αºìαª» αª╕αª«αºìαª¬αºéαª░αºìαªú αªòαª╛αª╕αºìαªƒαª« αª╕αª▓αª┐αªëαª╢αª¿ αªÜαª╛αªç?' },
+      { en: 'Check out the details of these projects.', bn: 'αªÅαªç αª¬αºìαª░αª£αºçαªòαºìαªƒαªùαºüαª▓αºïαª░ αª¼αª┐αª╕αºìαªñαª╛αª░αª┐αªñ αªªαºçαªûαªñαºç αª¬αª╛αª░αºçαª¿αÑñ' },
+      { en: 'Tell me your project requirements!', bn: 'αªåαª¬αª¿αª╛αª░ αª¬αºìαª░αª£αºçαªòαºìαªƒαºçαª░ αª░αª┐αªòαºïαºƒαª╛αª░αª«αºçαª¿αºìαªƒαªùαºüαª▓αºï αª£αª╛αª¿αª╛αª¿!' },
+    ],
+    'tech-stack': [
+      { en: 'Curious about our technologies?', bn: 'αªåαª«αª╛αªªαºçαª░ αª¬αºìαª░αª»αºüαªòαºìαªñαª┐ αª╕αª«αºìαª¬αª░αºìαªòαºç αª£αª╛αª¿αªñαºç αªÜαª╛αª¿?' },
+      { en: 'Need a specific tech stack?', bn: 'αªòαºïαª¿αºï αª¿αª┐αª░αºìαªªαª┐αª╖αºìαªƒ αª¬αºìαª░αª»αºüαªòαºìαªñαª┐αª░ αªòαª╛αª£ αªûαºüαªüαª£αª¢αºçαª¿?' },
+      { en: 'We use modern, scalable tech.', bn: 'αªåαª«αª░αª╛ αªåαªºαºüαª¿αª┐αªò αªÅαª¼αªé αª╕αºìαªòαºçαª▓αºçαª¼αª▓ αª¬αºìαª░αª»αºüαªòαºìαªñαª┐ αª¼αºìαª»αª¼αª╣αª╛αª░ αªòαª░αª┐αÑñ' },
+      { en: 'Ask me about any specific tool.', bn: 'αªòαºïαª¿αºï αª¿αª┐αª░αºìαªªαª┐αª╖αºìαªƒ αªƒαºüαª▓ αª╕αª«αºìαª¬αª░αºìαªòαºç αª£αª┐αª£αºìαª₧αºçαª╕ αªòαª░αªñαºç αª¬αª╛αª░αºçαª¿αÑñ' },
+    ],
+    'why-us': [
+      { en: 'Want to know why clients choose us?', bn: 'αªòαºìαª▓αª╛αª»αª╝αºçαª¿αºìαªƒαª░αª╛ αªòαºçαª¿ αªåαª«αª╛αªªαºçαª░ αª¡αª╛αª▓αºïαª¼αª╛αª╕αºç?' },
+      { en: 'We guarantee 100% satisfaction.', bn: 'αªåαª«αª░αª╛ αººαºªαºª% αªùαºìαª»αª╛αª░αª╛αª¿αºìαªƒαª┐ αªªαª┐αºƒαºç αªòαª╛αª£ αªòαª░αª┐αÑñ' },
+      { en: 'Ask about our communication process.', bn: 'αªåαª«αª╛αªªαºçαª░ αªòαª«αª┐αªëαª¿αª┐αªòαºçαª╢αª¿ αª¬αºìαª░αª╕αºçαª╕ αª╕αª«αºìαª¬αª░αºìαªòαºç αª£αª╛αª¿αºüαª¿αÑñ' },
+      { en: 'We deliver on time, every time.', bn: 'αªåαª«αª░αª╛ αª╕αª¼αª╕αª«αºƒ αªáαª┐αªò αª╕αª«αºƒαºç αªòαª╛αª£ αªíαºçαª▓αª┐αª¡αª╛αª░αª┐ αªªαª┐αªçαÑñ' },
+    ],
+    leadership: [
+      { en: 'Want to talk to our leadership team?', bn: 'αªåαª«αª╛αªªαºçαª░ αª▓αª┐αªíαª╛αª░αª╢αª┐αª¬ αªƒαª┐αª«αºçαª░ αª╕αª╛αªÑαºç αªòαªÑαª╛ αª¼αª▓αª¼αºçαª¿?' },
+      { en: 'Any questions for our founders?', bn: 'αªåαª«αª╛αªªαºçαª░ αª½αª╛αªëαª¿αºìαªíαª╛αª░αªªαºçαª░ αª£αª¿αºìαª» αªòαºïαª¿αºï αª¬αºìαª░αª╢αºìαª¿ αªåαª¢αºç?' },
+    ],
+    contact: [
+      { en: 'Have a specific question?', bn: 'αªòαºïαª¿αºï αª¿αª┐αª░αºìαªªαª┐αª╖αºìαªƒ αª¬αºìαª░αª╢αºìαª¿ αªåαª¢αºç?' },
+      { en: 'Drop me a message here!', bn: 'αªÅαªûαª╛αª¿αºç αªåαª«αª╛αªòαºç αª«αºìαª»αª╛αª╕αºçαª£ αªªαª┐αª¿!' },
+      { en: 'Want to book a free consultation?', bn: 'αª½αºìαª░αª┐ αªòαª¿αª╕αª╛αª▓αªƒαºçαª╢αª¿ αª¼αºüαªò αªòαª░αªñαºç αªÜαª╛αª¿?' },
+      { en: 'I can connect you to our team.', bn: 'αªåαª«αª┐ αªåαª¬αª¿αª╛αªòαºç αªåαª«αª╛αªªαºçαª░ αªƒαª┐αª«αºçαª░ αª╕αª╛αªÑαºç αªòαª╛αª¿αºçαªòαºìαªƒ αªòαª░αªñαºç αª¬αª╛αª░αª┐αÑñ' },
+    ],
+    default: [
+      { en: 'Chat with ORBIT', bn: 'ORBIT-αªÅαª░ αª╕αª╛αªÑαºç αªÜαºìαª»αª╛αªƒ αªòαª░αºüαª¿' },
+      { en: 'How can I help you today?', bn: 'αªòαºÇαª¡αª╛αª¼αºç αª╕αª╛αª╣αª╛αª»αºìαª» αªòαª░αªñαºç αª¬αª╛αª░αª┐?' },
+      { en: 'Still here if you need me!', bn: 'αªåαª«αª┐ αªÅαªûαª╛αª¿αºçαªç αªåαª¢αª┐, αªòαºïαª¿αºï αª╕αª╛αª╣αª╛αª»αºìαª» αª▓αª╛αªùαª▓αºç αª¼αª▓αª¼αºçαª¿!' },
+      { en: 'Have any questions?', bn: 'αªåαª¬αª¿αª╛αª░ αªòαºïαª¿αºï αª¬αºìαª░αª╢αºìαª¿ αªåαª¢αºç?' },
+      { en: 'LetΓÇÖs discuss your project.', bn: 'αªÜαª▓αºüαª¿ αªåαª¬αª¿αª╛αª░ αª¬αºìαª░αª£αºçαªòαºìαªƒ αª¿αª┐αºƒαºç αªåαª▓αºïαªÜαª¿αª╛ αªòαª░αª┐αÑñ' },
+      { en: 'Need a quick estimate?', bn: 'αªªαºìαª░αºüαªñ αª¬αºìαª░αª£αºçαªòαºìαªƒαºçαª░ αªûαª░αªÜ αª£αª╛αª¿αªñαºç αªÜαª╛αª¿?' },
+    ]
+  };
+
+  // Helper to determine the section currently in view
+  const getActiveSection = () => {
+    const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'contact'];
+    let currentSection = 'default';
+    let maxVisibleHeight = 0;
+
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        // Calculate how much of the element is visible in the viewport
+        const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+        if (visibleHeight > maxVisibleHeight && visibleHeight > window.innerHeight * 0.2) {
+          maxVisibleHeight = visibleHeight;
+          currentSection = id;
+        }
+      }
+    });
+    return currentSection;
+  };
+
+  // Select a random message for a section, ensuring it's not the exact same as the current
+  const getRandomContextMessage = (sectionId: string) => {
+    const msgs = contextMessages[sectionId] || contextMessages['default'];
+    if (msgs.length === 1) return msgs[0];
+
+    // Try to pick one that is different from the current
+    const unused = msgs.filter(m => m.en !== popupMessage.en);
+    if (unused.length > 0) {
+      return unused[Math.floor(Math.random() * unused.length)];
+    }
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  };
+
+  // Idle tracking logic
+  useEffect(() => {
+    if (open || messages.length > 0 || hasDismissedPopup) {
+      setShowWelcomePopup(false);
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
+      return;
+    }
+
+    const resetIdleTimer = () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
+
+      idleTimer.current = setTimeout(() => {
+        // User has been idle for 3 seconds
+        if (!open && messages.length === 0 && !hasDismissedPopup) {
+          const activeSec = getActiveSection();
+          const newMessage = getRandomContextMessage(activeSec);
+          setPopupMessage(newMessage);
+          setShowWelcomePopup(true);
+        }
+      }, 3000); // 3 seconds idle triggers popup instantly
+    };
+
+    const hideAndReset = () => {
+      // Hide popup IMMEDIATELY when user starts interacting heavily (scrolling, clicking)
+      setShowWelcomePopup((prev) => {
+        if (prev) return false;
+        return prev;
+      });
+      resetIdleTimer();
+    };
+
+    // Listeners for user activity
+    // Mousemove only resets the timer, but DOES NOT hide an already open popup (allows user to move mouse to click it)
+    window.addEventListener('mousemove', resetIdleTimer, { passive: true });
+
+    // Heavy interactions that should instantly hide the popup and reset the timer
+    window.addEventListener('scroll', hideAndReset, { passive: true });
+    window.addEventListener('keydown', hideAndReset, { passive: true });
+    window.addEventListener('mousedown', hideAndReset, { passive: true });
+    window.addEventListener('touchstart', hideAndReset, { passive: true });
+
+    // Initial trigger
+    resetIdleTimer();
+
+    return () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
+      window.removeEventListener('mousemove', resetIdleTimer);
+      window.removeEventListener('scroll', hideAndReset);
+      window.removeEventListener('keydown', hideAndReset);
+      window.removeEventListener('mousedown', hideAndReset);
+      window.removeEventListener('touchstart', hideAndReset);
+    };
+  }, [open, messages.length, hasDismissedPopup, popupMessage.en]);
+
+
+  // Dynamic chatbot strings with fallbacks to static translations
+  const chatContent = {
+    title: (content[chatLang] as any)?.chatbot?.title || translations[chatLang].chatbot.title,
+    placeholder: (content[chatLang] as any)?.chatbot?.placeholder || translations[chatLang].chatbot.placeholder,
+    greeting: (content[chatLang] as any)?.chatbot?.greeting || translations[chatLang].chatbot.greeting,
+    systemPrompt: (content[chatLang] as any)?.chatbot?.systemPrompt || '',
+  };
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.chatbot-menu-container')) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
+
+  const scrollYRef = useRef(0);
+
+  useEffect(() => {
+    if (open && window.innerWidth < 768) {
+      // Save current scroll position
+      scrollYRef.current = window.scrollY;
+      // Fully lock the body to prevent any content shifting
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollYRef.current}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      // Also lock the html element
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.height = '100%';
+    } else {
+      // Restore body position and scroll
+      const savedY = scrollYRef.current;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
+      if (savedY) {
+        window.scrollTo(0, savedY);
+      }
+    }
+    return () => {
+      const savedY = scrollYRef.current;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
+      if (savedY) {
+        window.scrollTo(0, savedY);
+      }
+    };
+  }, [open]);
+
+  // Add state to track if email has been provided
+  const [hasProvidedEmail, setHasProvidedEmail] = useState(false);
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadStatus, setLeadStatus] = useState<'idle' | 'loading'>('idle');
+
+  // Load email status on mount
+  useEffect(() => {
+    const status = localStorage.getItem('orbit_chatbot_email_provided');
+    if (status === 'true') {
+      setHasProvidedEmail(true);
+    }
+  }, []);
+
+  // --- INACTIVITY SUMMARY: After 25s of no new messages, generate AI summary and update lead ---
+  useEffect(() => {
+    // Clear previous timer on every message change
+    if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+
+    // Only trigger if: user has provided email, there are meaningful messages, and summary hasn't been sent for this session
+    const userMsgs = messages.filter(m => m.role === 'user');
+    const assistantMsgs = messages.filter(m => m.role === 'assistant');
+    if (!hasProvidedEmail || userMsgs.length < 1 || assistantMsgs.length < 1) return;
+
+    inactivityTimer.current = setTimeout(async () => {
+      if (summarySentRef.current) return;
+      summarySentRef.current = true;
+
+      try {
+        // Build the raw chat for the AI to summarize
+        const rawChat = messages
+          .filter(m => m.role !== 'system')
+          .map(m => `${m.role === 'user' ? 'User' : 'Orbit AI'}: ${m.content}`)
+          .join('\n');
+
+        // Ask the AI to produce a compact summary
+        const summaryPrompt: ChatMessage[] = [
+          {
+            role: 'system',
+            content: `You are a chat summarizer. Given a conversation between a user and Orbit SaaS AI, produce a compact 2-4 sentence summary. Include: what the user asked about, what services/projects interested them, and any action items. Be concise and factual. Do NOT use markdown. Output ONLY the summary text.`
+          },
+          { role: 'user', content: rawChat }
+        ];
+
+        const aiSummary = await sendToGroq(summaryPrompt);
+
+        // Get the stored email (from lead form or interceptor)
+        const storedEmail = leadEmail || localStorage.getItem('orbit_chatbot_email') || '';
+        if (!storedEmail) return;
+
+        // Update the lead with the AI-generated summary
+        const API_BASE = import.meta.env.VITE_API_URL || '';
+        await fetch(`${API_BASE}/api/submit-lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: storedEmail,
+            source: 'Chatbot Gateway',
+            interest: userMsgs[userMsgs.length - 1]?.content || 'General Inquiry',
+            chat_summary: `[AI Summary] ${aiSummary}`
+          })
+        });
+      } catch {
+        // Fail silently ΓÇö this is a background enhancement
+      }
+    }, 45000);
+
+    return () => {
+      if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+    };
+  }, [messages, hasProvidedEmail]);
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leadEmail || !leadEmail.includes('@')) {
+      toast.error(chatLang === 'bn' ? 'αªªαª»αª╝αª╛ αªòαª░αºç αª╕αªáαª┐αªò αªçαª«αºçαªçαª▓ αªªαª┐αª¿' : 'Please enter a valid email');
+      return;
+    }
+
+    setLeadStatus('loading');
+    try {
+      // Format chat summary to include in the lead
+      const chatSummary = messages
+        .map(m => `${m.role === 'user' ? 'User' : 'Orbit AI'}: ${m.content}`)
+        .join('\n\n');
+
+      // Extract user interest from their messages
+      const userMessages = messages.filter(m => m.role === 'user');
+      const extractedInterest = userMessages.length > 0
+        ? userMessages[userMessages.length - 1].content
+        : 'General Inquiry';
+
+      const API_BASE = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API_BASE}/api/submit-lead`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: leadEmail,
+          source: 'Chatbot Gateway',
+          interest: extractedInterest,
+          chat_summary: chatSummary
+        })
+      });
+
+      if (res.ok) {
+        localStorage.setItem('orbit_chatbot_email_provided', 'true');
+        localStorage.setItem('orbit_chatbot_email', leadEmail);
+        setHasProvidedEmail(true);
+        setShowEmailPrompt(false);
+        summarySentRef.current = false; // Allow summary to fire for this session
+        toast.success(chatLang === 'bn' ? 'αªºαª¿αºìαª»αª¼αª╛αªª! αªÅαªûαª¿ αªåαª¬αª¿αª┐ αªÜαºìαª»αª╛αªƒ αª╢αºüαª░αºü αªòαª░αªñαºç αª¬αª╛αª░αºçαª¿αÑñ' : 'Thank you! You can now start chatting.');
+
+        // Auto-reply to the message they already typed
+        executeAIResponse(messages);
+      } else {
+        throw new Error('Failed');
+      }
+    } catch {
+      toast.error(chatLang === 'bn' ? 'αªòαª┐αª¢αºü αª¡αºüαª▓ αª╣αª»αª╝αºçαª¢αºç, αªåαª¼αª╛αª░ αªÜαºçαª╖αºìαªƒαª╛ αªòαª░αºüαª¿' : 'Something went wrong, please try again');
+    } finally {
+      setLeadStatus('idle');
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const updateViewport = () => {
+      if (window.visualViewport) {
+        const isKbOpen = window.visualViewport.height < window.innerHeight * 0.75;
+        setIsKeyboardOpen(isKbOpen);
+
+        if (window.innerWidth < 768) {
+          if (isKbOpen) {
+            // Keyboard is open: use exact visual viewport height, pin to top
+            const vvHeight = window.visualViewport.height;
+            setViewportStyle({
+              height: `${vvHeight}px`,
+              top: '0px',
+              bottom: 'auto',
+              transition: 'height 0.25s cubic-bezier(0.32, 0.72, 0, 1)'
+            });
+          } else {
+            // Keyboard closed: clear inline styles, let CSS h-[100dvh] handle it
+            setViewportStyle({});
+          }
+
+          // Always prevent scroll when chatbot is open on mobile
+          if (open) {
+            window.scrollTo(0, 0);
+          }
+        } else {
+          // Desktop: use actual visible height minus bottom padding (toggle button area ~100px)
+          const availableHeight = window.visualViewport.height - 100;
+          const maxH = Math.min(availableHeight, window.innerHeight * 0.85);
+          setViewportStyle({
+            maxHeight: `${maxH}px`,
+          });
+        }
+      }
+    };
+
+    updateViewport();
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, open]);
+
+  const clearChat = () => {
+    setMessages([]);
+    setSuggestions([]);
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = { role: 'user', content: input };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setInput('');
+    setSuggestions([]);
+    setIsLoading(true);
+
+    // --- EMAIL INTERCEPTOR ---
+    // If the user types an email, capture it silently in the background
+    const emailMatch = input.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+    if (emailMatch) {
+      try {
+        // Find the user's previous context/interest
+        const userMessagesOnly = messages.filter(m => m.role === 'user');
+        const extractedInterest = userMessagesOnly.length > 0
+          ? userMessagesOnly[userMessagesOnly.length - 1].content
+          : 'General Inquiry';
+
+        const chatSummary = messages
+          .map(m => `${m.role === 'user' ? 'User' : 'Orbit AI'}: ${m.content}`)
+          .join('\n\n');
+
+        const API_BASE = import.meta.env.VITE_API_URL || '';
+        fetch(`${API_BASE}/api/submit-lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emailMatch[0],
+            source: 'AI Chatbot Intercept',
+            interest: extractedInterest,
+            chat_summary: chatSummary
+          })
+        }).catch(() => { });
+        localStorage.setItem('orbit_chatbot_email_provided', 'true');
+        localStorage.setItem('orbit_chatbot_email', emailMatch[0]);
+        setHasProvidedEmail(true);
+        summarySentRef.current = false; // Allow summary to fire
+      } catch (e) {
+        // Fail silently so chat UX is not interrupted
+      }
+    }
+    // -------------------------
+
+    if (!hasProvidedEmail && !emailMatch) {
+      if (messages.filter(m => m.role === 'user').length >= 1) {
+        setShowEmailPrompt(true);
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    await executeAIResponse(newMessages);
+  };
+
+  const executeAIResponse = async (chatHistory: ChatMessage[]) => {
+    setIsLoading(true);
+    try {
+      // 1. Fetch knowledge base from server (reads directly from database)
+      const activeT = chatLang === 'bn' ? translations.bn : translations.en;
+      const chatContent = activeT.chatbot;
+      let knowledgeBase = '';
+      let qaContext = '';
+
+      const API_BASE = import.meta.env.VITE_API_URL || '';
+      try {
+        const ctxRes = await fetch(`${API_BASE}/api/chatbot-context?lang=${chatLang}`);
+        if (ctxRes.ok) {
+          const ctxData = await ctxRes.json();
+          knowledgeBase = ctxData.knowledgeBase || '';
+          qaContext = ctxData.qaPairs || '';
+        }
+      } catch {
+        // API failed ΓÇö fall back to client-side assembly below
+      }
+
+      // Fallback: build from client-side content if API didn't return data
+      if (!knowledgeBase) {
+        const activeContent = content[chatLang] || content['en'];
+        knowledgeBase = "ORBIT SaaS - PRIMARY AUTHORITY DATA:\n\n";
+
+        const hero = (activeContent.hero as any);
+        if (hero) {
+          knowledgeBase += `IDENTITY & MISSION: ${hero.title}. Tagline: "${hero.tagline}". Mission: ${hero.subtitle}\n\n`;
+        }
+
+        const siteBaseUrl = 'https://orbitsaas.cloud';
+        const projects = (activeContent.projects as any)?.items || [];
+        if (projects.length > 0) {
+          knowledgeBase += "COMPLETED PORTFOLIO PROJECTS (USE THESE EXACT LINKS):\n";
+          projects.forEach((p: any, index: number) => {
+            const projectId = p.id || index;
+            knowledgeBase += `- ${p.title}: ${p.desc} | URL: ${siteBaseUrl}/project/${projectId}\n`;
+          });
+          knowledgeBase += "\n";
+        }
+
+        const services = (activeContent.services as any)?.items || [];
+        if (services.length > 0) {
+          knowledgeBase += "CORE AGENCY SERVICES:\n";
+          services.forEach((s: any) => { knowledgeBase += `- ${s.title}: ${s.desc}\n`; });
+          knowledgeBase += "\n";
+        }
+
+        const linksData = (activeContent.links as any)?.items || [];
+        if (linksData.length > 0) {
+          knowledgeBase += "IMPORTANT LINKS:\n";
+          linksData.forEach((l: any) => { knowledgeBase += `- ${l.title}: ${l.link}\n`; });
+          knowledgeBase += "\n";
+        }
+
+        knowledgeBase += `CORE LINKS: Home: ${siteBaseUrl}, Projects: ${siteBaseUrl}/project, Contact: ${siteBaseUrl}/#contact\n\n`;
+
+        qaContext = (activeT.chatbot.qaPairs || [])
+          .map((qa: { question: string; answer: string }) => `Q: ${qa.question}\nA: ${qa.answer}`)
+          .join('\n\n');
+      }
+
+      // 2. Prepare System Prompt based on chatLang
+      const adminPrompt = (chatContent as any)?.systemPrompt;
+      const defaultPrompt = (chatLang === 'en'
+        ? `You are ORBIT SaaS's official AI rep. Rules:
+GREETING: First msg only: "Hello! Welcome to Orbit SaaS." Never re-introduce after.
+ABOUT: Bangladesh-based agency offering A-Z custom software globally. Long track record.
+PRICING: Based on project weight/complexity. No hourly work. End-to-End only. Process: MVPΓåÆcustomizationΓåÆmilestones(25/50/75/100%)ΓåÆpayment by progress. Initial fund at MVP. Yearly maintenance subscription available.
+DELIVERY: ~1 week typical. On 100% completion+payment: source code, env files, video tutorials, docs.
+SERVICES: We build ALL types of software.
+COMMS: Direct contact with PM via Telegram/WhatsApp. Updates every 10% milestone.
+SCOPE: NEVER act as general AI. Redirect off-topic to ORBIT services.
+LEADS: If user asks pricing/consultation/project start AND hasn't given email (see EMAIL STATUS), ask for email first. If already given, answer directly.
+LINKS: Provide a link ONLY if the user specifically asks to see a project, service, or contact info. Do NOT include links in every message. NEVER use generic labels like "PROJECT SHOWCASE" or "AI SERVICES". Instead, use the actual name of the project or service (e.g., [Project Name](URL)). The UI will convert these into compact buttons. NEVER fabricate URLs. If a specific URL isn't provided, just describe it without a link.
+LANG: English only. If user speaks Bangla, prepend "[SUGGEST_SWITCH]".
+STYLE: Casual+professional. HARD LIMIT: 50-80 words max. Count your words. Max 3 bullets or 1 short paragraph. NEVER exceed 80 words. If listing items, use very short bullet points (5-8 words each).
+FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on its OWN NEW LINE starting with "≡ƒÆ¼". Phrase it AS IF THE USER IS SPEAKING TO YOU. Use "your" (referring to ORBIT), not "our". BAD: "≡ƒÆ¼ Learn more about our services" or "≡ƒÆ¼ Would you like to see our projects?". GOOD: "≡ƒÆ¼ Tell me about your pricing" or "≡ƒÆ¼ Show me your AI projects" or "≡ƒÆ¼ I want to start a project". NEVER phrase as a bot/company speaking. NEVER use "our". NEVER skip this.`
+        : `αªåαª¬αª¿αª┐ ORBIT SaaS-αªÅαª░ αªàαª½αª┐αª╕αª┐αª»αª╝αª╛αª▓ AI αª¬αºìαª░αªñαª┐αª¿αª┐αªºαª┐αÑñ αª¿αª┐αª»αª╝αª«:
+αª╢αºüαª¡αºçαªÜαºìαª¢αª╛: αª╢αºüαªºαºü αª¬αºìαª░αªÑαª« αª«αºçαª╕αºçαª£αºç "αª╣αºìαª»αª╛αª▓αºï! Orbit SaaS-αªÅ αª╕αºìαª¼αª╛αªùαªñαª«αÑñ" αª¬αª░αºç αªåαª░ αª¬αª░αª┐αªÜαª»αª╝/αª╢αºüαª¡αºçαªÜαºìαª¢αª╛ αª¿αª»αª╝αÑñ
+αª¬αª░αª┐αªÜαª┐αªñαª┐: αª¼αª╛αªéαª▓αª╛αªªαºçαª╢αª¡αª┐αªñαºìαªñαª┐αªò, αª¼αª┐αª╢αºìαª¼αª¼αºìαª»αª╛αª¬αºÇ A-Z αªòαª╛αª╕αºìαªƒαª« αª╕αª½αªƒαªôαª»αª╝αºìαª»αª╛αª░αÑñ αªªαºÇαª░αºìαªÿ αªàαª¡αª┐αª£αºìαª₧αªñαª╛αÑñ
+αª«αºéαª▓αºìαª»: αª¬αºìαª░αª£αºçαªòαºìαªƒαºçαª░ αªôαª£αª¿ αªàαª¿αºüαª»αª╛αª»αª╝αºÇαÑñ αªÿαªúαºìαªƒαª╛αª¡αª┐αªñαºìαªñαª┐αªò αª¿αª»αª╝αÑñ End-to-EndαÑñ αªºαª╛αª¬: MVPΓåÆαªòαª╛αª╕αºìαªƒαª«αª╛αªçαª£ΓåÆαº¿αº½/αº½αºª/αº¡αº½/αººαºªαºª% αª«αª╛αªçαª▓αª╕αºìαªƒαºïαª¿ΓåÆαª¬αºìαª░αªùαºìαª░αºçαª╕ αª¬αºçαª«αºçαª¿αºìαªƒαÑñ MVP-αªñαºç αª¬αºìαª░αª╛αªÑαª«αª┐αªò αª½αª╛αª¿αºìαªíαÑñ αª¼αª╛αª░αºìαª╖αª┐αªò αª«αºçαªçαª¿αªƒαºçαª¿αºìαª»αª╛αª¿αºìαª╕ αª╕αª╛αª¼αª╕αºìαªòαºìαª░αª┐αª¬αª╢αª¿ αªåαª¢αºçαÑñ
+αªíαºçαª▓αª┐αª¡αª╛αª░αª┐: αª╕αª╛αªºαª╛αª░αªúαªñ αºº αª╕αª¬αºìαªñαª╛αª╣αÑñ αººαºªαºª% αª╢αºçαª╖αºç: αª╕αºïαª░αºìαª╕ αªòαºïαªí, env αª½αª╛αªçαª▓, αª¡αª┐αªíαª┐αªô αªƒαª┐αªëαªƒαºïαª░αª┐αª»αª╝αª╛αª▓, αªíαªòαºüαª«αºçαª¿αºìαªƒαºçαª╢αª¿αÑñ
+αª╕αºçαª¼αª╛: αª╕αª¼ αªºαª░αª¿αºçαª░ αª╕αª½αªƒαªôαª»αª╝αºìαª»αª╛αª░ αªñαºêαª░αª┐ αªòαª░αª┐αÑñ
+αª»αºïαªùαª╛αª»αºïαªù: PM-αªÅαª░ αª╕αª╛αªÑαºç αªƒαºçαª▓αª┐αªùαºìαª░αª╛αª«/αª╣αºïαª»αª╝αª╛αªƒαª╕αªàαºìαª»αª╛αª¬αºç αª╕αª░αª╛αª╕αª░αª┐αÑñ αª¬αºìαª░αªñαª┐ αººαºª% αªåαª¬αªíαºçαªƒαÑñ
+αª╕αºÇαª«αª╛: αª╕αª╛αªºαª╛αª░αªú AI αª¿αª»αª╝αÑñ αªàαª¬αºìαª░αª╛αª╕αªÖαºìαªùαª┐αªò αª¼αª┐αª╖αª»αª╝ ORBIT-αªÅ αª½αºçαª░αª╛αª¿αÑñ
+αª▓αª┐αªí: αª¬αºìαª░αª╛αªçαª╕αª┐αªé/αªòαª¿αª╕αª╛αª▓αºìαªƒαºçαª╢αª¿ αªÜαª╛αªçαª▓αºç αªô αªçαª«αºçαªçαª▓ αª¿αª╛ αªªαª┐αª▓αºç (EMAIL STATUS αªªαºçαªûαºüαª¿) αªåαªùαºç αªçαª«αºçαªçαª▓ αªÜαª╛αª¿αÑñ αªªαª┐αª»αª╝αºç αªÑαª╛αªòαª▓αºç αª╕αª░αª╛αª╕αª░αª┐ αªëαªñαºìαªñαª░ αªªαª┐αª¿αÑñ
+αª▓αª┐αªéαªò: αª╢αºüαªºαºü knowledge base-αªÅαª░ URL αª¼αºìαª»αª¼αª╣αª╛αª░ αªòαª░αºüαª¿αÑñ αª¼αª╛αª¿αª╛αª¼αºçαª¿ αª¿αª╛αÑñ αª«αª╛αª░αºìαªòαªíαª╛αªëαª¿: [Text](URL)αÑñ αªòαªûαª¿αºï "αªåαª«αª╛αªªαºçαª░ αªôαª»αª╝αºçαª¼αª╕αª╛αªçαªƒ αªªαºçαªûαºüαª¿" αª¼αª▓αª¼αºçαª¿ αª¿αª╛ ΓÇö αªçαªëαª£αª╛αª░ αªÅαªûαª¿ αªôαª»αª╝αºçαª¼αª╕αª╛αªçαªƒαºçαªç αªåαª¢αºçαÑñ
+αª¡αª╛αª╖αª╛: αª╢αºüαªºαºü αª¼αª╛αªéαª▓αª╛αª»αª╝αÑñ αªçαªéαª░αºçαª£αª┐ αª¼αª▓αª▓αºç "[SUGGEST_SWITCH]" αªªαª┐αª¿αÑñ
+αª╢αºêαª▓αºÇ: αªòαºìαª»αª╛αª£αºüαª»αª╝αª╛αª▓+αª¬αºçαª╢αª╛αªªαª╛αª░αÑñ αªòαªáαª┐αª¿ αª╕αºÇαª«αª╛: αººαº¬αºª-αººαº¼αºª αª╢αª¼αºìαªªαÑñ αª╢αª¼αºìαªª αªùαºüαª¿αºüαª¿αÑñ αª╕αª░αºìαª¼αºïαªÜαºìαªÜ αº⌐ αª¼αºüαª▓αºçαªƒ αª¼αª╛ αºº αª¢αºïαªƒ αª¬αºìαª»αª╛αª░αª╛αÑñ αªòαªûαª¿αºï αº¼αºª αª╢αª¼αºìαªªαºçαª░ αª¼αºçαª╢αª┐ αª¿αª»αª╝αÑñ
+αª½αª▓αºï-αªåαª¬: αª¬αºìαª░αªñαª┐αªƒαª┐ αªëαªñαºìαªñαª░αºç αªàαª¼αª╢αºìαª»αªç αª╢αºçαª╖αºç αª¿αªñαºüαª¿ αª▓αª╛αªçαª¿αºç "≡ƒÆ¼" αªªαª┐αª»αª╝αºç αººαªƒαª┐ αª¬αª░αª¼αª░αºìαªñαºÇ αª¬αªªαªòαºìαª╖αºçαª¬ αªªαª┐αª¿ αªçαªëαª£αª╛αª░αºçαª░ αªªαºâαª╖αºìαªƒαª┐αªòαºïαªú αªÑαºçαªòαºçαÑñ "αªñαºïαª«αª╛αªªαºçαª░" αª¼αºìαª»αª¼αª╣αª╛αª░ αªòαª░αºüαª¿ (ORBIT αª¼αºïαª¥αª╛αªñαºç), "αªåαª«αª╛αªªαºçαª░" αª¿αª»αª╝αÑñ αªûαª╛αª░αª╛αª¬: "≡ƒÆ¼ αªåαª«αª╛αªªαºçαª░ αª╕αºçαª¼αª╛ αª╕αª«αºìαª¬αª░αºìαªòαºç αª£αª╛αª¿αºüαª¿"αÑñ αª¡αª╛αª▓αºï: "≡ƒÆ¼ αªñαºïαª«αª╛αªªαºçαª░ αª¬αºìαª░αª╛αªçαª╕αª┐αªé αª£αª╛αª¿αª╛αªô" αª¼αª╛ "≡ƒÆ¼ αªñαºïαª«αª╛αªªαºçαª░ AI αª¬αºìαª░αª£αºçαªòαºìαªƒαªùαºüαª▓αºï αªªαºçαªûαª╛αªô"αÑñ αªòαªûαª¿αºï αª¼αªƒαºçαª░ αª¡αª╛αª╖αª╛αª»αª╝ αª▓αª┐αªûαª¼αºçαª¿ αª¿αª╛αÑñ`);
+      const systemPrompt = (adminPrompt && adminPrompt.trim()) ? adminPrompt : defaultPrompt;
+
+      // 3. Email status context
+      const emailStatus = hasProvidedEmail
+        ? 'EMAIL: User already gave email. Do NOT ask again.'
+        : 'EMAIL: User has NOT given email. Ask when relevant.';
+
+      // 4. Combine everything (compact ΓÇö server already sends AI gist)
+      const fullSystemMessage = `${systemPrompt}\n\n${emailStatus}\n\n=== KNOWLEDGE BASE ===\n${knowledgeBase}${qaContext ? `\n\n=== Q&A ===\n${qaContext}` : ''}`;
+
+      // 6. Cap conversation history to last 8 messages to limit token growth
+      const recentHistory = chatHistory.filter(m => m.role !== 'system').slice(-8);
+
+      const conversationHistory = [
+        {
+          role: 'system',
+          content: fullSystemMessage
+        } as ChatMessage,
+        ...recentHistory
+      ];
+
+      const responseContent = await sendToGroq(conversationHistory);
+
+      // Extract follow-up suggestions with multiple fallback strategies:
+      const lines = responseContent.split('\n').filter(l => l.trim());
+      const suggestionLines: string[] = [];
+
+      // Strategy 1: Lines starting with ≡ƒÆ¼ (ideal case)
+      const emojiLines = lines.filter(l => l.trim().startsWith('≡ƒÆ¼'));
+      suggestionLines.push(...emojiLines);
+
+      let remainingLines = lines.filter(l => !l.trim().startsWith('≡ƒÆ¼'));
+
+      // Strategy 2: Last line ending with ? (standalone follow-up question)
+      // ONLY extract if there are at least 2 remaining lines (so message isn't emptied)
+      if (suggestionLines.length === 0 && remainingLines.length > 1) {
+        const lastLine = remainingLines[remainingLines.length - 1]?.trim() || '';
+        if (lastLine.endsWith('?') && !lastLine.startsWith('-') && !lastLine.startsWith('ΓÇó')) {
+          suggestionLines.push(lastLine);
+          remainingLines = remainingLines.slice(0, -1);
+        }
+      }
+
+      // Strategy 3: Extract last sentence ending with ? from a paragraph
+      // ONLY if removing it won't leave the message empty
+      if (suggestionLines.length === 0 && remainingLines.length > 0) {
+        const fullText = remainingLines.join('\n');
+        const sentences = fullText.match(/[^.!?\n]*\?/g);
+        if (sentences && sentences.length > 0) {
+          const lastQuestion = sentences[sentences.length - 1].trim();
+          if (lastQuestion.length > 5 && lastQuestion.length < 120) {
+            // Only extract if removing it leaves meaningful content
+            const idx = fullText.lastIndexOf(lastQuestion);
+            const cleaned = (fullText.slice(0, idx) + fullText.slice(idx + lastQuestion.length)).trim();
+            if (cleaned.length > 10) {
+              suggestionLines.push(lastQuestion);
+              remainingLines = cleaned.split('\n').filter(l => l.trim());
+            }
+          }
+        }
+      }
+
+
+      const cleanedContent = remainingLines.join('\n').trimEnd();
+      // Convert bot-perspective suggestions to user-perspective
+      const newSuggestions = suggestionLines.map(l => {
+        let s = l.replace(/^[\s≡ƒÆ¼]*/, '').trim();
+        // Convert "Would you like to know about X?" ΓåÆ "Tell me about X"
+        s = s.replace(/^would you like to (know|learn|hear) (about|more about)\s*/i, 'Tell me about ');
+        // Convert "Would you like to see X?" ΓåÆ "Show me X"
+        s = s.replace(/^would you like to (see|view|check out)\s*/i, 'Show me ');
+        // Convert "Would you like to X?" ΓåÆ "I'd like to X"
+        s = s.replace(/^would you like to\s*/i, "I'd like to ");
+        // Convert "Do you want to X?" ΓåÆ "I want to X"
+        s = s.replace(/^do you want to\s*/i, 'I want to ');
+        // Convert "Shall I X?" ΓåÆ "Please X"
+        s = s.replace(/^shall I\s*/i, 'Please ');
+        // Convert "Can I help you with X?" ΓåÆ "Help me with X"
+        s = s.replace(/^can I help you with\s*/i, 'Help me with ');
+        // Convert "Learn more about our/the X" ΓåÆ "Tell me about your X"
+        s = s.replace(/^learn more about (our|the)\s*/i, 'Tell me about your ');
+        s = s.replace(/^learn more about\s*/i, 'Tell me about ');
+        // Convert "Explore our X" ΓåÆ "Show me your X"
+        s = s.replace(/^explore (our|the)\s*/i, 'Show me your ');
+        s = s.replace(/^explore\s*/i, 'Show me ');
+        // Convert "Check out our X" ΓåÆ "Show me your X"
+        s = s.replace(/^check out (our|the)\s*/i, 'Show me your ');
+        // Fix any remaining "our" ΓåÆ "your" (bot speaking as company)
+        s = s.replace(/\bour\b/gi, 'your');
+        // Remove trailing ? since these are now statements
+        s = s.replace(/\?$/, '');
+        // Capitalize first letter
+        s = s.charAt(0).toUpperCase() + s.slice(1);
+        return s;
+      }).filter(Boolean);
+
+      setSuggestions(newSuggestions);
+      setMessages(prev => [...prev, { role: 'assistant', content: cleanedContent }]);
+    } catch (error) {
+      console.error('Failed to get response:', error);
+      setMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please try again later." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Basic Markdown-to-JSX Formatter (Bold, Links, Bullets)
+  const formatMessage = (content: string) => {
+    // 1. Pre-process to fix common AI punctuation spacing issues
+    let processed = content
+      .replace(/\s+([,.?!])/g, '$1')
+      .replace(/(\*\*.*?)(([,.?!])\s*)\*\*/g, '$1**$2');
+
+    // 2. Extract ALL links (markdown and raw)
+    const linkPlaceholders: { url: string; text: string }[] = [];
+
+    // First: Markdown links [text](url)
+    processed = processed.replace(/\[([^\]]*?)]\(([^)]+)\)/g, (_match, text, url) => {
+      const idx = linkPlaceholders.length;
+      linkPlaceholders.push({ url, text: text.replace(/\*\*/g, '').trim() });
+      return `__LINK_${idx}__`;
+    });
+
+    // Second: Raw URLs (that aren't already placeholders)
+    processed = processed.replace(/(https?:\/\/[^\s)]+)/g, (url) => {
+      // Skip if this URL is already inside a placeholder (though the regex above should have consumed it)
+      if (processed.includes(`](${url})`)) return url;
+      const idx = linkPlaceholders.length;
+      linkPlaceholders.push({ url, text: '' });
+      return `__LINK_${idx}__`;
+    });
+
+    const lines = processed.split('\n');
+
+    // Helper: render inline content (bold, quoted text, + link placeholders)
+    const renderInline = (text: string, keyPrefix: string) => {
+      // Split by bold, link placeholders, AND double-quoted text
+      const parts = text.split(/(\*\*.*?\*\*|__LINK_\d+__|"[^"]{2,}")/g);
+      return parts.map((part, i) => {
+        // Bold
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={`${keyPrefix}-b${i}`} className="font-bold text-primary/90">{part.slice(2, -2)}</strong>;
+        }
+        // Double-quoted text ΓåÆ render as bold italic (no quotes)
+        if (part.startsWith('"') && part.endsWith('"') && part.length > 2) {
+          return <strong key={`${keyPrefix}-q${i}`} className="font-bold italic text-primary/90">{part.slice(1, -1)}</strong>;
+        }
+        // Link placeholder ΓåÆ render as bold "Click Me" button
+        const linkMatch = part.match(/^__LINK_(\d+)__$/);
+        if (linkMatch) {
+          const link = linkPlaceholders[parseInt(linkMatch[1], 10)];
+          return (
+            <a
+              key={`${keyPrefix}-l${i}`}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex mt-1.5 mb-1 items-center px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-full text-[11px] tracking-normal shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20 group animate-in zoom-in-50 duration-300"
+            >
+              <span className="mr-1">{link.text || 'CLICK HERE'}</span>
+              <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          );
+        }
+        return part;
+      });
+    };
+
+    return lines.map((line, lineIndex) => {
+      // Handle Bullet Points
+      const isBullet = /^\s*[*-]\s+/.test(line);
+      let cleanLine = line.replace(/^\s*[*-]\s+/, '');
+
+      if (isBullet) {
+        // Auto-bold the main point (text before colon) if not already bolded
+        const colonIndex = cleanLine.indexOf(':');
+        if (colonIndex > 0 && colonIndex < 80 && !cleanLine.includes('**')) {
+          cleanLine = `**${cleanLine.substring(0, colonIndex + 1)}**${cleanLine.substring(colonIndex + 1)}`;
+        }
+      }
+
+      const inlineContent = renderInline(isBullet ? cleanLine : line, `line-${lineIndex}`);
+
+      if (isBullet) {
+        return (
+          <div key={`line-${lineIndex}`} className="flex gap-2 pl-1 my-0.5 text-xs">
+            <span className="text-primary mt-1.5 w-1 h-1 rounded-full bg-primary shrink-0" />
+            <span className="flex-1 leading-relaxed">{inlineContent}</span>
+          </div>
+        );
+      }
+
+      return (
+        <p key={`line-${lineIndex}`} className={`text-xs leading-relaxed ${line.trim() === '' ? 'h-2' : 'mb-1.5 last:mb-0'}`}>
+          {inlineContent}
+        </p>
+      );
+    });
+  };
+
+  return (
+    <>
+      {/* Backdrop for mobile - blur entire background and close on click */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-[190] bg-background/60 backdrop-blur-md md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Chatbot Welcome Popup (Speech Bubble) */}
+      <AnimatePresence>
+        {!open && showWelcomePopup && !hasDismissedPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.3, transformOrigin: 'bottom right' }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.5 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="fixed bottom-[20dvh] mb-5 sm:mb-8 md:bottom-28 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
+          >
+            <div className="relative pointer-events-auto cursor-pointer group" onClick={() => setOpen(true)}>
+              {/* Main Speech Bubble */}
+              <motion.div
+                animate={{
+                  borderColor: ["rgba(16, 185, 129, 0.8)", "rgba(245, 158, 11, 0.8)", "rgba(16, 185, 129, 0.8)"],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="relative flex flex-col items-start gap-0.5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rounded-2xl rounded-br-sm px-4 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.6)] transition-all duration-300 group-hover:-translate-y-1"
+              >
+
+                {/* Close Button X (small, absolute) */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowWelcomePopup(false);
+                    setHasDismissedPopup(true);
+                  }}
+                  className="absolute -top-2 -right-2 bg-[#1a1a24] border border-primary/30 rounded-full p-1.5 text-muted-foreground hover:text-white hover:bg-red-500/80 hover:border-red-500/80 transition-all cursor-pointer shadow-lg hover:scale-110 active:scale-95 z-10"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+
+                {/* Text Content */}
+                <div className="flex flex-col items-start pr-1">
+                  <p className="text-[9px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-amber-400 uppercase tracking-widest mb-0 drop-shadow-sm">Orbit AI</p>
+                  <span className="text-[13px] font-medium text-white/90 tracking-wide whitespace-nowrap drop-shadow-md transition-all duration-300">
+                    {chatLang === 'bn' ? popupMessage.bn : popupMessage.en}
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Speech Bubble Tail */}
+              <motion.div
+                animate={{
+                  borderColor: ["rgba(245, 158, 11, 0.8)", "rgba(16, 185, 129, 0.8)", "rgba(245, 158, 11, 0.8)"],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute -bottom-3 right-5 sm:right-7 w-5 h-5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rotate-45 transform shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all duration-300 flex items-center justify-center"
+              >
+                <motion.div
+                  animate={{
+                    backgroundColor: ["rgba(16, 185, 129, 0.8)", "rgba(245, 158, 11, 0.8)", "rgba(16, 185, 129, 0.8)"],
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="w-1 h-1 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.5)]"
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toggle button - hide on mobile when chat is open since we have a new close button */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setOpen(!open)}
+        className={`fixed bottom-[12dvh] md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
+          ? 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary text-primary-foreground neon-glow shadow-2xl hidden md:flex'
+          : 'w-[12vw] h-[12vw] max-w-[60px] max-h-[60px] sm:w-[80px] sm:h-[80px] sm:max-w-[80px] sm:max-h-[80px] bg-transparent'
+          }`}
+      >
+        {open ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <div className="chatbot-float-icon relative w-full h-full flex items-center justify-center drop-shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+            <DotLottieReact
+              src="/robot.json"
+              loop
+              autoplay
+              className="w-full h-full object-contain scale-[1.2]"
+            />
+          </div>
+        )}
+      </motion.button>
+
+      {/* Chat panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{
+              type: 'spring',
+              damping: 25,
+              stiffness: 300
+            }}
+            style={{
+              ...viewportStyle,
+              transformOrigin: 'bottom',
+              boxShadow: '0 0 10px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3), 0 0 60px rgba(124, 58, 237, 0.15), inset 0 0 10px rgba(124, 58, 237, 0.05)'
+            }}
+            className={`fixed md:bottom-24 left-0 right-0 md:left-auto md:right-6 z-[200] w-full md:w-[400px] max-w-full md:max-w-[400px] overflow-hidden border-t md:border md:border-primary/50 border-border bg-background md:bg-card/90 backdrop-blur-3xl shadow-2xl flex flex-col h-[100dvh] md:h-auto top-0 md:top-auto ${isKeyboardOpen && typeof window !== 'undefined' && window.innerWidth < 768 ? 'rounded-none border-t-0' : 'bottom-0 rounded-t-3xl md:rounded-2xl'}`}
+          >
+            {/* Header */}
+            <div className="shrink-0 px-5 py-3.5 bg-primary/20 border-b border-border flex items-center justify-between relative">
+              <div>
+                <h4 className="font-display font-semibold text-foreground text-sm leading-tight">
+                  {chatContent.title}
+                </h4>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                    {chatLang === 'bn' ? 'αªàαª¿αª▓αª╛αªçαª¿' : 'Online'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 chatbot-menu-container">
+                {/* Control Pill */}
+                <div className="flex items-center gap-1 bg-secondary/80 p-0.5 rounded-full border border-border/50 shadow-sm">
+                  {/* Actions Menu Trigger */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowMenu(!showMenu)}
+                      className={`w-7 h-7 flex items-center justify-center rounded-full transition-all cursor-pointer ${showMenu ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background/50 text-muted-foreground hover:text-foreground hover:bg-background'}`}
+                    >
+                      <MoreVertical className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    <AnimatePresence>
+                      {showMenu && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                          className="absolute right-0 mt-3 w-48 rounded-2xl bg-card border border-border shadow-2xl z-[210] py-2 overflow-hidden ring-1 ring-black/5"
+                        >
+                          {/* Lang Selector inside Menu */}
+                          <div className="px-4 py-2 border-b border-border/50">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                              {chatLang === 'bn' ? 'αª¡αª╛αª╖αª╛ αª¿αª┐αª░αºìαª¼αª╛αªÜαª¿ αªòαª░αºüαª¿' : 'Select Language'}
+                            </p>
+                            <div className="flex bg-secondary p-0.5 rounded-lg border border-border/50">
+                              <button
+                                onClick={() => { setChatLang('en'); setShowMenu(false); }}
+                                className={`flex-1 px-2 py-1.5 text-[10px] font-bold rounded-md transition-all ${chatLang === 'en' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                              >
+                                English
+                              </button>
+                              <button
+                                onClick={() => { setChatLang('bn'); setShowMenu(false); }}
+                                className={`flex-1 px-2 py-1.5 text-[10px] font-bold rounded-md transition-all ${chatLang === 'bn' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                              >
+                                αª¼αª╛αªéαª▓αª╛
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Clear Chat inside Menu */}
+                          <button
+                            onClick={() => { clearChat(); setShowMenu(false); }}
+                            className="w-full px-4 py-2.5 flex items-center gap-3 text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            {chatLang === 'bn' ? 'αªÜαºìαª»αª╛αªƒ αª«αºüαª¢αºüαª¿' : 'Clear Conversation'}
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Minimize Button */}
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-background/50 text-muted-foreground hover:text-foreground hover:bg-background transition-all cursor-pointer"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-background/40 md:bg-card/40 md:max-h-[500px] relative">
+              <div className="space-y-3 transition-all duration-500">
+                {/* Initial Selection Flow */}
+                {messages.length === 0 && !isLoading && (
+                  <div className="space-y-4 py-2">
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
+                        <Bot className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div className="bg-[#0f111a] border-[0.5px] border-primary/40 rounded-xl rounded-tl-none px-3 py-2 text-xs text-[#f8f9fa] max-w-[85%] shadow-lg leading-relaxed">
+                        <p className="font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-amber-400 uppercase tracking-widest text-[10px]">
+                          {chatLang === 'bn' ? 'αª╕αºìαª¼αª╛αªùαªñαª«!' : 'Welcome!'}
+                        </p>
+                        {chatLang === 'bn'
+                          ? 'αª╢αºüαª░αºü αªòαª░αª╛αª░ αª£αª¿αºìαª» αªåαª¬αª¿αª╛αª░ αª¬αª¢αª¿αºìαªªαºçαª░ αª¡αª╛αª╖αª╛αªƒαª┐ αª¿αª┐αª░αºìαª¼αª╛αªÜαª¿ αªòαª░αºüαª¿:'
+                          : 'Please select your preferred language to begin:'}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pl-9">
+                      <button
+                        onClick={() => setChatLang('en')}
+                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all shadow-sm ${chatLang === 'en' ? 'bg-primary border-primary text-primary-foreground shadow-primary/20' : 'bg-background border-border text-muted-foreground hover:border-primary/40'}`}
+                      >
+                        English
+                      </button>
+                      <button
+                        onClick={() => setChatLang('bn')}
+                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all shadow-sm ${chatLang === 'bn' ? 'bg-primary border-primary text-primary-foreground shadow-primary/20' : 'bg-background border-border text-muted-foreground hover:border-primary/40'}`}
+                      >
+                        αª¼αª╛αªéαª▓αª╛
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {messages.filter(m => m.role !== 'system').map((msg, i) => {
+                  const isAssistant = msg.role === 'assistant';
+                  const hasSwitchSuggestion = isAssistant && msg.content.includes('[SUGGEST_SWITCH]');
+                  const cleanContent = isAssistant ? msg.content.replace('[SUGGEST_SWITCH]', '').trim() : msg.content;
+
+                  return (
+                    <div key={i} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                        {isAssistant && (
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
+                            <Bot className="w-4 h-4 text-emerald-400" />
+                          </div>
+                        )}
+                        <div className={`rounded-xl px-3 py-2 text-xs max-w-[85%] shadow-lg border-[0.5px] ${msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground border-primary/40 shadow-emerald-500/10 rounded-tr-none'
+                          : 'bg-[#0f111a] border-primary/40 text-[#f8f9fa] rounded-tl-none'
+                          }`}>
+                          {isAssistant ? formatMessage(cleanContent) : msg.content}
+                        </div>
+                      </div>
+                      {hasSwitchSuggestion && (
+                        <div className="flex justify-start ml-9 pb-1">
+                          <button
+                            onClick={() => setChatLang(chatLang === 'en' ? 'bn' : 'en')}
+                            className="px-4 py-1.5 rounded-full text-[10px] font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-1.5 cursor-pointer ring-2 ring-primary/20"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            {chatLang === 'en' ? 'αª¼αª╛αªéαª▓αª╛αºƒ αªòαªÑαª╛ αª¼αª▓αºüαª¿' : 'Switch to English'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Email Prompt Native Chat Bubble */}
+                {showEmailPrompt && !hasProvidedEmail && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
+                        <Bot className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div className="bg-[#0f111a] rounded-xl rounded-tl-none px-4 py-3 text-sm text-[#f8f9fa] shadow-xl max-w-[90%] border-[0.5px] border-primary/40 bg-gradient-to-br from-[#0f111a] to-emerald-500/5">
+                        <p className="mb-3 text-xs leading-relaxed font-medium">
+                          {chatLang === 'bn'
+                            ? 'αªàαª¼αª╢αºìαª»αªç, αªåαª«αª┐ αª╕αª╛αª╣αª╛αª»αºìαª» αªòαª░αªñαºç αª¬αª╛αª░αª┐αÑñ αªñαª¼αºç αªåαª«αª╛αªªαºçαª░ αª╕αªéαª»αºïαªù αª¼αª┐αªÜαºìαª¢αª┐αª¿αºìαª¿ αª╣αºƒαºç αªùαºçαª▓αºç, αªåαª«αª┐ αªòαºïαªÑαª╛αºƒ αªëαªñαºìαªñαª░ αª¬αª╛αªáαª╛αª¼αºï? αªåαª¬αª¿αª╛αª░ αªçαª«αºçαªçαª▓αªƒαª┐ αªªαª┐αª¿:'
+                            : 'Definitely I can help with that. In case we get disconnected, what is your email address?'}
+                        </p>
+                        <form onSubmit={handleLeadSubmit} className="flex flex-col gap-2 relative z-10">
+                          <input
+                            type="email"
+                            required
+                            placeholder={chatLang === 'bn' ? 'αªåαª¬αª¿αª╛αª░ αªçαª«αºçαªçαª▓...' : 'Your email address...'}
+                            value={leadEmail}
+                            onChange={(e) => setLeadEmail(e.target.value)}
+                            disabled={leadStatus === 'loading'}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pointer-events-auto"
+                          />
+                          <button
+                            type="submit"
+                            disabled={leadStatus === 'loading' || !leadEmail}
+                            className="w-full bg-primary text-primary-foreground font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 text-xs transition-opacity cursor-pointer pointer-events-auto"
+                          >
+                            {leadStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                            {chatLang === 'bn' ? 'αªëαªñαºìαªñαª░ αª¬αª╛αª¿' : 'Send & Continue'}
+                          </button>
+                          <p className="text-[9px] text-muted-foreground text-center mt-1">
+                            {chatLang === 'bn' ? 'αªåαª«αª░αª╛ αª╕αºìαª¬αºìαª»αª╛αª« αªòαª░αª┐ αª¿αª╛αÑñ' : '100% Secure. No spam.'}
+                          </p>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {isLoading && (
+                  <div className="flex gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
+                      <Bot className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <div className="bg-[#0f111a] border-[0.5px] border-primary/40 rounded-xl rounded-tl-none px-4 py-3 shadow-lg flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-white" style={{ animation: 'dotBounce 1.4s ease-in-out infinite' }} />
+                      <span className="w-2 h-2 rounded-full bg-white" style={{ animation: 'dotBounce 1.4s ease-in-out 0.2s infinite' }} />
+                      <span className="w-2 h-2 rounded-full bg-white" style={{ animation: 'dotBounce 1.4s ease-in-out 0.4s infinite' }} />
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} />
+              </div> {/* End of blurred wrapper */}
+            </div>
+
+            {/* Suggestion Chips */}
+            {(() => {
+              const defaultChips = chatLang === 'bn'
+                ? ['αªñαºïαª«αª╛αªªαºçαª░ αª╕αºçαª¼αª╛αªùαºüαª▓αºï αªòαª┐?', 'αª¬αºìαª░αª£αºçαªòαºìαªƒαªùαºüαª▓αºï αªªαºçαªûαª╛αªô', 'αª¬αºìαª░αª╛αªçαª╕αª┐αªé αªòαºçαª«αª¿?', 'αª»αºïαªùαª╛αª»αºïαªù αªòαª░αªñαºç αªÜαª╛αªç']
+                : ['What services do you offer?', 'Show me your projects', 'Tell me about pricing', 'I want to contact you'];
+              const activeChips = suggestions.length > 0 ? suggestions : (messages.length <= 1 ? defaultChips : []);
+              return activeChips.length > 0 && !isLoading ? (
+                <div className={`shrink-0 px-4 pt-2 pb-0 bg-card/80 transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
+                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                    {activeChips.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setSuggestions([]);
+                          setInput(s);
+                          setTimeout(() => {
+                            const userMessage: ChatMessage = { role: 'user', content: s };
+                            const newMessages = [...messages, userMessage];
+                            setMessages(newMessages);
+                            setInput('');
+                            setIsLoading(true);
+
+                            // Email gate: same logic as handleSend
+                            if (!hasProvidedEmail && messages.filter(m => m.role === 'user').length >= 1) {
+                              setShowEmailPrompt(true);
+                              setIsLoading(false);
+                              return;
+                            }
+
+                            executeAIResponse(newMessages);
+                          }, 50);
+                        }}
+                        className="shrink-0 px-4 py-2 rounded-full text-[11px] font-bold bg-primary/10 text-white border-[0.5px] border-primary/40 hover:bg-primary/20 hover:border-amber-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all duration-300 cursor-pointer whitespace-nowrap backdrop-blur-sm"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null;
+            })()}
+
+            {/* Input & Mobile Close Button */}
+            <div className="shrink-0 relative">
+              <div className={`px-4 py-3 pb-6 md:pb-3 ${suggestions.length > 0 && !isLoading ? 'pt-2' : ''} flex gap-2 bg-card/90 backdrop-blur-md transition-opacity ${showEmailPrompt ? 'opacity-40 pointer-events-none' : ''}`}>
+                <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSend()}
+                  onFocus={(e) => {
+                    // Prevent the browser from scrolling the page to bring input into view
+                    if (window.innerWidth < 768) {
+                      e.target.scrollIntoView({ block: 'nearest' });
+                      setTimeout(() => window.scrollTo(0, 0), 50);
+                      setTimeout(() => window.scrollTo(0, 0), 150);
+                      setTimeout(() => window.scrollTo(0, 0), 300);
+                    }
+                  }}
+                  placeholder={chatContent.placeholder}
+                  disabled={isLoading}
+                  enterKeyHint="send"
+                  // Prevent auto-focus on open to stop keyboard jumping
+                  autoFocus={false}
+                  className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-[13px] md:text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 transition-all"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={isLoading || !input.trim()}
+                  className="group w-10 h-10 rounded-full bg-emerald-500 text-black flex items-center justify-center hover:scale-110 active:scale-90 shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-[1.5px] border-white/40 overflow-hidden relative"
+                >
+                  <Send className="w-4 h-4 relative z-10 fill-black stroke-black" strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

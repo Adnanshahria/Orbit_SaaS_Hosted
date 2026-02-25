@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <!-- Enhanced shadow for pointer hover state -->
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#10b981" flood-opacity="0.7"/>
+      <feDropShadow dx="1" dy="1" stdDeviation="1" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Flames / Burner: Native Golden (Mirrored) -->
+  <path d="M 21 18 L 31 30" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 18.5 22 L 27 31" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+
+  <!-- Main Rocket Body: Native Green (Mirrored) -->
+  <path d="M 29 17 
+           C 22 7, 12 2, 2 2 
+           C 4 10, 8 20, 17 27
+           C 17 17, 22 15, 29 17 Z" 
+        fill="#10b981" filter="url(#glow)"/>
+</svg>
