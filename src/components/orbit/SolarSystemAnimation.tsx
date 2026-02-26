@@ -31,7 +31,7 @@ export function SolarSystemAnimation() {
         ctx.scale(dpr, dpr);
 
         // Frame rate throttling
-        const targetFPS = isMobile ? 20 : (lowEnd ? 24 : 30);
+        const targetFPS = isMobile ? 40 : (lowEnd ? 30 : 60);
         const frameDuration = 1000 / targetFPS;
         let lastFrameTime = 0;
 

@@ -82,6 +82,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   animation: textShimmerSweep 5s linear infinite;
+  will-change: background-position;
   display: inline-block;
 }
 
@@ -97,17 +98,16 @@
   -webkit-background-clip: text;
   background-clip: text;
   animation: textShimmerSweep 5s linear infinite;
+  will-change: background-position;
   display: inline-block;
 }
 
 @keyframes borderGradient {
   0%, 100% {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(245, 158, 11, 0.8));
-    filter: brightness(1.1);
   }
   50% {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(16, 185, 129, 0.8));
-    filter: brightness(1.3);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(16, 185, 129, 0.9));
   }
 }
 
@@ -118,14 +118,12 @@
       0 0 30px rgba(16, 185, 129, 0.3),
       0 0 60px rgba(20, 184, 166, 0.15),
       inset 0 0 20px rgba(245, 158, 11, 0.1);
-    transform: rotate(0deg);
   }
   50% {
     box-shadow:
       0 0 50px rgba(16, 185, 129, 0.5),
       0 0 100px rgba(20, 184, 166, 0.25),
       inset 0 0 35px rgba(245, 158, 11, 0.2);
-    transform: rotate(180deg);
   }
 }
 
@@ -256,12 +254,12 @@ html.low-perf .neon-text-cyan {
 
   /* Force custom cursor on absolutely everything */
   *, *::before, *::after {
-    cursor: url('/orbit-cursor.png') 9 4, auto !important;
+    cursor: url('/orbit-cursor-new.png') 9 4, auto !important;
   }
 
   /* Ensure interactive elements get the pointer active cursor */
   a, a *, button, button *, [role="button"], [role="button"] *, input[type="submit"], input[type="button"], .cursor-pointer, .cursor-pointer * {
-    cursor: url('/orbit-cursor.png') 9 4, pointer !important;
+    cursor: url('/orbit-cursor-new.png') 9 4, pointer !important;
   }
 
   .font-display {

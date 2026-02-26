@@ -73,16 +73,19 @@ export function HeroSection() {
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 
   // ─── Loading Sequence: Holographic Ring Portal ────────────────
-  const [step, setStep] = useState(0);
-  const [isHeroLoaded, setIsHeroLoaded] = useState(false);
-  const [ringDissolved, setRingDissolved] = useState(false);
   const letters = ['O', 'R', 'B', 'I', 'T'];
+
+  // On return visits, skip loading sequence entirely
+  const [step, setStep] = useState(isFirstVisit ? 0 : letters.length + 1);
+  const [isHeroLoaded, setIsHeroLoaded] = useState(!isFirstVisit);
+  const [ringDissolved, setRingDissolved] = useState(!isFirstVisit);
 
   const revealedCount = Math.min(step, letters.length);
   const showRing = step > 0 && step <= letters.length;
   const showSaaS = step > letters.length;
 
   useEffect(() => {
+    if (!isFirstVisit) return; // Skip loading sequence on return visits
     // step 1-5: each letter materializes, step 6: SaaS, step 7: hero loaded
     const timings = [500, 1000, 1500, 2100, 2700, 3300, 4100];
     const timers: ReturnType<typeof setTimeout>[] = [];
@@ -114,9 +117,9 @@ export function HeroSection() {
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 4.3 }}
+              initial={{ opacity: 0, y: -30, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 18, delay: baseDelay + 0.3 }}
               className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-[2dvh] sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               style={{ color: taglineColor }}
             >
@@ -151,14 +154,14 @@ export function HeroSection() {
                 revealedCount > i && (
                   <motion.span
                     key={letter}
-                    initial={{ opacity: 0, scale: 0.3, y: 20, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                    initial={{ opacity: 0, scale: 0.3, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{
                       type: 'spring',
                       stiffness: 180,
                       damping: 18,
                     }}
-                    className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit drop-shadow-lg pb-1"
+                    className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit pb-1"
                   >
                     {letter}
                   </motion.span>
@@ -168,10 +171,10 @@ export function HeroSection() {
               {/* "SaaS" materializes after ring dissolves */}
               {showSaaS && (
                 <motion.span
-                  initial={{ opacity: 0, scale: 0.3, x: -10, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, scale: 1, x: 0, filter: 'blur(0px)' }}
+                  initial={{ opacity: 0, scale: 0.3, x: -10 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ type: 'spring', stiffness: 150, damping: 20 }}
-                  className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas drop-shadow-lg pb-1"
+                  className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas pb-1"
                 >
                   SaaS
                 </motion.span>
@@ -182,9 +185,15 @@ export function HeroSection() {
             <AnimatePresence>
               {isHeroLoaded && (
                 <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ type: 'spring', stiffness: 80, damping: 18, delay: 0.15 }}
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 70,
+                    damping: 16,
+                    delay: isFirstVisit ? 0.15 : 0.5,
+                    mass: 0.8,
+                  }}
                   className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
                   style={{ color: titleColor }}
                 >
