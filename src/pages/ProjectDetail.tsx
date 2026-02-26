@@ -256,8 +256,8 @@ function CollapsibleCards({ blocks }: { blocks: string[] }) {
                                     className="relative flex items-center justify-center w-9 h-9 rounded-full border border-white/5 bg-[#0e0e18] shadow-inner"
                                 >
                                     <ChevronDown
-                                        className={`w-4 h-4 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isExpanded ? '' : '-rotate-90'}`}
-                                        style={{ color: headingColor || '#a29bfe' }}
+                                        className={`w-4 h-4 transition-transform duration-500 ${isExpanded ? '' : '-rotate-90'}`}
+                                        style={{ color: headingColor || '#a29bfe', transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                                     />
                                 </div>
                             </div>
