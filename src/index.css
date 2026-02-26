@@ -256,12 +256,12 @@ html.low-perf .neon-text-cyan {
 
   /* Force custom cursor on absolutely everything */
   *, *::before, *::after {
-    cursor: url('/orbit-cursor.png') 4 2, auto !important;
+    cursor: url('/orbit-cursor.png') 9 4, auto !important;
   }
 
   /* Ensure interactive elements get the pointer active cursor */
   a, a *, button, button *, [role="button"], [role="button"] *, input[type="submit"], input[type="button"], .cursor-pointer, .cursor-pointer * {
-    cursor: url('/orbit-cursor.png') 4 2, pointer !important;
+    cursor: url('/orbit-cursor.png') 9 4, pointer !important;
   }
 
   .font-display {

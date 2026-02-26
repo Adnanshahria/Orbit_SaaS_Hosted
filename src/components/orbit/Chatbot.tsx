@@ -877,7 +877,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="absolute -bottom-3 right-5 sm:right-7 w-5 h-5 bg-[#0a0a0f]/95 backdrop-blur-2xl border-[0.5px] rotate-45 transform shadow-[4px_4px_10px_rgba(0,0,0,0.3)] transition-all duration-300 flex items-center justify-center"
+                className="absolute -bottom-[5px] right-5 sm:right-7 w-2.5 h-2.5 bg-[#0a0a0f]/95 border-[0.5px] rotate-45 transform shadow-[2px_2px_6px_rgba(0,0,0,0.3)] flex items-center justify-center"
               >
                 <motion.div
                   animate={{
@@ -888,7 +888,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="w-1.5 h-1.5 rounded-full shadow-[0_0_4px_rgba(0,0,0,0.5)]"
+                  className="w-1 h-1 rounded-full shadow-[0_0_3px_rgba(0,0,0,0.4)]"
                 />
               </motion.div>
             </div>
