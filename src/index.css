@@ -127,6 +127,11 @@
   }
 }
 
+@keyframes ringRotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .orbit-ring-portal {
   width: clamp(180px, 45vw, 420px);
   height: clamp(180px, 45vw, 420px);
@@ -135,7 +140,8 @@
   background:
     linear-gradient(#06060c, #06060c) padding-box,
     linear-gradient(135deg, #10b981, #14b8a6, #f59e0b, #ec4899, #10b981) border-box;
-  animation: ringPulse 3s ease-in-out infinite;
+  animation: ringPulse 3s ease-in-out infinite, ringRotate 6s linear infinite;
+  will-change: transform;
   position: relative;
 }
 

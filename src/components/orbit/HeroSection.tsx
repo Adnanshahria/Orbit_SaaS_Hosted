@@ -117,9 +117,9 @@ export function HeroSection() {
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (
             <motion.div
-              initial={{ opacity: 0, y: -30, scale: 0.92 }}
+              initial={{ opacity: 0, y: -12, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ type: 'spring', stiffness: 90, damping: 18, delay: baseDelay + 0.3 }}
+              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
               className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-[2dvh] sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
               style={{ color: taglineColor }}
             >
@@ -139,8 +139,14 @@ export function HeroSection() {
                   initial={{ scale: 0.3, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 2.5, opacity: 0 }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+                  transition={{
+                    type: 'spring',
+                    stiffness: 60,
+                    damping: 14,
+                    mass: 0.8,
+                    opacity: { duration: 0.6, ease: 'easeOut' },
+                  }}
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 will-change-transform"
                 >
                   <div className="orbit-ring-portal" />
                 </motion.div>
@@ -154,12 +160,11 @@ export function HeroSection() {
                 revealedCount > i && (
                   <motion.span
                     key={letter}
-                    initial={{ opacity: 0, scale: 0.3, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{
-                      type: 'spring',
-                      stiffness: 180,
-                      damping: 18,
+                      duration: 0.8,
+                      ease: [0.25, 0.46, 0.45, 0.94],
                     }}
                     className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit pb-1"
                   >
@@ -171,9 +176,9 @@ export function HeroSection() {
               {/* "SaaS" materializes after ring dissolves */}
               {showSaaS && (
                 <motion.span
-                  initial={{ opacity: 0, scale: 0.3, x: -10 }}
+                  initial={{ opacity: 0, scale: 0.85, x: -6 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
-                  transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+                  transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
                   className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas pb-1"
                 >
                   SaaS
@@ -185,14 +190,12 @@ export function HeroSection() {
             <AnimatePresence>
               {isHeroLoaded && (
                 <motion.span
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   transition={{
-                    type: 'spring',
-                    stiffness: 70,
-                    damping: 16,
+                    duration: 1.2,
+                    ease: 'easeOut',
                     delay: isFirstVisit ? 0.15 : 0.5,
-                    mass: 0.8,
                   }}
                   className="block mt-2 sm:mt-6 text-[1.25rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
                   style={{ color: titleColor }}
