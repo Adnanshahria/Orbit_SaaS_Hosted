@@ -108,8 +108,11 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom', 'framer-motion'],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          'framer-motion': ['framer-motion'],
           ui: ['@radix-ui/react-accordion', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react', 'clsx', 'tailwind-merge'],
+          charts: ['recharts'],
+          lottie: ['@lottiefiles/dotlottie-react', 'lottie-react'],
         },
       },
     },

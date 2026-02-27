@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud, Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase, Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette } from 'lucide-react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import type { LucideIcon } from 'lucide-react';
 
@@ -11,7 +11,24 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 const DEFAULT_ICONS = [Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket];
 
-// Animations removed to prevent mobile scroll layout shifting
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 40,
+    scale: 0.97,
+  },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 18,
+      delay: i * 0.1,
+    },
+  }),
+};
 
 export function ServicesSection() {
   const { t } = useLang();
@@ -24,22 +41,8 @@ export function ServicesSection() {
   const cardBorder = (t.services as any).cardBorder || '';
   const iconColor = (t.services as any).iconColor || '#6c5ce7';
 
-  // Dark mode detection to prevent bright pastel colors from blinding users in dark mode
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    // Check initial state
-    setIsDark(document.documentElement.classList.contains('dark'));
-
-    // Listen for changes
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-
   const subtitle = t.services.subtitle || '';
-  const words = subtitle.split(' ');
+  const words = useMemo(() => subtitle.split(' '), [subtitle]);
 
   return (
     <section id="services" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12">

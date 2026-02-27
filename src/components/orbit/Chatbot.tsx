@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { MessageCircle, X, Send, Loader2, Trash2, MoreVertical, ChevronDown, Mail, Bot } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
@@ -9,6 +9,61 @@ import { sendToGroq, ChatMessage } from '@/services/aiService';
 import { translations } from '@/lib/i18n';
 
 type Lang = 'en' | 'bn'; // Define Lang type
+
+// Context-aware dynamic messages — moved to module scope to avoid re-creating on every render
+const contextMessages: Record<string, Array<{ en: string, bn: string }>> = {
+  hero: [
+    { en: 'Chat with ORBIT!', bn: 'ORBIT-এর সাথে চ্যাট করুন!' },
+    { en: 'Ready to launch your project?', bn: 'প্রজেক্ট শুরু করতে প্রস্তুত?' },
+    { en: 'Need a custom AI solution?', bn: 'কাস্টম এআই সলিউশন লাগবে?' },
+    { en: 'Let’s transform your ideas into reality!', bn: 'আপনার আইডিয়াগুলোকে বাস্তবে রূপ দিই চলুন!' },
+    { en: 'Looking for a reliable tech partner?', bn: 'নির্ভরযোগ্য টেক পার্টনার খুঁজছেন?' },
+  ],
+  services: [
+    { en: 'Need help choosing a service?', bn: 'সঠিক সেবা খুঁজতে সাহায্য লাগবে?' },
+    { en: 'Want to know more about our services?', bn: 'আমাদের সার্ভিস নিয়ে আরও জানতে চান?' },
+    { en: 'We build Web, AI, and Mobile Apps.', bn: 'আমরা ওয়েব, এআই এবং মোবাইল অ্যাপ বানাই।' },
+    { en: 'Looking for End-to-End Development?', bn: 'এন্ড-টু-এন্ড ডেভেলপমেন্ট খুঁজছেন?' },
+    { en: 'Ask me about our tech expertise!', bn: 'আমাদের টেক এক্সপার্টিজ সম্পর্কে জিজ্ঞেস করুন!' },
+  ],
+  project: [
+    { en: "Like our previous work?", bn: 'আমাদের কাজগুলো ভালো লেগেছে?' },
+    { en: "Let's build something like this for you.", bn: 'আপনার জন্যও এমন কিছু বানাতে পারি।' },
+    { en: 'Want a completely custom solution?', bn: 'আপনার জন্য সম্পূর্ণ কাস্টম সলিউশন চাই?' },
+    { en: 'Check out the details of these projects.', bn: 'এই প্রজেক্টগুলোর বিস্তারিত দেখতে পারেন।' },
+    { en: 'Tell me your project requirements!', bn: 'আপনার প্রজেক্টের রিকোয়ারমেন্টগুলো জানান!' },
+  ],
+  'tech-stack': [
+    { en: 'Curious about our technologies?', bn: 'আমাদের প্রযুক্তি সম্পর্কে জানতে চান?' },
+    { en: 'Need a specific tech stack?', bn: 'কোনো নির্দিষ্ট প্রযুক্তির কাজ খুঁজছেন?' },
+    { en: 'We use modern, scalable tech.', bn: 'আমরা আধুনিক এবং স্কেলেবল প্রযুক্তি ব্যবহার করি।' },
+    { en: 'Ask me about any specific tool.', bn: 'কোনো নির্দিষ্ট টুল সম্পর্কে জিজ্ঞেস করতে পারেন।' },
+  ],
+  'why-us': [
+    { en: 'Want to know why clients choose us?', bn: 'ক্লায়েন্টরা কেন আমাদের ভালোবাসে?' },
+    { en: 'We guarantee 100% satisfaction.', bn: 'আমরা ১০০% গ্যারান্টি দিয়ে কাজ করি।' },
+    { en: 'Ask about our communication process.', bn: 'আমাদের কমিউনিকেশন প্রসেস সম্পর্কে জানুন।' },
+    { en: 'We deliver on time, every time.', bn: 'আমরা সবসময় ঠিক সময়ে কাজ ডেলিভারি দিই।' },
+  ],
+  leadership: [
+    { en: 'Want to talk to our leadership team?', bn: 'আমাদের লিডারশিপ টিমের সাথে কথা বলবেন?' },
+    { en: 'Any questions for our founders?', bn: 'আমাদের ফাউন্ডারদের জন্য কোনো প্রশ্ন আছে?' },
+  ],
+  contact: [
+    { en: 'Have a specific question?', bn: 'কোনো নির্দিষ্ট প্রশ্ন আছে?' },
+    { en: 'Drop me a message here!', bn: 'এখানে আমাকে ম্যাসেজ দিন!' },
+    { en: 'Want to book a free consultation?', bn: 'ফ্রি কনসাল্টেশন বুক করতে চান?' },
+    { en: 'I can connect you to our team.', bn: 'আমি আপনাকে আমাদের টিমের সাথে কানেক্ট করতে পারি।' },
+  ],
+  default: [
+    { en: 'Chat with ORBIT', bn: 'ORBIT-এর সাথে চ্যাট করুন' },
+    { en: 'How can I help you today?', bn: 'কীভাবে সাহায্য করতে পারি?' },
+    { en: 'Still here if you need me!', bn: 'আমি এখানেই আছি, কোনো সাহায্য লাগলে বলবেন!' },
+    { en: 'Have any questions?', bn: 'আপনার কোনো প্রশ্ন আছে?' },
+    { en: 'Let’s discuss your project.', bn: 'চলুন আপনার প্রজেক্ট নিয়ে আলোচনা করি।' },
+    { en: 'Need a quick estimate?', bn: 'দ্রুত প্রজেক্টের খরচ জানতে চান?' },
+  ]
+};
 
 export function Chatbot() {
   const { t, lang: siteLang, toggleLang } = useLang();
@@ -30,60 +85,6 @@ export function Chatbot() {
   const hidePopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const summarySentRef = useRef(false);
 
-  // Define context-aware dynamic messages
-  const contextMessages: Record<string, Array<{ en: string, bn: string }>> = {
-    hero: [
-      { en: 'Chat with ORBIT!', bn: 'ORBIT-এর সাথে চ্যাট করুন!' },
-      { en: 'Ready to launch your project?', bn: 'প্রজেক্ট শুরু করতে প্রস্তুত?' },
-      { en: 'Need a custom AI solution?', bn: 'কাস্টম এআই সলিউশন লাগবে?' },
-      { en: 'Let’s transform your ideas into reality!', bn: 'আপনার আইডিয়াগুলোকে বাস্তবে রূপ দিই চলুন!' },
-      { en: 'Looking for a reliable tech partner?', bn: 'নির্ভরযোগ্য টেক পার্টনার খুঁজছেন?' },
-    ],
-    services: [
-      { en: 'Need help choosing a service?', bn: 'সঠিক সেবা খুঁজতে সাহায্য লাগবে?' },
-      { en: 'Want to know more about our services?', bn: 'আমাদের সার্ভিস নিয়ে আরও জানতে চান?' },
-      { en: 'We build Web, AI, and Mobile Apps.', bn: 'আমরা ওয়েব, এআই এবং মোবাইল অ্যাপ বানাই।' },
-      { en: 'Looking for End-to-End Development?', bn: 'এন্ড-টু-এন্ড ডেভেলপমেন্ট খুঁজছেন?' },
-      { en: 'Ask me about our tech expertise!', bn: 'আমাদের টেক এক্সপার্টিজ সম্পর্কে জিজ্ঞেস করুন!' },
-    ],
-    project: [
-      { en: "Like our previous work?", bn: 'আমাদের কাজগুলো ভালো লেগেছে?' },
-      { en: "Let's build something like this for you.", bn: 'আপনার জন্যও এমন কিছু বানাতে পারি।' },
-      { en: 'Want a completely custom solution?', bn: 'আপনার জন্য সম্পূর্ণ কাস্টম সলিউশন চাই?' },
-      { en: 'Check out the details of these projects.', bn: 'এই প্রজেক্টগুলোর বিস্তারিত দেখতে পারেন।' },
-      { en: 'Tell me your project requirements!', bn: 'আপনার প্রজেক্টের রিকোয়ারমেন্টগুলো জানান!' },
-    ],
-    'tech-stack': [
-      { en: 'Curious about our technologies?', bn: 'আমাদের প্রযুক্তি সম্পর্কে জানতে চান?' },
-      { en: 'Need a specific tech stack?', bn: 'কোনো নির্দিষ্ট প্রযুক্তির কাজ খুঁজছেন?' },
-      { en: 'We use modern, scalable tech.', bn: 'আমরা আধুনিক এবং স্কেলেবল প্রযুক্তি ব্যবহার করি।' },
-      { en: 'Ask me about any specific tool.', bn: 'কোনো নির্দিষ্ট টুল সম্পর্কে জিজ্ঞেস করতে পারেন।' },
-    ],
-    'why-us': [
-      { en: 'Want to know why clients choose us?', bn: 'ক্লায়েন্টরা কেন আমাদের ভালোবাসে?' },
-      { en: 'We guarantee 100% satisfaction.', bn: 'আমরা ১০০% গ্যারান্টি দিয়ে কাজ করি।' },
-      { en: 'Ask about our communication process.', bn: 'আমাদের কমিউনিকেশন প্রসেস সম্পর্কে জানুন।' },
-      { en: 'We deliver on time, every time.', bn: 'আমরা সবসময় ঠিক সময়ে কাজ ডেলিভারি দিই।' },
-    ],
-    leadership: [
-      { en: 'Want to talk to our leadership team?', bn: 'আমাদের লিডারশিপ টিমের সাথে কথা বলবেন?' },
-      { en: 'Any questions for our founders?', bn: 'আমাদের ফাউন্ডারদের জন্য কোনো প্রশ্ন আছে?' },
-    ],
-    contact: [
-      { en: 'Have a specific question?', bn: 'কোনো নির্দিষ্ট প্রশ্ন আছে?' },
-      { en: 'Drop me a message here!', bn: 'এখানে আমাকে ম্যাসেজ দিন!' },
-      { en: 'Want to book a free consultation?', bn: 'ফ্রি কনসালটেশন বুক করতে চান?' },
-      { en: 'I can connect you to our team.', bn: 'আমি আপনাকে আমাদের টিমের সাথে কানেক্ট করতে পারি।' },
-    ],
-    default: [
-      { en: 'Chat with ORBIT', bn: 'ORBIT-এর সাথে চ্যাট করুন' },
-      { en: 'How can I help you today?', bn: 'কীভাবে সাহায্য করতে পারি?' },
-      { en: 'Still here if you need me!', bn: 'আমি এখানেই আছি, কোনো সাহায্য লাগলে বলবেন!' },
-      { en: 'Have any questions?', bn: 'আপনার কোনো প্রশ্ন আছে?' },
-      { en: 'Let’s discuss your project.', bn: 'চলুন আপনার প্রজেক্ট নিয়ে আলোচনা করি।' },
-      { en: 'Need a quick estimate?', bn: 'দ্রুত প্রজেক্টের খরচ জানতে চান?' },
-    ]
-  };
 
   // Helper to determine the section currently in view
   const getActiveSection = () => {
@@ -177,13 +178,13 @@ export function Chatbot() {
   }, [open, messages.length, hasDismissedPopup, popupMessage.en]);
 
 
-  // Dynamic chatbot strings with fallbacks to static translations
-  const chatContent = {
+  // Dynamic chatbot strings with fallbacks to static translations (memoized)
+  const chatContentMemo = useMemo(() => ({
     title: (content[chatLang] as any)?.chatbot?.title || translations[chatLang].chatbot.title,
     placeholder: (content[chatLang] as any)?.chatbot?.placeholder || translations[chatLang].chatbot.placeholder,
     greeting: (content[chatLang] as any)?.chatbot?.greeting || translations[chatLang].chatbot.greeting,
     systemPrompt: (content[chatLang] as any)?.chatbot?.systemPrompt || '',
-  };
+  }), [content, chatLang]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -286,7 +287,7 @@ export function Chatbot() {
           .map(m => `${m.role === 'user' ? 'User' : 'Orbit AI'}: ${m.content}`)
           .join('\n');
 
-        // Ask the AI to produce a compact summary
+        // Ask the AI to produce a compact 2-4 sentence summary
         const summaryPrompt: ChatMessage[] = [
           {
             role: 'system',
@@ -378,6 +379,8 @@ export function Chatbot() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    let resizeTimer: ReturnType<typeof setTimeout>;
+
     const updateViewport = () => {
       if (window.visualViewport) {
         const isKbOpen = window.visualViewport.height < window.innerHeight * 0.75;
@@ -413,15 +416,21 @@ export function Chatbot() {
       }
     };
 
+    const debouncedUpdateViewport = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateViewport, 100); // Debounce by 100ms
+    };
+
     updateViewport();
-    window.visualViewport?.addEventListener('resize', updateViewport);
-    window.visualViewport?.addEventListener('scroll', updateViewport);
-    window.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('resize', debouncedUpdateViewport);
+    window.visualViewport?.addEventListener('scroll', debouncedUpdateViewport);
+    window.addEventListener('resize', debouncedUpdateViewport);
 
     return () => {
-      window.visualViewport?.removeEventListener('resize', updateViewport);
-      window.visualViewport?.removeEventListener('scroll', updateViewport);
-      window.removeEventListener('resize', updateViewport);
+      clearTimeout(resizeTimer);
+      window.visualViewport?.removeEventListener('resize', debouncedUpdateViewport);
+      window.visualViewport?.removeEventListener('scroll', debouncedUpdateViewport);
+      window.removeEventListener('resize', debouncedUpdateViewport);
     };
   }, [open]);
 
@@ -723,7 +732,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
   };
 
   // Basic Markdown-to-JSX Formatter (Bold, Links, Bullets)
-  const formatMessage = (content: string) => {
+  const formatMessage = useCallback((content: string) => {
     // 1. Pre-process to fix common AI punctuation spacing issues
     let processed = content
       .replace(/\s+([,.?!])/g, '$1')
@@ -816,7 +825,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
         </p>
       );
     });
-  };
+  }, []);
 
   return (
     <>
@@ -828,7 +837,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-[190] bg-background/60 backdrop-blur-md md:hidden"
+            className="fixed inset-0 z-[190] bg-background/80 chatbot-overlay-blur md:hidden"
           />
         )}
       </AnimatePresence>
@@ -943,7 +952,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             <div className="shrink-0 px-5 py-3.5 bg-primary/20 border-b border-border flex items-center justify-between relative">
               <div>
                 <h4 className="font-display font-semibold text-foreground text-sm leading-tight">
-                  {chatContent.title}
+                  {chatContentMemo.title}
                 </h4>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -1207,7 +1216,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                       setTimeout(() => window.scrollTo(0, 0), 300);
                     }
                   }}
-                  placeholder={chatContent.placeholder}
+                  placeholder={chatContentMemo.placeholder}
                   disabled={isLoading}
                   enterKeyHint="send"
                   // Prevent auto-focus on open to stop keyboard jumping

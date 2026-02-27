@@ -14,7 +14,7 @@ import { ContactSection } from './components/orbit/ContactSection';
 import { OrbitFooter } from './components/orbit/OrbitFooter';
 // Chatbot is lazy-loaded below for performance
 import { StructuredData } from './components/seo/StructuredData';
-import { LeadMagnetPopup } from './components/orbit/LeadMagnetPopup';
+// LeadMagnetPopup is lazy-loaded below — only triggers after 15s or exit-intent
 import ScrollToTop from './components/ScrollToTop';
 
 import { lazy, Suspense, useEffect, useState } from 'react';
@@ -41,6 +41,7 @@ const AdminReviews = lazy(() => import('./pages/admin/AdminReviews'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const Chatbot = lazy(() => import('./components/orbit/Chatbot').then(m => ({ default: m.Chatbot })));
+const LeadMagnetPopup = lazy(() => import('./components/orbit/LeadMagnetPopup').then(m => ({ default: m.LeadMagnetPopup })));
 import { GlobalBackground } from './components/orbit/GlobalBackground';
 import { FallingIcons } from './components/orbit/FallingIcons';
 
@@ -141,7 +142,11 @@ function PublicSite() {
           )}
         </main>
         {isLoaded && <OrbitFooter />}
-        {isLoaded && <LeadMagnetPopup />}
+        {isLoaded && (
+          <Suspense fallback={null}>
+            <LeadMagnetPopup />
+          </Suspense>
+        )}
         {showChatbot && (
           <Suspense fallback={null}>
             <Chatbot />

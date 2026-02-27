@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap&font-display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,8 +10,17 @@
 }
 
 @keyframes pulse-slow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.03); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03);
+  }
 }
 
 
@@ -115,9 +124,12 @@
 }
 
 @keyframes borderGradient {
-  0%, 100% {
+
+  0%,
+  100% {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(245, 158, 11, 0.8));
   }
+
   50% {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(16, 185, 129, 0.9));
   }
@@ -125,12 +137,15 @@
 
 /* ── Holographic Ring Portal ── */
 @keyframes ringPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow:
       0 0 30px rgba(16, 185, 129, 0.3),
       0 0 60px rgba(20, 184, 166, 0.15),
       inset 0 0 20px rgba(245, 158, 11, 0.1);
   }
+
   50% {
     box-shadow:
       0 0 50px rgba(16, 185, 129, 0.5),
@@ -140,8 +155,13 @@
 }
 
 @keyframes ringRotate {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .orbit-ring-portal {
@@ -184,17 +204,18 @@
 /* ── Performance: disable GPU-heavy effects on tablets and below ── */
 @media (max-width: 1024px) {
 
-  /* Remove backdrop-blur from container cards — biggest perf win */
+  /* Remove ALL backdrop-blur from every element — biggest perf win */
   .backdrop-blur-xl,
   .backdrop-blur-md,
   .backdrop-blur-2xl,
   .backdrop-blur-sm,
-  .backdrop-blur-\[2px\] {
+  .backdrop-blur-lg,
+  [class*="backdrop-blur"] {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  /* Simulate glass on mobile: semi-transparent dark (not opaque) */
+  /* Make semi-transparent cards look solid against dark BG */
   .bg-white\/\[0\.02\],
   .bg-white\/\[0\.03\],
   .bg-white\/\[0\.05\] {
@@ -202,13 +223,20 @@
   }
 
   .bg-background\/90 {
-    background-color: rgba(8, 8, 15, 0.92) !important;
+    background-color: #0c0c14 !important;
+  }
+
+  /* Solid fallback for card backgrounds that had blur */
+  .bg-card\/60,
+  .bg-card\/40 {
+    background-color: rgba(18, 18, 26, 0.92) !important;
   }
 
   /* Hide massive decorative blur orbs that tank GPU */
   .blur-\[120px\],
   .blur-\[130px\],
-  .blur-\[150px\] {
+  .blur-\[150px\],
+  .blur-xl {
     display: none !important;
   }
 
@@ -216,7 +244,24 @@
   .glass-effect {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: rgba(16, 16, 26, 0.9) !important;
+    background: rgba(18, 18, 26, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  /* Sections off-screen: defer rendering entirely */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+
+  /* Paint isolation for section containers */
+  section>div {
+    contain: paint;
+  }
+
+  /* Reduce complex box-shadow to simpler single-layer version */
+  .shadow-\[0_0_40px_rgba\(108\,92\,231\,0\.08\)\] {
+    box-shadow: 0 0 12px rgba(108, 92, 231, 0.06) !important;
   }
 
   /* ── Replace mask-composite gradient borders with simple borders ──
@@ -255,7 +300,9 @@
 html.low-perf .backdrop-blur-xl,
 html.low-perf .backdrop-blur-md,
 html.low-perf .backdrop-blur-2xl,
-html.low-perf .backdrop-blur-sm {
+html.low-perf .backdrop-blur-sm,
+html.low-perf .backdrop-blur-lg,
+html.low-perf [class*="backdrop-blur"] {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
@@ -263,12 +310,19 @@ html.low-perf .backdrop-blur-sm {
 html.low-perf .glass-effect {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background: rgba(16, 16, 26, 0.9) !important;
+  background: rgba(18, 18, 26, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.low-perf .bg-card\/60,
+html.low-perf .bg-card\/40 {
+  background-color: rgba(18, 18, 26, 0.92) !important;
 }
 
 html.low-perf .blur-\[120px\],
 html.low-perf .blur-\[130px\],
-html.low-perf .blur-\[150px\] {
+html.low-perf .blur-\[150px\],
+html.low-perf .blur-xl {
   display: none !important;
 }
 
@@ -283,7 +337,7 @@ html.low-perf .pulse-glow {
 
 html.low-perf .neon-glow,
 html.low-perf .neon-glow-cyan {
-  box-shadow: none !important;
+  box-shadow: 0 0 6px rgba(108, 92, 231, 0.12) !important;
 }
 
 html.low-perf .neon-text,
@@ -291,22 +345,76 @@ html.low-perf .neon-text-cyan {
   text-shadow: none !important;
 }
 
-html.low-perf .shimmer-effect::after {
+/* Defer off-screen content rendering on low-perf */
+html.low-perf section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+html.low-perf section>div {
+  contain: paint;
+}
+
+html.low-perf .shadow-\[0_0_40px_rgba\(108\,92\,231\,0\.08\)\] {
+  box-shadow: 0 0 8px rgba(108, 92, 231, 0.05) !important;
+}
+
+/* Disable shimmer/sweep animations on low-perf — use static gradient */
+html.low-perf .animate-text-shimmer-orbit,
+html.low-perf .animate-text-shimmer-saas {
   animation: none !important;
 }
 
-html.low-perf .premium-card::before,
-html.low-perf .premium-card-sub::before,
-html.low-perf .navbar-gradient-border::before {
-  animation: none !important;
+/* Disable custom cursor on low-perf — saves GPU compositing */
+html.low-perf body,
+html.low-perf a,
+html.low-perf button,
+html.low-perf [role="button"] {
+  cursor: auto !important;
 }
 
-/* Respect OS-level reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* Low-perf: solid overlays instead of backdrop-blur */
+html.low-perf .chatbot-overlay-blur {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: rgba(10, 10, 15, 0.85) !important;
+}
+
+html.low-perf .leadmagnet-overlay-blur {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: rgba(10, 10, 15, 0.85) !important;
+}
+
+/* Low-perf: simplify gentle-animation transitions */
+html.low-perf .gentle-animation {
+  transition-duration: 0.15s !important;
+}
+
+/* Low-perf: disable 3D transforms (dice animation) */
+html.low-perf .dice,
+html.low-perf .hero-dice-cube {
+  transform-style: flat !important;
+}
+
+/* Content containment for all viewports — major render perf win */
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+section>div {
+  contain: layout style paint;
+}
+
+/* ── Touch devices: disable custom cursor (invisible anyway) ── */
+@media (hover: none) and (pointer: coarse) {
+
+  body,
+  a,
+  button,
+  [role="button"] {
+    cursor: auto !important;
   }
 }
 
@@ -325,12 +433,23 @@ html.low-perf .navbar-gradient-border::before {
   }
 
   /* Force custom cursor on absolutely everything */
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     cursor: url('/orbit-cursor-new.png') 9 4, auto !important;
   }
 
   /* Ensure interactive elements get the pointer active cursor */
-  a, a *, button, button *, [role="button"], [role="button"] *, input[type="submit"], input[type="button"], .cursor-pointer, .cursor-pointer * {
+  a,
+  a *,
+  button,
+  button *,
+  [role="button"],
+  [role="button"] *,
+  input[type="submit"],
+  input[type="button"],
+  .cursor-pointer,
+  .cursor-pointer * {
     cursor: url('/orbit-cursor-new.png') 9 4, pointer !important;
   }
 
@@ -339,7 +458,12 @@ html.low-perf .navbar-gradient-border::before {
   }
 
   .gentle-animation {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-effect {
@@ -548,6 +672,7 @@ html.hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 html.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

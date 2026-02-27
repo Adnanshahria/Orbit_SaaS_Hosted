@@ -1,5 +1,27 @@
 import React, { useRef, useEffect } from 'react';
 
+// Lucide icon SVG path data — avoids importing react-dom/server (~40KB)
+const ICON_PATHS: Record<string, { d: string; strokeWidth?: number }[]> = {
+    Zap: [{ d: 'M13 2L3 14h9l-1 10 10-12h-9l1-10z' }],
+    Sparkles: [{ d: 'M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z' }, { d: 'M20 3v4' }, { d: 'M22 5h-4' }],
+    Globe: [{ d: 'M21.54 15H17a2 2 0 0 0-2 2v4.54' }, { d: 'M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17' }, { d: 'M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05' }],
+    Bot: [{ d: 'M12 8V4H8' }, { d: 'M2 14h2' }, { d: 'M20 14h2' }, { d: 'M15 13v2' }, { d: 'M9 13v2' }],
+    Code: [{ d: 'M16 18l6-6-6-6' }, { d: 'M8 6l-6 6 6 6' }],
+    Database: [{ d: 'M12 8c4.97 0 9-1.34 9-3s-4.03-3-9-3-9 1.34-9 3 4.03 3 9 3z', strokeWidth: 2 }, { d: 'M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5' }, { d: 'M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3' }],
+    Cpu: [{ d: 'M6 6h12v12H6z' }, { d: 'M9 9h6v6H9z' }, { d: 'M9 1v3' }, { d: 'M15 1v3' }, { d: 'M9 20v3' }, { d: 'M15 20v3' }, { d: 'M20 9h3' }, { d: 'M20 14h3' }, { d: 'M1 9h3' }, { d: 'M1 14h3' }],
+    Smartphone: [{ d: 'M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z' }, { d: 'M11 17h2' }],
+};
+
+// Build SVG string for an icon without react-dom/server
+function buildIconSvg(iconName: string, color: string, size: number, strokeW: number): string {
+    const paths = ICON_PATHS[iconName];
+    if (!paths) return '';
+    const pathsStr = paths.map(p =>
+        `<path d="${p.d}" fill="none" stroke="${color}" stroke-width="${p.strokeWidth || strokeW}" stroke-linecap="round" stroke-linejoin="round"/>`
+    ).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round">${pathsStr}</svg>`;
+}
+
 // Detect low-end device based on hardware hints
 function isLowEndDevice(): boolean {
     const cores = navigator.hardwareConcurrency || 2;
@@ -8,8 +30,13 @@ function isLowEndDevice(): boolean {
     return cores <= 4 || memory <= 4 || isMobile;
 }
 
+// Icon name mapping for planets
+const PLANET_ICONS = ['Zap', 'Sparkles', 'Globe', 'Bot', 'Code', 'Database', 'Cpu', 'Smartphone'];
+
 export function SolarSystemAnimation() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    // Component-level flags for conditional rendering (cursor, etc.)
+    const [isDesktopCapable, setIsDesktopCapable] = React.useState(true);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -19,6 +46,7 @@ export function SolarSystemAnimation() {
 
         const isMobile = window.innerWidth < 768;
         const lowEnd = isLowEndDevice();
+        setIsDesktopCapable(!isMobile && !lowEnd);
 
         const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
 
@@ -62,6 +90,30 @@ export function SolarSystemAnimation() {
         };
         window.addEventListener('resize', handleResize);
 
+        // Planet speeds boosted slightly for a more dynamic, realistic feel
+        const planets = [
+            { name: 'Mercury', dist: 80, speed: 3.0, size: 16, color: '0, 255, 255', iconIdx: 0 },
+            { name: 'Venus', dist: 130, speed: 2.2, size: 18, color: '100, 210, 255', iconIdx: 1 },
+            { name: 'Earth', dist: 190, speed: 1.5, size: 22, color: '0, 160, 255', iconIdx: 2 },
+            { name: 'Mars', dist: 250, speed: 1.1, size: 18, color: '160, 110, 255', iconIdx: 3 },
+            { name: 'Jupiter', dist: 400, speed: 0.55, size: 32, color: '0, 255, 255', iconIdx: 4 },
+            { name: 'Saturn', dist: 550, speed: 0.35, size: 28, color: '110, 255, 255', iconIdx: 5 },
+            { name: 'Uranus', dist: 700, speed: 0.22, size: 24, color: '0, 210, 255', iconIdx: 6 },
+            { name: 'Neptune', dist: 850, speed: 0.15, size: 24, color: '160, 255, 255', iconIdx: 7 },
+        ];
+
+        // Pre-render icons to textures — using direct SVG strings (no react-dom/server)
+        const iconTextures: Record<string, HTMLImageElement> = {};
+        planets.forEach(p => {
+            const iconName = PLANET_ICONS[p.iconIdx];
+            const svgString = buildIconSvg(iconName, `rgb(${p.color})`, isMobile ? 48 : 64, isMobile ? 2 : 2.5);
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.src = url;
+            iconTextures[p.name] = img;
+        });
+
         // ─── Stars ───────────────────────────────────────────────
         const starCount = isMobile ? 100 : (lowEnd ? 180 : 320);
         const stars = Array.from({ length: starCount }).map(() => ({
@@ -75,6 +127,17 @@ export function SolarSystemAnimation() {
             color: Math.random() > 0.7
                 ? `${200 + Math.floor(Math.random() * 55)}, ${170 + Math.floor(Math.random() * 60)}, ${80 + Math.floor(Math.random() * 50)}`
                 : `${220 + Math.floor(Math.random() * 35)}, ${220 + Math.floor(Math.random() * 35)}, ${220 + Math.floor(Math.random() * 35)}`
+        }));
+
+        // Reduced particle counts for performance
+        const asteroidCount = isMobile ? 40 : (lowEnd ? 60 : 120);
+
+        const asteroids = Array.from({ length: asteroidCount }).map(() => ({
+            dist: 290 + Math.random() * 80,
+            angle: Math.random() * Math.PI * 2,
+            speed: 0.5 + Math.random() * 0.3,
+            size: Math.random() * 1.2 + 0.3,
+            alpha: Math.random() * 0.3 + 0.05
         }));
 
         // ─── Floating dust motes (rising golden particles) ──────
@@ -270,14 +333,20 @@ export function SolarSystemAnimation() {
     }, []);
 
     return (
-        <div className="absolute inset-0 w-full h-full bg-[#06060c] z-0 pointer-events-none select-none overflow-hidden">
-            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-100" />
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    background: 'radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(6,6,12,0.6) 70%, #06060c 100%)'
-                }}
-            />
-        </div>
+        <>
+            {/* Custom cursor only on non-touch desktop devices */}
+            {isDesktopCapable && (
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+        body, a, button, [role="button"] {
+          cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext x='0' y='24' font-size='24' style='transform: rotate(-30deg); transform-origin: center; filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.8));'%3E🛸%3C/text%3E%3C/svg%3E") 16 16, auto !important;
+        }
+      `}} />
+            )}
+            <div className="absolute inset-0 w-full h-full bg-[#000510] z-0 pointer-events-none select-none overflow-hidden">
+                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-100" />
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at center, transparent 40%, rgba(0,5,16,0.7) 85%, #000 100%)' }} />
+            </div>
+        </>
     );
 }

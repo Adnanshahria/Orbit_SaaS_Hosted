@@ -16,10 +16,13 @@ function MarqueeRow({
   category: Category;
   reverse?: boolean;
 }) {
-  // Triple the items for a seamless infinite loop
+  // Double items on mobile (saves DOM nodes), triple on desktop for seamless loop
   const itemsList = category.items || [];
-  const tripled = [...itemsList, ...itemsList, ...itemsList];
-  const items = reverse ? [...tripled].reverse() : tripled;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const repeated = isMobile
+    ? [...itemsList, ...itemsList]
+    : [...itemsList, ...itemsList, ...itemsList];
+  const items = reverse ? [...repeated].reverse() : repeated;
 
   return (
     <div className="mb-6">

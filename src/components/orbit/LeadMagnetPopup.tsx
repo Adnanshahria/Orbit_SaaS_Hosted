@@ -89,7 +89,7 @@ export function LeadMagnetPopup() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                        className="absolute inset-0 bg-background/80 leadmagnet-overlay-blur"
                         onClick={handleClose}
                     />
                     <motion.div

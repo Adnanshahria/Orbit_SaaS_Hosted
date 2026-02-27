@@ -33,51 +33,49 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
             onMouseLeave={onMouseLeave}
         >
             {/* Media Area */}
-            <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-                <Link to={`/project/${routeId}`} className="block absolute inset-0 z-10 cursor-pointer">
-                    {/* Video Preview (on hover) */}
-                    {item.videoPreview && isHovered ? (
-                        <video src={item.videoPreview} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
-                    ) : null}
+            <Link to={`/project/${routeId}`} className="block relative aspect-video overflow-hidden bg-muted cursor-pointer">
+                {/* Video Preview (on hover, desktop only) */}
+                {item.videoPreview && isHovered && typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches ? (
+                    <video src={item.videoPreview} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover z-20" />
+                ) : null}
 
-                    {/* Static Image */}
-                    <img
-                        src={coverImage}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
+                {/* Static Image */}
+                <img
+                    src={coverImage}
+                    alt={item.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
 
-                    {/* Featured Badge */}
-                    {item.featured && (
-                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-gradient-to-r from-yellow-500/90 to-amber-400/90 text-white text-[10px] font-bold uppercase tracking-wider shadow-[0_0_12px_rgba(245,158,11,0.4)] border border-yellow-400/30">
-                            ✦ Featured
-                        </div>
-                    )}
+                {/* Featured Badge */}
+                {item.featured && (
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-gradient-to-r from-yellow-500/90 to-amber-400/90 text-white text-[10px] font-bold uppercase tracking-wider shadow-[0_0_12px_rgba(245,158,11,0.4)] border border-yellow-400/30">
+                        ✦ Featured
+                    </div>
+                )}
+            </Link>
+
+            {/* Overlay with interaction buttons */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center gap-4 backdrop-blur-[2px] pointer-events-none">
+                <Link
+                    to={`/project/${routeId}`}
+                    className="p-3 rounded-full bg-white/10 hover:bg-neon-amber/20 text-white hover:text-neon-amber backdrop-blur-md border border-white/20 hover:border-neon-amber/40 transition-all transform hover:scale-110 hover:shadow-[0_0_15px_rgba(0,245,255,0.3)] flex items-center justify-center pointer-events-auto"
+                    title="View Details"
+                >
+                    <Eye className="w-5 h-5" />
                 </Link>
-
-                {/* Overlay with interaction buttons */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center gap-4 backdrop-blur-[2px] pointer-events-none">
-                    <Link
-                        to={`/project/${routeId}`}
-                        className="p-3 rounded-full bg-white/10 hover:bg-neon-amber/20 text-white hover:text-neon-amber backdrop-blur-md border border-white/20 hover:border-neon-amber/40 transition-all transform hover:scale-110 hover:shadow-[0_0_15px_rgba(0,245,255,0.3)] flex items-center justify-center pointer-events-auto"
-                        title="View Details"
+                {item.link && (
+                    <a
+                        href={ensureAbsoluteUrl(item.link)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-3 rounded-full bg-neon-emerald/80 hover:bg-neon-emerald text-white shadow-[0_0_20px_rgba(108,92,231,0.4)] transition-all transform hover:scale-110 flex items-center justify-center pointer-events-auto"
+                        title="Visit Live"
                     >
-                        <Eye className="w-5 h-5" />
-                    </Link>
-                    {item.link && (
-                        <a
-                            href={ensureAbsoluteUrl(item.link)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-3 rounded-full bg-neon-emerald/80 hover:bg-neon-emerald text-white shadow-[0_0_20px_rgba(108,92,231,0.4)] transition-all transform hover:scale-110 flex items-center justify-center pointer-events-auto"
-                            title="Visit Live"
-                        >
-                            <ExternalLink className="w-5 h-5" />
-                        </a>
-                    )}
-                </div>
+                        <ExternalLink className="w-5 h-5" />
+                    </a>
+                )}
             </div>
-
             {/* Content */}
             <div className="p-3 sm:p-4 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-1.5">

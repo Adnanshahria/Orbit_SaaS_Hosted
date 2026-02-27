@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback } from 'react';
+import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { translations } from '@/lib/i18n';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 
@@ -56,11 +56,11 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
 
     const [enQuery, bnQuery] = results;
 
-    // Derived state from queries using deepMerge
-    const content = {
+    // Derived state from queries using deepMerge — memoized to prevent cascading re-renders
+    const content = useMemo(() => ({
         en: deepMerge(translations.en, enQuery.data || {}),
         bn: deepMerge(translations.bn, bnQuery.data || {}),
-    };
+    }), [enQuery.data, bnQuery.data]);
 
     const loading = enQuery.isLoading || bnQuery.isLoading;
 

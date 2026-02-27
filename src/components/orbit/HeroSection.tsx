@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { ArrowRight, ChevronDown, Send, Loader2, Mail, MessageCircle } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
@@ -54,8 +54,10 @@ export function HeroSection() {
     setShowEmailBar(v < 0.15);
   });
 
-  // Staggered word animation for the subtitle
+  // Staggered word animation for the subtitle (memoized to prevent re-splits)
   const subtitle = t.hero.subtitle || '';
+  const words = useMemo(() => subtitle.split(' '), [subtitle]);
+  const isLowPerf = useMemo(() => document.documentElement.classList.contains('low-perf'), []);
 
   // Always play the loading animation on every page load
   const isFirstVisit = true;
@@ -205,18 +207,32 @@ export function HeroSection() {
             </AnimatePresence>
           </div>
 
-          {/* Subtitle — smooth fade-up reveal with no word-clipping */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.9,
-              delay: baseDelay + 0.85,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            }}
-            className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-[2.5dvh] sm:mb-12 leading-relaxed font-medium text-center px-2"
-          >
-            {subtitle}
+          {/* Subtitle — word-by-word reveal */}
+          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-[2.5dvh] sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
+            {isLowPerf ? (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: baseDelay + 0.9 }}
+              >
+                {subtitle}
+              </motion.span>
+            ) : (
+              words.map((word, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: baseDelay + 0.9 + i * 0.04,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                >
+                  {word}
+                </motion.span>
+              ))
+            )}
           </motion.p>
 
           {/* CTA buttons — slide up with spring */}
