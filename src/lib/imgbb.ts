@@ -1,30 +1,15 @@
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
 export async function uploadToImgBB(file: File): Promise<string> {
-    // Convert file to base64
-    const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const result = reader.result as string;
-            // Remove the data:image/xxx;base64, prefix
-            resolve(result.split(',')[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
+    const formData = new FormData();
+    formData.append('image', file);
 
-    const token = localStorage.getItem('admin_token');
-
-    const res = await fetch(`${API_BASE}/api/upload-image`, {
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ image: base64 }),
+        body: formData,
     });
 
-    if (!res.ok) throw new Error('Image upload failed');
+    if (!res.ok) throw new Error('ImgBB upload failed');
     const data = await res.json();
-    return data.url;
+    return data.data.url;
 }
