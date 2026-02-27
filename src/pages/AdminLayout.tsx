@@ -7,11 +7,12 @@ import {
     LayoutDashboard, Type, ShoppingCart, Users, FolderOpen,
     MessageCircle, Globe, Shield, LogOut, Menu, X,
     Lightbulb, Phone, FileText, Cpu, CloudUpload, Loader2, Link as LinkIcon,
-    Database, Mail
+    Database, Mail, BarChart3
 } from 'lucide-react';
 
 const navItems = [
     { label: 'Hero', path: '/admin/hero', icon: Type },
+    { label: 'Stats', path: '/admin/stats', icon: BarChart3 },
     { label: 'Services', path: '/admin/services', icon: ShoppingCart },
     { label: 'Tech Stack', path: '/admin/tech-stack', icon: Cpu },
     { label: 'Why Us', path: '/admin/why-us', icon: Lightbulb },

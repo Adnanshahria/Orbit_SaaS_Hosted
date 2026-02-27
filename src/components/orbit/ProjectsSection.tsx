@@ -86,12 +86,12 @@ export function ProjectsSection() {
       <div className="w-full mx-auto relative" ref={ref}>
         {/* Big Container Card */}
         <div className="relative rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
-          {/* Visit Button */}
+          {/* View All / Mobile Nav Button */}
           <Link
             to="/project"
-            className="absolute top-5 right-5 sm:top-8 sm:right-8 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neon-emerald/20 text-neon-emerald font-semibold text-sm border border-neon-emerald/30 hover:bg-neon-emerald/30 transition-all shadow-[0_0_15px_rgba(108,92,231,0.15)] hover:shadow-[0_0_25px_rgba(108,92,231,0.3)] hover:gap-3"
+            className="absolute top-5 right-5 sm:top-8 sm:right-8 inline-flex items-center justify-center gap-2 rounded-xl bg-neon-emerald/20 text-neon-emerald font-semibold text-sm border border-neon-emerald/30 hover:bg-neon-emerald/30 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(108,92,231,0.3)] hover:gap-3 w-10 h-10 sm:w-auto sm:h-auto sm:px-5 sm:py-2.5 animate-pulse-slow sm:animate-none"
           >
-            Visit <ArrowRight className="w-4 h-4" />
+            <span className="hidden sm:inline">View All</span> <ArrowRight className="w-4 h-4" />
           </Link>
           {/* Header */}
           <motion.div

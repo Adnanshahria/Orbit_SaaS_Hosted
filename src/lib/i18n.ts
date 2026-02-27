@@ -18,6 +18,14 @@ export const translations = {
       cta: 'Book an Appointment',
       learnMore: 'Explore Services',
     },
+    stats: {
+      items: [
+        { value: 24, suffix: '+', label: 'Live Projects' },
+        { value: 5, suffix: '+', label: 'Countries' },
+        { value: 120, suffix: '+', label: 'Users Served' },
+        { value: 3, suffix: '+', label: 'Years Experience' },
+      ],
+    },
     services: {
       title: 'Our Core Services',
       subtitle: 'What We Build',
@@ -130,6 +138,14 @@ export const translations = {
       subtitle: 'ওয়েব অ্যাপস, এআই চ্যাটবট, এজেন্টিক অটোমেশন, মোবাইল অ্যাপস, ই-কমার্স ও PWA — অত্যাধুনিক প্রযুক্তি দিয়ে এন্ড-টু-এন্ড সলিউশন।',
       cta: 'অ্যাপয়েন্টমেন্ট বুক করুন',
       learnMore: 'সেবাসমূহ দেখুন',
+    },
+    stats: {
+      items: [
+        { value: 24, suffix: '+', label: 'লাইভ প্রজেক্ট' },
+        { value: 5, suffix: '+', label: 'দেশ' },
+        { value: 120, suffix: '+', label: 'ব্যবহারকারী' },
+        { value: 3, suffix: '+', label: 'বছরের অভিজ্ঞতা' },
+      ],
     },
     services: {
       title: 'আমাদের মূল সেবাসমূহ',

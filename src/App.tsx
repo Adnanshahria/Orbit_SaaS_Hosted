@@ -3,6 +3,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { ContentProvider } from './contexts/ContentContext';
 import { Navbar } from './components/orbit/Navbar';
 import { HeroSection } from './components/orbit/HeroSection';
+import { StatsSection } from './components/orbit/StatsSection';
 import { ServicesSection } from './components/orbit/ServicesSection';
 import { TechStackSection } from './components/orbit/TechStackSection';
 import { WhyUsSection } from './components/orbit/WhyUsSection';
@@ -34,6 +35,7 @@ const AdminLinks = lazy(() => import('./pages/admin/AdminLinks'));
 const AdminNavbar = lazy(() => import('./pages/admin/AdminNavbar'));
 const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const AdminBackup = lazy(() => import('./pages/admin/AdminBackup'));
+const AdminStats = lazy(() => import('./pages/admin/AdminStats'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const Chatbot = lazy(() => import('./components/orbit/Chatbot').then(m => ({ default: m.Chatbot })));
@@ -54,7 +56,7 @@ function detectLowEndDevice() {
 function PublicSite() {
   const [showChatbot, setShowChatbot] = useState(false);
   // Tracks whether the dice loader has finished (3.2s)
-  const [isLoaded, setIsLoaded] = useState(() => !!sessionStorage.getItem('orbit_has_visited'));
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Formulate and record unique visitor session
   useEffect(() => {
@@ -123,6 +125,7 @@ function PublicSite() {
           <HeroSection />
           {isLoaded && (
             <>
+              <StatsSection />
               <ServicesSection />
               <TechStackSection />
               <WhyUsSection />
@@ -188,6 +191,7 @@ export default function App() {
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<Navigate to="/admin/hero" replace />} />
                     <Route path="hero" element={<AdminHero />} />
+                    <Route path="stats" element={<AdminStats />} />
                     <Route path="services" element={<AdminServices />} />
                     <Route path="tech-stack" element={<AdminTechStack />} />
                     <Route path="why-us" element={<AdminWhyUs />} />

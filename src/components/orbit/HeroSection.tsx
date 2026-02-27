@@ -57,9 +57,9 @@ export function HeroSection() {
   // Staggered word animation for the subtitle
   const subtitle = t.hero.subtitle || '';
 
-  // Loader sync: Only delay if this is the absolute first visit (loader runs for 3.5s)
-  const [isFirstVisit] = useState(!sessionStorage.getItem('orbit_has_visited'));
-  const baseDelay = isFirstVisit ? 4.2 : 0;
+  // Always play the loading animation on every page load
+  const isFirstVisit = true;
+  const baseDelay = 4.2;
 
   // Theme Customization: Forcing Emerald & Gold for this redesign
   const taglineColor = '#10b981'; // Emerald
@@ -300,70 +300,74 @@ export function HeroSection() {
             </motion.a>
           </motion.div>
           {/* Newsletter Subscribe — Desktop block (inside card for relative flow) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
-            transition={{ type: 'spring', stiffness: 60, damping: 16, delay: showEmailBar ? 0 : 0 }}
-            className={`hidden sm:block relative mt-6 w-[450px] max-w-full mx-auto px-0 z-[100] ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
-          >
-            <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
-              <input
-                type="email"
-                placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={status === 'loading'}
-                className="w-full bg-card/80 border border-border/60 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
-              />
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer border-[0.5px] border-amber-400/40"
-              >
-                {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
-              </button>
-            </form>
-            {status === 'success' && (
-              <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-                {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
-              </p>
-            )}
-          </motion.div>
+          {isHeroLoaded && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
+              transition={{ type: 'spring', stiffness: 60, damping: 16 }}
+              className={`hidden sm:block relative mt-6 w-[450px] max-w-full mx-auto px-0 z-[100] ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+            >
+              <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
+                <input
+                  type="email"
+                  placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === 'loading'}
+                  className="w-full bg-card/80 border border-border/60 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
+                />
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer border-[0.5px] border-amber-400/40"
+                >
+                  {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
+                </button>
+              </form>
+              {status === 'success' && (
+                <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+                  {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
+                </p>
+              )}
+            </motion.div>
+          )}
         </div>{/* End Hero Container Card */}
       </div>
 
       {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
-        transition={{ type: 'spring', stiffness: 60, damping: 16, delay: showEmailBar ? 0 : 0 }}
-        className={`fixed bottom-[12dvh] left-4 right-[80px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
-      >
-        <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
-          <input
-            type="email"
-            placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={status === 'loading'}
-            className="w-full bg-card/80 border border-border/60 rounded-full py-2 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
-          />
-          <button
-            type="submit"
-            disabled={status === 'loading'}
-            className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-full bg-primary text-primary-foreground font-semibold text-[12px] flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-          >
-            {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
-          </button>
-        </form>
-        {status === 'success' && (
-          <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-            {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
-          </p>
-        )}
-      </motion.div>
+      {isHeroLoaded && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
+          transition={{ type: 'spring', stiffness: 60, damping: 16 }}
+          className={`fixed bottom-[12dvh] left-4 right-[80px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+        >
+          <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
+            <input
+              type="email"
+              placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={status === 'loading'}
+              className="w-full bg-card/80 border border-border/60 rounded-full py-2 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
+            />
+            <button
+              type="submit"
+              disabled={status === 'loading'}
+              className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-full bg-primary text-primary-foreground font-semibold text-[12px] flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+            >
+              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
+            </button>
+          </form>
+          {status === 'success' && (
+            <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+              {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
+            </p>
+          )}
+        </motion.div>
+      )}
 
 
       {/* Scroll indicator — hidden on mobile, shown on desktop */}
