@@ -3,12 +3,9 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const ALLOWED_ORIGINS = [
     'https://orbitsaas.cloud',
     'https://www.orbitsaas.cloud',
+    'http://localhost:5173',
+    'http://localhost:3000'
 ];
-
-// In development, also allow localhost
-if (process.env.NODE_ENV !== 'production') {
-    ALLOWED_ORIGINS.push('http://localhost:5173', 'http://localhost:3000');
-}
 
 export function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
     const origin = req.headers.origin || '';
