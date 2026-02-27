@@ -1,13 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { setCorsHeaders } from './lib/cors.js';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const API_KEY = process.env.VITE_GROQ_API_KEY;
+const API_KEY = process.env.GROQ_API_KEY;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    setCorsHeaders(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     if (req.method !== 'POST') {

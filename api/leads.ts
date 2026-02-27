@@ -1,11 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import db from './lib/db.js';
+import { setCorsHeaders } from './lib/cors.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    setCorsHeaders(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {

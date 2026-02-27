@@ -2,15 +2,21 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import bcrypt from 'bcryptjs';
 import db from './lib/db.js';
 import { translations } from '../src/lib/i18n.js';
+import { setCorsHeaders } from './lib/cors.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  setCorsHeaders(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Protect seed endpoint from public access
+  const { code } = req.body || {};
+  const secretCode = process.env.ADMIN_ACCESS_CODE;
+  if (!secretCode || code !== secretCode) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   try {

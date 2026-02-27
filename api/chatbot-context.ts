@@ -1,9 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import db from './lib/db.js';
+import { setCorsHeaders } from './lib/cors.js';
 
 const SITE_BASE_URL = 'https://orbitsaas.cloud';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const API_KEY = process.env.VITE_GROQ_API_KEY;
+const API_KEY = process.env.GROQ_API_KEY;
 
 /**
  * Build a structured knowledge base string from raw DB content.
@@ -107,9 +108,7 @@ async function generateGist(knowledgeBase: string): Promise<string | null> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    setCorsHeaders(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     if (req.method !== 'GET') {

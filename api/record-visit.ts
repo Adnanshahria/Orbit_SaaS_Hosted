@@ -1,4 +1,5 @@
 import { createClient } from '@libsql/client';
+import { setCorsHeadersEdge } from './lib/cors.js';
 
 export const config = {
     runtime: 'edge',
@@ -9,11 +10,7 @@ export default async function handler(req: Request) {
     if (req.method === 'OPTIONS') {
         return new Response(null, {
             status: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            },
+            headers: setCorsHeadersEdge(req),
         });
     }
 
@@ -52,7 +49,7 @@ export default async function handler(req: Request) {
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,
-            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+            headers: { 'Content-Type': 'application/json', ...setCorsHeadersEdge(req) },
         });
 
     } catch (error) {

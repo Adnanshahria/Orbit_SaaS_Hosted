@@ -1,10 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { signToken } from './lib/auth.js';
+import { setCorsHeaders } from './lib/cors.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    setCorsHeaders(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     if (req.method !== 'POST') {
@@ -30,9 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({
-            error: 'Internal server error',
-            details: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined
+            error: 'Internal server error'
         });
     }
 }

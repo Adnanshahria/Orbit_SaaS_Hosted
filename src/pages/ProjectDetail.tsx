@@ -9,6 +9,7 @@ import { Chatbot } from '@/components/orbit/Chatbot';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ensureAbsoluteUrl } from '@/lib/utils';
+import DOMPurify from 'dompurify';
 
 function ImageGallery({ images, title, onLightboxChange }: { images: string[]; title: string; onLightboxChange?: (open: boolean) => void }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -289,7 +290,7 @@ function CollapsibleCards({ blocks }: { blocks: string[] }) {
                                 >
                                     <div
                                         className="px-5 sm:px-8 pb-5 sm:pb-7 pt-2 text-muted-foreground text-base sm:text-lg leading-relaxed space-y-4 [&_b]:font-bold [&_b]:text-foreground [&_i]:italic [&_span]:inline"
-                                        dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(bodyHtml) }}
                                     />
                                 </motion.div>
                             )}

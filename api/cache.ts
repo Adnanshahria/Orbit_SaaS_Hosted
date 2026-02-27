@@ -1,12 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import db from './lib/db.js';
 import { isAuthorized } from './lib/auth.js';
+import { setCorsHeaders } from './lib/cors.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    setCorsHeaders(req, res);
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
@@ -85,8 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } catch (error) {
         console.error('Cache API error:', error);
         return res.status(500).json({
-            error: 'Cache operation failed',
-            details: error instanceof Error ? error.message : String(error),
+            error: 'Cache operation failed'
         });
     }
 }
