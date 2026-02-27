@@ -287,7 +287,7 @@ export function Navbar() {
         transition={{ duration: 0.6, delay: 0.8 }}
         className="md:hidden fixed bottom-[2dvh] left-4 right-4 z-[120]"
       >
-        <div className="navbar-gradient-border flex items-center gap-0.5 px-3 py-3 rounded-[28px] bg-[#0a0a0f] shadow-[0_10px_30px_rgba(0,0,0,0.3)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
+        <div className="navbar-gradient-border flex items-center gap-0 px-2 py-2 rounded-[22px] bg-[#0a0a0f] shadow-[0_10px_30px_rgba(0,0,0,0.3)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
           {links.map((link) => {
             const isActive = activeSection === link.href;
             // Map href to icon
@@ -305,12 +305,12 @@ export function Navbar() {
                 className="relative"
               >
                 <motion.div
-                  className={`flex items-center gap-2 rounded-full gentle-animation cursor-pointer ${isActive
-                    ? 'bg-primary/20 px-3 py-2 border border-primary/50 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                    : 'px-2 py-2 hover:bg-[#141420] border border-transparent'
+                  className={`flex items-center gap-1.5 rounded-full gentle-animation cursor-pointer ${isActive
+                    ? 'bg-primary/20 px-2.5 py-1.5 border border-primary/50 shadow-[0_0_8px_rgba(16,185,129,0.25)]'
+                    : 'px-1.5 py-1.5 hover:bg-[#141420] border border-transparent'
                     }`}
                 >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                   <AnimatePresence>
                     {isActive && (
                       <motion.span
@@ -318,7 +318,7 @@ export function Navbar() {
                         animate={{ width: 'auto', opacity: 1 }}
                         exit={{ width: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="text-sm font-semibold text-primary whitespace-nowrap overflow-hidden"
+                        className="text-xs font-semibold text-primary whitespace-nowrap overflow-hidden"
                       >
                         {link.label}
                       </motion.span>

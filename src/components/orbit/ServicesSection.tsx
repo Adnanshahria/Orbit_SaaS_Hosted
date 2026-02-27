@@ -14,16 +14,16 @@ const DEFAULT_ICONS = [Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket];
 const cardVariants = {
   hidden: {
     opacity: 0,
-    y: 40,
+    y: 20,
   },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      type: 'spring' as const,
-      stiffness: 100,
-      damping: 18,
-      delay: i * 0.1,
+      type: 'tween' as const,
+      duration: 0.4,
+      ease: [0, 0, 0.2, 1] as const,
+      delay: i * 0.08,
     },
   }),
 };
@@ -109,11 +109,7 @@ export function ServicesSection() {
                   variants={cardVariants}
                   initial="hidden"
                   animate={inView ? 'visible' : 'hidden'}
-                  whileHover={{
-                    y: -4,
-                    transition: { type: 'spring', stiffness: 400, damping: 25 },
-                  }}
-                  className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-7 group cursor-default premium-card-sub overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md`}
+                  className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-7 group cursor-default premium-card-sub overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md sm:hover:-translate-y-1 sm:transition-transform sm:duration-300`}
                 >
                   {/* Hover glow */}
                   <div
