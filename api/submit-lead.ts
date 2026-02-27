@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import db from './lib/db.js';
-import { Resend } from 'resend';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     // CORS
@@ -68,38 +67,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             args: [email, source || 'website', name || null, interest || null, chat_summary || null]
         });
 
-        // Trigger Auto-Welcome Email asynchronously
-        if (process.env.RESEND_API_KEY) {
-            const resend = new Resend(process.env.RESEND_API_KEY);
-            resend.emails.send({
-                from: 'ORBIT SaaS <hello@orbitsaas.cloud>', // Must have a verified domain on Resend
-                to: email,
-                subject: 'Welcome to the ORBIT SaaS Waitlist! 🚀',
-                html: `
-                    <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1a2e;">
-                        <div style="text-align: center; margin-bottom: 30px;">
-                            <h1 style="color: #6c5ce7; margin: 0; font-size: 28px; font-weight: 800;">ORBIT SaaS</h1>
-                        </div>
-                        <div style="background: #ffffff; border-radius: 12px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #eef0f6;">
-                            <h2 style="margin-top: 0; font-size: 22px; color: #1a1a2e;">You're on the list! 🎉</h2>
-                            <p style="font-size: 16px; line-height: 1.6; color: #64648a;">
-                                Thank you for joining the ORBIT SaaS waitlist. We are thrilled to have you onboard as we build the next generation of digital experiences.
-                            </p>
-                            <p style="font-size: 16px; line-height: 1.6; color: #64648a;">
-                                We'll keep you updated with our latest launches, exclusive tools, and early-access features before anyone else.
-                            </p>
-                            <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #eef0f6; text-align: center;">
-                                <p style="font-size: 14px; color: #8888a0; margin: 0;">
-                                    Stay awesome,<br>
-                                    <strong>The ORBIT SaaS Team</strong>
-                                </p>
+        // Trigger Auto-Welcome Email asynchronously using SendPulse
+        if (process.env.SENDPULSE_API_USER_ID && process.env.SENDPULSE_API_SECRET) {
+            import('sendpulse-api').then((sendpulseModule) => {
+                const sendpulse = sendpulseModule.default || sendpulseModule;
+
+                sendpulse.init(process.env.SENDPULSE_API_USER_ID, process.env.SENDPULSE_API_SECRET, process.env.SENDPULSE_TOKEN_STORAGE || '/tmp/', (token: any) => {
+                    if (token && token.is_error) {
+                        console.error("SendPulse init error:", token.message);
+                        return;
+                    }
+
+                    const emailData = {
+                        "html": `
+                            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1a2e;">
+                                <div style="text-align: center; margin-bottom: 30px;">
+                                    <h1 style="color: #6c5ce7; margin: 0; font-size: 28px; font-weight: 800;">ORBIT SaaS</h1>
+                                </div>
+                                <div style="background: #ffffff; border-radius: 12px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #eef0f6;">
+                                    <h2 style="margin-top: 0; font-size: 22px; color: #1a1a2e;">You're on the list! 🎉</h2>
+                                    <p style="font-size: 16px; line-height: 1.6; color: #64648a;">
+                                        Thank you for joining the ORBIT SaaS waitlist. We are thrilled to have you onboard as we build the next generation of digital experiences.
+                                    </p>
+                                    <p style="font-size: 16px; line-height: 1.6; color: #64648a;">
+                                        We'll keep you updated with our latest launches, exclusive tools, and early-access features before anyone else.
+                                    </p>
+                                    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #eef0f6; text-align: center;">
+                                        <p style="font-size: 14px; color: #8888a0; margin: 0;">
+                                            Stay awesome,<br>
+                                            <strong>The ORBIT SaaS Team</strong>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                `
-            }).catch((err: any) => console.error("Resend welcome email failed:", err));
+                        `,
+                        "text": "Thank you for joining the ORBIT SaaS waitlist! We'll keep you updated.",
+                        "subject": "Welcome to the ORBIT SaaS Waitlist! 🚀",
+                        "from": {
+                            "name": "ORBIT SaaS",
+                            "email": "contact@orbitsaas.cloud" // Ensure this is a verified sender in SendPulse
+                        },
+                        "to": [
+                            {
+                                "name": name || "Subscriber",
+                                "email": email
+                            }
+                        ]
+                    };
+
+                    sendpulse.smtpSendMail((response: any) => {
+                        if (response && response.is_error) {
+                            console.error("SendPulse email send failed:", response.message);
+                        } else {
+                            console.log("SendPulse welcome email sent successfully");
+                        }
+                    }, emailData);
+                });
+            }).catch(err => console.error("Failed to load sendpulse-api module:", err));
         } else {
-            console.warn("RESEND_API_KEY is not set. Skipping welcome email.");
+            console.warn("SENDPULSE_API_USER_ID or SENDPULSE_API_SECRET is not set. Skipping welcome email.");
         }
 
         return res.status(200).json({ success: true, message: 'Lead captured successfully' });

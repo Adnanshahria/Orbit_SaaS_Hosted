@@ -1,4 +1,4 @@
-# ORBIT SaaS - Website Development Company
+# ORBIT SaaS - Full-Service Software & AI Agency
 # https://orbitsaas.cloud
 
 User-agent: *
@@ -6,6 +6,31 @@ Allow: /
 Disallow: /admin/
 Disallow: /admin
 Crawl-delay: 1
+
+# Allow AI / Generative Engine crawlers (GEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
 
 # Sitemaps
 Sitemap: https://orbitsaas.cloud/sitemap.xml
