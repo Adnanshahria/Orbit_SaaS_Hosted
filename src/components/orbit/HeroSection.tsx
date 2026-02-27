@@ -313,7 +313,7 @@ export function HeroSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={status === 'loading'}
-                className="w-full bg-secondary/80 border-[0.5px] border-amber-500/40 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+                className="w-full bg-card/80 border border-border/60 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
               />
               <button
                 type="submit"
@@ -347,7 +347,7 @@ export function HeroSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'loading'}
-            className="w-full bg-background/95 border-[0.5px] border-amber-500/40 rounded-full py-2 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground"
+            className="w-full bg-card/80 border border-border/60 rounded-full py-2 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
           />
           <button
             type="submit"
