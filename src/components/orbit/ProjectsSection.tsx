@@ -1,6 +1,6 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
 import { Link } from 'react-router-dom';
@@ -27,7 +27,7 @@ const DEFAULT_CATEGORIES = ['SaaS', 'eCommerce', 'Enterprise', 'Education', 'Por
 
 import { ensureAbsoluteUrl } from '@/lib/utils';
 
-const HOMEPAGE_LIMIT = 6;
+const INITIAL_SHOW = 3;
 
 export function ProjectsSection() {
   const { lang, t } = useLang();
@@ -38,6 +38,7 @@ export function ProjectsSection() {
   // State
   const [activeCategory, setActiveCategory] = useState('All');
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   // Data with Fallback Logic
   const enData = (content.en as any).projects || {};
@@ -70,9 +71,9 @@ export function ProjectsSection() {
     return cats.includes(activeCategory);
   });
 
-  // Limit to homepage count
-  const items = filteredItems.slice(0, HOMEPAGE_LIMIT);
-  const hasMore = filteredItems.length > HOMEPAGE_LIMIT;
+  // Show 3 initially, all when expanded
+  const items = expanded ? filteredItems : filteredItems.slice(0, INITIAL_SHOW);
+  const canExpand = filteredItems.length > INITIAL_SHOW;
 
   // Section Title/Subtitle Fallback
   const sectionTitle = lang === 'bn' && bnData.title ? bnData.title : (enData.title || 'Featured Projects');
@@ -111,17 +112,19 @@ export function ProjectsSection() {
           {/* Projects Grid */}
           <motion.div
             layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            transition={{ layout: { type: 'spring', stiffness: 40, damping: 20 } }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <AnimatePresence mode="popLayout">
-              {items.map((item: any) => {
+              {items.map((item: any, idx: number) => {
                 const routeId = item._id || item._originalIndex;
 
                 return (
                   <motion.div
                     layout
+                    layoutId={`project-${routeId}`}
                     key={routeId}
-                    custom={item._originalIndex}
+                    custom={idx}
                     variants={cardVariants}
                     initial="hidden"
                     animate="visible"
@@ -140,20 +143,34 @@ export function ProjectsSection() {
             </AnimatePresence>
           </motion.div>
 
-          {/* View All Projects Button */}
-          {hasMore && (
+          {/* Expand / Collapse Button */}
+          {canExpand && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-center mt-14"
+              className="text-center mt-10"
             >
-              <Link
-                to="/project"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-neon-emerald/20 text-neon-emerald font-semibold text-base border border-neon-emerald/30 hover:bg-neon-emerald/30 transition-all shadow-[0_0_20px_rgba(108,92,231,0.2)] hover:shadow-[0_0_30px_rgba(108,92,231,0.35)] hover:gap-3"
+              <button
+                onClick={() => setExpanded(prev => !prev)}
+                className="group inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm border border-transparent transition-all duration-500 cursor-pointer hover:gap-3"
+                style={{
+                  background: 'linear-gradient(#10101a, #10101a) padding-box, linear-gradient(135deg, #10b981, #f59e0b, #10b981) border-box',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'transparent',
+                  boxShadow: '0 0 20px rgba(16, 185, 129, 0.12), 0 0 40px rgba(245, 158, 11, 0.06)',
+                }}
               >
-                View All Projects <ArrowRight className="w-5 h-5" />
-              </Link>
+                <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">
+                  {expanded ? 'Show Less' : 'Explore More ✦'}
+                </span>
+                {expanded ? (
+                  <ChevronUp className="w-4 h-4 text-emerald-400 transition-transform group-hover:-translate-y-0.5" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-amber-400 transition-transform group-hover:translate-y-0.5" />
+                )}
+              </button>
             </motion.div>
           )}
         </div>{/* End Container Card */}

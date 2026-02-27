@@ -14,9 +14,12 @@ const BN_LABELS = ['লাইভ প্রজেক্ট', 'দেশ', 'ব্
 
 function AnimatedCounter({ target, active }: { target: number; active: boolean }) {
     const [count, setCount] = useState(0);
+    const hasAnimated = useRef(false);
 
     useEffect(() => {
-        if (!active) { setCount(0); return; }
+        if (!active) return;
+        // Re-animate from 0 each time it becomes visible
+        hasAnimated.current = true;
         let start = 0;
         const step = Math.max(1, Math.ceil(target / 60));
         const timer = setInterval(() => {
@@ -87,7 +90,7 @@ export function StatsSection() {
                 <div className="flex items-center gap-1.5 sm:gap-3 whitespace-nowrap overflow-hidden">
                     {items.map((stat: any, i: number) => (
                         <div key={i} className="flex items-center gap-1.5 sm:gap-3">
-                            {i !== 0 && <span className="text-amber-500/40 font-bold">·</span>}
+                            {i !== 0 && <span className="text-white/50 text-[8px] sm:text-[10px]">✦</span>}
                             <div className="flex items-center gap-1 sm:gap-1.5">
                                 <span className="text-sm sm:text-base font-bold text-foreground font-poppins tabular-nums">
                                     <AnimatedCounter target={Number(stat.value) || 0} active={visible} />

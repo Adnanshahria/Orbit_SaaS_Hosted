@@ -33,7 +33,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
             onMouseLeave={onMouseLeave}
         >
             {/* Media Area */}
-            <div className="relative aspect-video overflow-hidden bg-muted">
+            <div className="relative aspect-[16/10] overflow-hidden bg-muted">
                 <Link to={`/project/${routeId}`} className="block absolute inset-0 z-10 cursor-pointer">
                     {/* Video Preview (on hover) */}
                     {item.videoPreview && isHovered ? (
@@ -79,26 +79,26 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
             </div>
 
             {/* Content */}
-            <div className="p-4 sm:p-6 flex flex-col flex-grow">
-                <div className="flex justify-between items-start mb-3">
+            <div className="p-3 sm:p-4 flex flex-col flex-grow">
+                <div className="flex justify-between items-start mb-1.5">
                     <div>
-                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neon-amber neon-text mb-1 block">
+                        <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neon-amber neon-text mb-0.5 block">
                             {categories.join(' · ')}
                         </span>
                         <Link to={`/project/${routeId}`}>
-                            <h3 className="font-display text-base sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
+                            <h3 className="font-display text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
                                 {item.title}
                             </h3>
                         </Link>
                     </div>
                 </div>
 
-                <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 line-clamp-2 flex-grow">
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed mb-2 line-clamp-2 flex-grow">
                     {shortDesc}
                 </p>
 
                 {/* Footer: Tags & Link */}
-                <div className="pt-3 sm:pt-4 border-t border-white/[0.06] flex items-center justify-between mt-auto">
+                <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between mt-auto">
                     <div className="flex -space-x-2">
                         {item.tags?.slice(0, 3).map((tag: string, j: number) => (
                             <div key={j} className="w-6 h-6 rounded-full bg-neon-emerald/10 border border-neon-emerald/20 flex items-center justify-center text-[10px] text-neon-emerald" title={tag}>
