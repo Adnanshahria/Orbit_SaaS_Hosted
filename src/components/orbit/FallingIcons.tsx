@@ -110,94 +110,93 @@ export function FallingIcons() {
             <div
                 className="relative"
                 style={{
-                    animation: \`systemDrift 40s ease-in-out infinite\`,
-            transformStyle: 'preserve-3d',
-            width: 0,
-            height: 0
+                    animation: `systemDrift 40s ease-in-out infinite`,
+                    transformStyle: 'preserve-3d',
+                    width: 0,
+                    height: 0
                 }}
             >
-            {/* Rotating Frame for everything inside the solar system */}
-            <div
-                className="absolute inset-0"
-                style={{
-                    animation: \`systemSpin \${SYSTEM_ROTATE_SPEED}s linear infinite\`,
-            transformStyle: 'preserve-3d',
+                {/* Rotating Frame for everything inside the solar system */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        animation: `systemSpin ${SYSTEM_ROTATE_SPEED}s linear infinite`,
+                        transformStyle: 'preserve-3d',
                     }}
                 >
-            {/* Orbit Rings (Dashed circles to show the planetary paths rotating) */}
-            {[150, 250, 350, 450, 550, 650].map((r, idx) => (
-                <div
-                    key={\`ring-\${idx}\`}
-            className="absolute rounded-full border-primary/10 border-dashed"
-            style={{
-                width: r * 2,
-                height: r * 2,
-                left: -r,
-                top: -r,
-                transform: 'translateZ(-1px)', // Keep rings slightly below icons
-                borderWidth: '1px'
-            }}
+                    {/* Orbit Rings (Dashed circles to show the planetary paths rotating) */}
+                    {[150, 250, 350, 450, 550, 650].map((r, idx) => (
+                        <div
+                            key={`ring-${idx}`}
+                            className="absolute rounded-full border-primary/10 border-dashed"
+                            style={{
+                                width: r * 2,
+                                height: r * 2,
+                                left: -r,
+                                top: -r,
+                                transform: 'translateZ(-1px)', // Keep rings slightly below icons
+                                borderWidth: '1px'
+                            }}
                         />
                     ))}
 
-            {/* Orbiting Icons */}
-            {particles.map(({ Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key }) => (
-                <div
-                    key={key}
-                    className="absolute flex items-center justify-center"
-                    style={{
-                        animation: \`orbitAnim \${orbitDuration}s \${delay}s linear infinite\`,
-            animationDirection: isReverse ? 'reverse' : 'normal',
-            transformStyle: 'preserve-3d',
+                    {/* Orbiting Icons */}
+                    {particles.map(({ Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key }) => (
+                        <div
+                            key={key}
+                            className="absolute flex items-center justify-center"
+                            style={{
+                                animation: `orbitAnim ${orbitDuration}s ${delay}s linear infinite`,
+                                animationDirection: isReverse ? 'reverse' : 'normal',
+                                transformStyle: 'preserve-3d',
                             }}
                         >
-            {/* Push the icon out to its orbit radius */}
-            <div
-                style={{
-                    transform: \`translateX(\${radius}px)\`,
-            transformStyle: 'preserve-3d',
+                            {/* Push the icon out to its orbit radius */}
+                            <div
+                                style={{
+                                    transform: `translateX(${radius}px)`,
+                                    transformStyle: 'preserve-3d',
                                 }}
                             >
-            {/* Counter-rotate the local orbit so the icon faces 0 deg Z before self-spin */}
-            <div
-                style={{
-                    animation: \`counterOrbitAnim \${orbitDuration}s \${delay}s linear infinite\`,
-            animationDirection: isReverse ? 'reverse' : 'normal',
-            transformStyle: 'preserve-3d',
+                                {/* Counter-rotate the local orbit so the icon faces 0 deg Z before self-spin */}
+                                <div
+                                    style={{
+                                        animation: `counterOrbitAnim ${orbitDuration}s ${delay}s linear infinite`,
+                                        animationDirection: isReverse ? 'reverse' : 'normal',
+                                        transformStyle: 'preserve-3d',
                                     }}
                                 >
-            {/* Counter-rotate the global system spin so it stays perfectly aligned */}
-            <div
-                style={{
-                    animation: \`counterSystemSpin \${SYSTEM_ROTATE_SPEED}s linear infinite\`,
-            transformStyle: 'preserve-3d',
+                                    {/* Counter-rotate the global system spin so it stays perfectly aligned */}
+                                    <div
+                                        style={{
+                                            animation: `counterSystemSpin ${SYSTEM_ROTATE_SPEED}s linear infinite`,
+                                            transformStyle: 'preserve-3d',
                                         }}
                                     >
-            {/* Tilt back to face the camera, then spin 2D */}
-            <div
-                style={{
-                    animation: \`selfSpin \${spinDuration}s linear infinite\`,
-            transformStyle: 'preserve-3d',
+                                        {/* Tilt back to face the camera, then spin 2D */}
+                                        <div
+                                            style={{
+                                                animation: `selfSpin ${spinDuration}s linear infinite`,
+                                                transformStyle: 'preserve-3d',
                                             }}
                                         >
-            <Icon
-                style={{
-                    width: size,
-                    height: size,
-                    color,
-                    opacity,
-                    filter: \`drop-shadow(0px 8px 6px rgba(0,0,0,0.6)) drop-shadow(0px 3px 3px rgba(0,0,0,0.8))\`
+                                            <Icon
+                                                style={{
+                                                    width: size,
+                                                    height: size,
+                                                    color,
+                                                    opacity,
+                                                    filter: `drop-shadow(0px 8px 6px rgba(0,0,0,0.6)) drop-shadow(0px 3px 3px rgba(0,0,0,0.8))`
                                                 }}
                                             />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
-                                    </div >
-                                </div >
-                            </div >
-                        </div >
-                    ))
-}
-                </div >
-            </div >
-        </div >
     );
 }
