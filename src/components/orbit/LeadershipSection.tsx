@@ -59,8 +59,8 @@ export function LeadershipSection() {
       <div className="w-full mx-auto relative" ref={ref}>
         <div className="rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <motion.div
-            initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
-            animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ type: 'spring', stiffness: 80, damping: 20 }}
             className="text-center mb-5 sm:mb-8"
           >

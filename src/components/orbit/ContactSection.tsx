@@ -38,8 +38,8 @@ export function ContactSection() {
           >
             <motion.h2
               className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4"
-              initial={{ opacity: 0, filter: 'blur(8px)' }}
-              animate={inView ? { opacity: 1, filter: 'blur(0px)' } : {}}
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               {t.contact.title}

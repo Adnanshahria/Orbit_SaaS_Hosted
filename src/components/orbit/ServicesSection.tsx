@@ -15,12 +15,10 @@ const cardVariants = {
   hidden: {
     opacity: 0,
     y: 40,
-    filter: 'blur(8px)',
   },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: {
       type: 'spring' as const,
       stiffness: 100,

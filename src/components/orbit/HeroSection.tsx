@@ -207,8 +207,8 @@ export function HeroSection() {
 
           {/* Subtitle — smooth fade-up reveal with no word-clipping */}
           <motion.p
-            initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
               duration: 0.9,
               delay: baseDelay + 0.85,
