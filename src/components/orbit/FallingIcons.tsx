@@ -14,21 +14,17 @@ export const ICON_MAP: Record<string, LucideIcon> = {
 };
 export const ALL_ICON_NAMES = Object.keys(ICON_MAP);
 const FALLBACK_ICONS = ['Brain', 'Wrench', 'Zap', 'Shield', 'Target', 'Rocket', 'Globe', 'Bot'];
-const FALL_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#22d3ee'];
-const PARTICLE_COUNT = 30;
+const ORBIT_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#22d3ee'];
 
 /**
- * Global falling-icons background with orbital 3D-tilted rotation.
- * Reads enabled icons from content.en.fallingIcons; falls back to Why Us icons or defaults.
+ * Global background with 3D planetary orbital rotation.
+ * Reads enabled icons from content.en.fallingIcons.
  */
 export function FallingIcons() {
     const { content } = useContent();
 
-    // Read admin-configured enabled icons
     const iconNames = useMemo(() => {
         const config = (content?.en as any)?.fallingIcons;
-
-        // If admin has configured specific icons, use only those that are enabled
         if (config?.icons && typeof config.icons === 'object') {
             const enabled = Object.entries(config.icons)
                 .filter(([_, v]) => v === true)
@@ -36,82 +32,172 @@ export function FallingIcons() {
                 .filter(name => ICON_MAP[name]);
             if (enabled.length >= 1) return enabled;
         }
-
-        // Fallback: extract from Why Us section
         const whyUsData = (content?.en as any)?.whyUs;
         const items: any[] = whyUsData?.items || [];
         const names = items.map((item: any) => item.icon).filter(Boolean) as string[];
         return names.length >= 3 ? names : FALLBACK_ICONS;
     }, [content]);
 
-    // Check if effect is disabled by admin
     const isEnabled = useMemo(() => {
         const config = (content?.en as any)?.fallingIcons;
         if (config && config.enabled === false) return false;
         return true;
     }, [content]);
 
-    const particles = useMemo(() =>
-        Array.from({ length: PARTICLE_COUNT }).map((_, i) => {
-            const iconName = iconNames[Math.floor(Math.random() * iconNames.length)];
+    const particles = useMemo(() => {
+        // Map over exactly the selected icons so each shows up only once
+        return iconNames.map((iconName, i) => {
             const Icon = ICON_MAP[iconName] || Zap;
-            const size = 12 + Math.random() * 20;
-            const left = Math.random() * 100;
-            const delay = Math.random() * 18;
-            const duration = 14 + Math.random() * 20;
-            const drift = -40 + Math.random() * 80;
-            const opacity = 0.30 + Math.random() * 0.2;
-            const color = FALL_COLORS[Math.floor(Math.random() * FALL_COLORS.length)];
-            // Orbital spin: each icon gets its own spin speed and tilt axis
-            const spinDuration = 3 + Math.random() * 6; // 3-9s per orbit rotation
-            const tiltX = 40 + Math.random() * 30;      // 40-70° perspective tilt
-            const tiltDir = Math.random() > 0.5 ? 1 : -1; // clockwise or counter
 
-            return { Icon, size, left, delay, duration, drift, opacity, color, key: i, spinDuration, tiltX, tiltDir };
-        }), [iconNames]);
+            // Randomize orbit properties
+            const radius = 100 + Math.random() * 500; // Orbit distance from center
+            const orbitDuration = 30 + Math.random() * 60; // 30s-90s to complete one orbit
+            const delay = -Math.random() * orbitDuration; // Random phase start
+            const spinDuration = 4 + Math.random() * 8; // 4-12s spin on own 2D axis
+            const isReverse = Math.random() > 0.5; // Orbit direction
+
+            const size = 18 + Math.random() * 16;
+            const opacity = 0.40 + Math.random() * 0.4;
+            const color = ORBIT_COLORS[Math.floor(Math.random() * ORBIT_COLORS.length)];
+
+            return { Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key: i };
+        });
+    }, [iconNames]);
 
     if (!isEnabled) return null;
 
+    const TILT_ANGLE = 65; // Degrees of isometric tilt for the solar system
+    const SYSTEM_ROTATE_SPEED = 180; // Seconds for the entire solar system to align once
+
     return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden>
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 flex items-center justify-center" aria-hidden style={{ perspective: '1200px' }}>
             <style>{`
-                @keyframes globalIconFall {
-                    0%   { transform: translateY(-80px) translateX(0px); opacity: 0; }
-                    8%   { opacity: var(--p-opacity); }
-                    92%  { opacity: var(--p-opacity); }
-                    100% { transform: translateY(calc(100vh + 80px)) translateX(var(--p-drift)); opacity: 0; }
+                /* Global slow rotation of the whole solar system */
+                @keyframes systemSpin {
+                    0%   { transform: rotateZ(0deg); }
+                    100% { transform: rotateZ(360deg); }
                 }
-                @keyframes iconOrbitSpin {
-                    0%   { transform: perspective(200px) rotateX(var(--p-tiltX)) rotateY(0deg); }
-                    100% { transform: perspective(200px) rotateX(var(--p-tiltX)) rotateY(var(--p-spin-dir)); }
+                /* Counter-rotation to keep icons oriented correctly relative to global spin */
+                @keyframes counterSystemSpin {
+                    0%   { transform: rotateZ(0deg); }
+                    100% { transform: rotateZ(-360deg); }
+                }
+                /* Individual planet orbit around the sun */
+                @keyframes orbitAnim {
+                    0%   { transform: rotateZ(0deg); }
+                    100% { transform: rotateZ(360deg); }
+                }
+                /* Counter-rotation to keep icons oriented correctly relative to their orbit */
+                @keyframes counterOrbitAnim {
+                    0%   { transform: rotateZ(0deg); }
+                    100% { transform: rotateZ(-360deg); }
+                }
+                /* 2D Spin (like a steering wheel) facing the camera */
+                @keyframes selfSpin {
+                    0%   { transform: rotateX(-${TILT_ANGLE}deg) rotateZ(0deg); }
+                    100% { transform: rotateX(-${TILT_ANGLE}deg) rotateZ(360deg); }
+                }
+                /* Slow drift of the entire solar system across the screen */
+                @keyframes systemDrift {
+                    0%   { transform: translate(0px, 0px) rotateX(${TILT_ANGLE}deg); }
+                    33%  { transform: translate(3vw, -4vh) rotateX(${TILT_ANGLE}deg); }
+                    66%  { transform: translate(-2vw, 5vh) rotateX(${TILT_ANGLE}deg); }
+                    100% { transform: translate(0px, 0px) rotateX(${TILT_ANGLE}deg); }
                 }
             `}</style>
-            {particles.map(({ Icon, size, left, delay, duration, drift, opacity, color, key, spinDuration, tiltX, tiltDir }) => (
-                <div
-                    key={key}
-                    className="absolute"
-                    style={{
-                        left: `${left}%`,
-                        top: '-60px',
-                        animation: `globalIconFall ${duration}s ${delay}s linear infinite`,
-                        ['--p-drift' as any]: `${drift}px`,
-                        ['--p-opacity' as any]: opacity,
+
+            {/* The Solar System Container (Tilted in 3D space and drifting) */}
+            <div
+                className="relative"
+                style={{
+                    animation: \`systemDrift 40s ease-in-out infinite\`,
+            transformStyle: 'preserve-3d',
+            width: 0,
+            height: 0
+                }}
+            >
+            {/* Rotating Frame for everything inside the solar system */}
+            <div
+                className="absolute inset-0"
+                style={{
+                    animation: \`systemSpin \${SYSTEM_ROTATE_SPEED}s linear infinite\`,
+            transformStyle: 'preserve-3d',
                     }}
                 >
-                    <div
-                        style={{
-                            animation: `iconOrbitSpin ${spinDuration}s linear infinite`,
-                            ['--p-tiltX' as any]: `${tiltX}deg`,
-                            ['--p-spin-dir' as any]: `${tiltDir * 360}deg`,
-                            transformStyle: 'preserve-3d',
-                        }}
-                    >
-                        <Icon
-                            style={{ width: size, height: size, color }}
+            {/* Orbit Rings (Dashed circles to show the planetary paths rotating) */}
+            {[150, 250, 350, 450, 550, 650].map((r, idx) => (
+                <div
+                    key={\`ring-\${idx}\`}
+            className="absolute rounded-full border-primary/10 border-dashed"
+            style={{
+                width: r * 2,
+                height: r * 2,
+                left: -r,
+                top: -r,
+                transform: 'translateZ(-1px)', // Keep rings slightly below icons
+                borderWidth: '1px'
+            }}
                         />
-                    </div>
-                </div>
-            ))}
+                    ))}
+
+            {/* Orbiting Icons */}
+            {particles.map(({ Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key }) => (
+                <div
+                    key={key}
+                    className="absolute flex items-center justify-center"
+                    style={{
+                        animation: \`orbitAnim \${orbitDuration}s \${delay}s linear infinite\`,
+            animationDirection: isReverse ? 'reverse' : 'normal',
+            transformStyle: 'preserve-3d',
+                            }}
+                        >
+            {/* Push the icon out to its orbit radius */}
+            <div
+                style={{
+                    transform: \`translateX(\${radius}px)\`,
+            transformStyle: 'preserve-3d',
+                                }}
+                            >
+            {/* Counter-rotate the local orbit so the icon faces 0 deg Z before self-spin */}
+            <div
+                style={{
+                    animation: \`counterOrbitAnim \${orbitDuration}s \${delay}s linear infinite\`,
+            animationDirection: isReverse ? 'reverse' : 'normal',
+            transformStyle: 'preserve-3d',
+                                    }}
+                                >
+            {/* Counter-rotate the global system spin so it stays perfectly aligned */}
+            <div
+                style={{
+                    animation: \`counterSystemSpin \${SYSTEM_ROTATE_SPEED}s linear infinite\`,
+            transformStyle: 'preserve-3d',
+                                        }}
+                                    >
+            {/* Tilt back to face the camera, then spin 2D */}
+            <div
+                style={{
+                    animation: \`selfSpin \${spinDuration}s linear infinite\`,
+            transformStyle: 'preserve-3d',
+                                            }}
+                                        >
+            <Icon
+                style={{
+                    width: size,
+                    height: size,
+                    color,
+                    opacity,
+                    filter: \`drop-shadow(0px 8px 6px rgba(0,0,0,0.6)) drop-shadow(0px 3px 3px rgba(0,0,0,0.8))\`
+                                                }}
+                                            />
         </div>
+                                    </div >
+                                </div >
+                            </div >
+                        </div >
+                    ))
+}
+                </div >
+            </div >
+        </div >
     );
 }

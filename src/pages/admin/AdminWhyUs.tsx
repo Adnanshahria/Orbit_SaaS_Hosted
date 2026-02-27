@@ -550,9 +550,9 @@ export default function AdminWhyUs() {
                     <div>
                         <h3 className="font-semibold text-foreground flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-primary" />
-                            Global Snowfall Background Effect
+                            Global Orbital Background Effect
                         </h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">Control the 3D rotating icons that fall across the site background.</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Control the 3D rotating icons that orbit across the site background.</p>
                     </div>
                     {/* Master Toggle */}
                     <label className="relative inline-flex items-center cursor-pointer">
