@@ -93,6 +93,11 @@ export const translations = {
       subtitle: 'The minds behind ORBIT SaaS — building the future of software.',
       members: [] as any[],
     },
+    reviews: {
+      title: 'Client Reviews',
+      subtitle: 'What our clients say about working with us',
+      items: [] as any[],
+    },
     contact: {
       title: 'Ready to Build Something Great?',
       subtitle: 'Let\'s discuss your next web, AI, or mobile project — book a free consultation today.',
@@ -214,6 +219,11 @@ export const translations = {
       subtitle: 'ORBIT SaaS-এর পেছনের মানুষ — সফটওয়্যারের ভবিষ্যৎ নির্মাণ করছি।',
       members: [] as any[],
     },
+    reviews: {
+      title: 'ক্লায়েন্ট রিভিউ',
+      subtitle: 'আমাদের সাথে কাজ করার অভিজ্ঞতা',
+      items: [] as any[],
+    },
     contact: {
       title: 'দারুণ কিছু তৈরি করতে প্রস্তুত?',
       subtitle: 'আপনার পরবর্তী ওয়েব, এআই বা মোবাইল প্রজেক্ট নিয়ে আলোচনা করুন — আজই ফ্রি কনসালটেশন বুক করুন।',
@@ -222,7 +232,7 @@ export const translations = {
     },
     footer: {
       brandName: 'ORBIT SaaS',
-      rights: '© ২০২৫ ORBIT SaaS। সমস্ত অধিকার সংরক্ষিত।',
+      rights: '© 2026 ORBIT SaaS। সমস্ত অধিকার সংরক্ষিত।',
       tagline: 'ফুল-সার্ভিস সফটওয়্যার ও এআই এজেন্সি — ওয়েব, এআই, মোবাইল এবং আরও অনেক কিছু।',
       socials: [
         { platform: 'facebook', url: '', enabled: false },

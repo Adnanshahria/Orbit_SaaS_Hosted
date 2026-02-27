@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, Home, Layers, MessageSquare, Trophy, Users, Phone, FolderOpen, ChevronDown, MessageCircle, Mail } from 'lucide-react';
+import { Menu, X, Globe, Home, Layers, MessageSquare, Trophy, Users, Phone, FolderOpen, ChevronDown, MessageCircle, Mail, Star } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import orbitLogo from '@/assets/orbit-logo.png';
@@ -12,6 +12,7 @@ const mobileNavItems = [
   { href: '#why-us', icon: MessageSquare, label: 'Why Us' },
   { href: '#project', icon: FolderOpen, label: 'Projects' },
   { href: '#leadership', icon: Users, label: 'Team' },
+  { href: '#reviews', icon: Star, label: 'Reviews' },
   { href: '#contact', icon: Phone, label: 'Contact' },
 ];
 
@@ -54,7 +55,7 @@ export function Navbar() {
         if (location.pathname !== '/') {
           setActiveSection('');
         } else {
-          const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'contact'];
+          const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'reviews', 'contact'];
           let current = 'hero';
           const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
           if (atBottom) {
@@ -113,6 +114,7 @@ export function Navbar() {
     { href: '#why-us', label: t.nav.whyUs },
     { href: '#project', label: (t.nav as any).projects ?? 'Projects' },
     { href: '#leadership', label: t.nav.leadership },
+    { href: '#reviews', label: 'Reviews' },
     { href: '#contact', label: t.nav.contact },
   ];
 

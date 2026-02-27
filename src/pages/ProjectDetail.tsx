@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, X, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, X, ArrowRight, Star } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import { useContent } from '@/contexts/ContentContext';
 import { Navbar } from '@/components/orbit/Navbar';
@@ -534,7 +534,39 @@ export default function ProjectDetail() {
                                 className="w-full lg:w-[380px] flex-shrink-0"
                             >
                                 <div className="lg:sticky lg:top-24">
-                                    <h2 className="font-display text-lg font-bold text-foreground mb-4 neon-text">More Projects</h2>
+                                    {/* Project Reviews — same card style as ReviewsSection */}
+                                    {(() => {
+                                        const reviewsData = (content.en as any).reviews;
+                                        const reviewItems: any[] = reviewsData?.items || [];
+                                        const projectSlug = projectEn?.id || String(idx);
+                                        const projectReviews = reviewItems.filter((r: any) => r.projectId === projectSlug);
+                                        if (projectReviews.length === 0) return null;
+                                        return (
+                                            <div className="mb-2">
+                                                <h2 className="font-display text-lg font-bold text-foreground mb-4 neon-text">Reviews</h2>
+                                                <div className="flex flex-col gap-3">
+                                                    {projectReviews.map((review: any, ri: number) => (
+                                                        <div key={ri} className="rounded-xl bg-white/[0.03] backdrop-blur-xl border border-[#2a2a3e] p-4 flex flex-col transition-all duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                                            {/* Top row: Stars + (no badge needed — we're already on the project page) */}
+                                                            <div className="flex gap-0.5 mb-2.5">
+                                                                {Array.from({ length: 5 }).map((_, si) => (
+                                                                    <Star key={si} className={`w-3.5 h-3.5 ${si < (review.rating || 5) ? 'text-amber-400 fill-amber-400' : 'text-white/10'}`} />
+                                                                ))}
+                                                            </div>
+                                                            <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-4">
+                                                                "{review.text}"
+                                                            </p>
+                                                            <div className="pt-2.5 border-t border-white/[0.06]">
+                                                                <span className="font-bold text-foreground text-xs block">{review.name}</span>
+                                                                <span className="text-muted-foreground text-[11px]">{review.role}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+                                    <h2 className="font-display text-lg font-bold text-foreground mb-4 neon-text mt-8">More Projects</h2>
                                     <div className="flex flex-col gap-3">
                                         {suggested.map((item: any) => {
                                             const routeId = item._id || item._originalIndex;

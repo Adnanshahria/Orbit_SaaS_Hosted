@@ -9,6 +9,7 @@ import { TechStackSection } from './components/orbit/TechStackSection';
 import { WhyUsSection } from './components/orbit/WhyUsSection';
 import { ProjectsSection } from './components/orbit/ProjectsSection';
 import { LeadershipSection } from './components/orbit/LeadershipSection';
+import { ReviewsSection } from './components/orbit/ReviewsSection';
 import { ContactSection } from './components/orbit/ContactSection';
 import { OrbitFooter } from './components/orbit/OrbitFooter';
 // Chatbot is lazy-loaded below for performance
@@ -36,6 +37,7 @@ const AdminNavbar = lazy(() => import('./pages/admin/AdminNavbar'));
 const AdminSEO = lazy(() => import('./pages/admin/AdminSEO'));
 const AdminBackup = lazy(() => import('./pages/admin/AdminBackup'));
 const AdminStats = lazy(() => import('./pages/admin/AdminStats'));
+const AdminReviews = lazy(() => import('./pages/admin/AdminReviews'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const Chatbot = lazy(() => import('./components/orbit/Chatbot').then(m => ({ default: m.Chatbot })));
@@ -131,6 +133,7 @@ function PublicSite() {
               <WhyUsSection />
               <ProjectsSection />
               <LeadershipSection />
+              <ReviewsSection />
               <ContactSection />
             </>
           )}
@@ -197,6 +200,7 @@ export default function App() {
                     <Route path="why-us" element={<AdminWhyUs />} />
                     <Route path="project" element={<AdminProjects />} />
                     <Route path="leadership" element={<AdminLeadership />} />
+                    <Route path="reviews" element={<AdminReviews />} />
                     <Route path="contact" element={<AdminContact />} />
                     <Route path="footer" element={<AdminFooter />} />
                     <Route path="chatbot" element={<AdminChatbot />} />
