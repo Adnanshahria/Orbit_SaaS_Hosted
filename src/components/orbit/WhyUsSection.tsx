@@ -25,15 +25,15 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 50, scale: 0.9 },
+  hidden: { opacity: 0, y: 15, scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      type: 'spring' as const,
-      stiffness: 70,
-      damping: 16,
+      type: 'tween' as const,
+      duration: 0.4,
+      ease: [0, 0, 0.2, 1] as const,
     },
   },
 };
@@ -117,12 +117,7 @@ export function WhyUsSection() {
                 <motion.div
                   key={i}
                   variants={itemVariants}
-                  whileHover={{
-                    y: -4,
-                    boxShadow: `0 12px 40px ${accentColor}25`,
-                    transition: { type: 'spring', stiffness: 300, damping: 20 },
-                  }}
-                  className={`bg-card/60 backdrop-blur-md premium-card-sub rounded-2xl p-5 sm:pt-9 sm:px-7 sm:pb-8 text-center transition-colors duration-300 group`}
+                  className={`bg-card/60 backdrop-blur-md premium-card-sub rounded-2xl p-5 sm:pt-9 sm:px-7 sm:pb-8 text-center transition-all duration-300 group sm:hover:-translate-y-1`}
                   style={{ backgroundImage: item.bg?.includes('gradient') || item.bg?.includes('url') ? item.bg : undefined }}
                 >
                   <div

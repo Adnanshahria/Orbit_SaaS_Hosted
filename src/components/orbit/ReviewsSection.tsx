@@ -143,9 +143,9 @@ export function ReviewsSection() {
                                 return (
                                     <motion.div
                                         key={i}
-                                        initial={{ opacity: 0, y: 30 }}
+                                        initial={{ opacity: 0, y: 15 }}
                                         animate={inView ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ type: 'spring', stiffness: 50, damping: 15, delay: (i % displayItems.length) * 0.08 }}
+                                        transition={{ type: 'tween', duration: 0.4, ease: [0, 0, 0.2, 1], delay: (i % displayItems.length) * 0.08 }}
                                         className="w-[260px] sm:w-[300px] flex-shrink-0"
                                         aria-hidden={i >= displayItems.length ? true : undefined}
                                     >

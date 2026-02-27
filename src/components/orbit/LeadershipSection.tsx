@@ -20,15 +20,15 @@ const containerVariants = {
 };
 
 const memberVariants = {
-  hidden: { opacity: 0, y: 50, scale: 0.85 },
+  hidden: { opacity: 0, y: 15, scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      type: 'spring' as const,
-      stiffness: 70,
-      damping: 15,
+      type: 'tween' as const,
+      duration: 0.4,
+      ease: [0, 0, 0.2, 1] as const,
     },
   },
 };
@@ -82,12 +82,7 @@ export function LeadershipSection() {
                 <motion.div
                   key={i}
                   variants={memberVariants}
-                  whileHover={{
-                    y: -6,
-                    boxShadow: '0 16px 32px rgba(108, 92, 231, 0.15)',
-                    transition: { type: 'spring', stiffness: 300, damping: 20 },
-                  }}
-                  className="glass-effect bg-card/40 rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group transition-colors duration-300 premium-card-sub"
+                  className="glass-effect bg-card/40 rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group transition-all duration-300 premium-card-sub sm:hover:-translate-y-1"
                 >
                   {/* Circular photo or fallback icon */}
                   <motion.div

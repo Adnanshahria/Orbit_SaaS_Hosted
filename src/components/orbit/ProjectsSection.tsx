@@ -7,14 +7,14 @@ import { Link } from 'react-router-dom';
 import { ProjectCard } from './ProjectCard';
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      type: 'spring' as const,
-      stiffness: 50,
-      damping: 15,
+      type: 'tween' as const,
+      duration: 0.4,
+      ease: [0, 0, 0.2, 1] as const,
       delay: i * 0.1,
     },
   }),
