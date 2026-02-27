@@ -7,8 +7,10 @@ import {
     ErrorAlert,
     ItemListEditor,
     JsonPanel,
+    ColorField,
 } from '@/components/admin/EditorComponents';
 import { useContent } from '@/contexts/ContentContext';
+import { ALL_ICON_NAMES, ICON_MAP } from '@/components/orbit/FallingIcons';
 
 // ─── Types ───
 
@@ -35,13 +37,6 @@ const DEFAULT_ITEM: UnifiedUSP = {
 // ─── Icon Registry ───
 import { Settings2, Paintbrush, Palette, ChevronDown, Plus, Trash2, ArrowUp, ArrowDown, GripVertical, Eye, Layers, Sparkles, Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud, Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase, Award, BookOpen, Users, BarChart3 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { ColorField } from '@/components/admin/EditorComponents';
-
-const ICON_MAP: Record<string, LucideIcon> = {
-    Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud,
-    Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase,
-    Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette
-};
 const ICON_NAMES = Object.keys(ICON_MAP);
 const DEFAULT_ICONS = ['Brain', 'Wrench', 'Zap', 'Shield', 'Target', 'Rocket'];
 
@@ -307,6 +302,10 @@ export default function AdminWhyUs() {
         en: { title: '', subtitle: '' },
         bn: { title: '', subtitle: '' },
     });
+    const [fallingIconsConfig, setFallingIconsConfig] = useState<{ enabled: boolean, icons: Record<string, boolean> }>({
+        enabled: true,
+        icons: {}
+    });
 
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -324,10 +323,23 @@ export default function AdminWhyUs() {
 
         const enW = (content.en.whyUs as any) || { items: [] };
         const bnW = (content.bn.whyUs as any) || { items: [] };
+        const fIcons = (content.en.fallingIcons as any) || { enabled: true, icons: {} };
 
         setSectionInfo({
             en: { title: enW.title || '', subtitle: enW.subtitle || '' },
             bn: { title: bnW.title || '', subtitle: bnW.subtitle || '' },
+        });
+
+        // Initialize falling icons config, ensuring we have boolean values
+        const mergedIcons: Record<string, boolean> = {};
+        ALL_ICON_NAMES.forEach(name => {
+            mergedIcons[name] = fIcons.icons && typeof fIcons.icons[name] === 'boolean'
+                ? fIcons.icons[name]
+                : false; // default false
+        });
+        setFallingIconsConfig({
+            enabled: fIcons.enabled !== false, // default true
+            icons: mergedIcons
         });
 
         const enItems = enW.items || [];
@@ -390,9 +402,12 @@ export default function AdminWhyUs() {
                 items: bnItems,
             });
 
-            if (enOk && bnOk) {
+            // Save falling icons config to EN
+            const iconOk = await updateSection('fallingIcons', 'en', fallingIconsConfig);
+
+            if (enOk && bnOk && iconOk) {
                 setSaved(true);
-                toast.success('USP items saved!', { id: toastId });
+                toast.success('Saved successfully!', { id: toastId });
                 window.dispatchEvent(
                     new CustomEvent('orbit:save-success', { detail: { section: 'whyUs' } })
                 );
@@ -527,6 +542,63 @@ export default function AdminWhyUs() {
                         );
                     }}
                 />
+            </div>
+
+            {/* ── Global Background Effect Config ── */}
+            <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <div className="bg-secondary/40 px-6 py-4 border-b border-border flex items-center justify-between">
+                    <div>
+                        <h3 className="font-semibold text-foreground flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                            Global Snowfall Background Effect
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">Control the 3D rotating icons that fall across the site background.</p>
+                    </div>
+                    {/* Master Toggle */}
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={fallingIconsConfig.enabled}
+                            onChange={(e) => setFallingIconsConfig(prev => ({ ...prev, enabled: e.target.checked }))}
+                        />
+                        <div className="w-11 h-6 bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary border border-border"></div>
+                        <span className="ml-3 text-sm font-medium text-foreground">
+                            {fallingIconsConfig.enabled ? 'Enabled' : 'Disabled'}
+                        </span>
+                    </label>
+                </div>
+
+                {fallingIconsConfig.enabled && (
+                    <div className="p-6">
+                        <p className="text-sm text-foreground mb-4">Select which icons should be included in the snowfall animation:</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                            {ALL_ICON_NAMES.map(name => {
+                                const IconCmp = ICON_MAP[name];
+                                const isActive = fallingIconsConfig.icons[name];
+                                return (
+                                    <button
+                                        key={name}
+                                        onClick={() => setFallingIconsConfig(prev => ({
+                                            ...prev,
+                                            icons: { ...prev.icons, [name]: !isActive }
+                                        }))}
+                                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${isActive
+                                            ? 'bg-primary/10 border-primary/30 text-primary shadow-[0_0_15px_rgba(99,102,241,0.15)]'
+                                            : 'bg-secondary/20 border-border/40 text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+                                            }`}
+                                    >
+                                        <IconCmp className="w-5 h-5 mb-2" />
+                                        <span className="text-[10px] font-medium truncate w-full text-center">{name}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div className="mt-4 text-xs text-muted-foreground bg-secondary/30 p-3 rounded-lg border border-border/50">
+                            💡 <strong>Tip:</strong> If no icons are specifically selected above, the system will automatically fall back to using the icons assigned to your Why Us points, or a default set.
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* ── Inline JSON Import / Export ── */}
