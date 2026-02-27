@@ -3,36 +3,26 @@ import { useRef, useEffect, useCallback } from 'react';
 import { Star, ArrowRight } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
 import { useLang } from '@/contexts/LanguageContext';
-import { Link } from 'react-router-dom';
-
-const DEFAULT_REVIEWS = [
-    {
-        name: 'Sarah Chen',
-        role: 'CTO, TechVentures',
-        rating: 5,
-        text: 'Orbit delivered an exceptional product that exceeded our expectations. The attention to detail and technical expertise was outstanding.',
-        projectId: '',
-        projectName: 'LifeSolver',
-    },
-];
+import { useNavigate } from 'react-router-dom';
 
 export function ReviewsSection() {
     const { content } = useContent();
     const { lang } = useLang();
+    const navigate = useNavigate();
     const ref = useRef(null);
     const inView = useInView(ref, { once: true, margin: '-60px' });
     const scrollRef = useRef<HTMLDivElement>(null);
     const isPaused = useRef(false);
     const rafRef = useRef<number>(0);
 
-    // Get reviews data
+    // Get reviews data — no placeholders, only admin-managed items
     const enReviews = (content.en as any).reviews;
     const bnReviews = (content.bn as any).reviews;
     const reviewsData = lang === 'bn' && bnReviews ? bnReviews : enReviews;
 
     const title = reviewsData?.title || 'Client Reviews';
     const subtitle = reviewsData?.subtitle || 'What our clients say about working with us';
-    const items = reviewsData?.items?.length ? reviewsData.items : DEFAULT_REVIEWS;
+    const items: any[] = reviewsData?.items?.length ? reviewsData.items : [];
 
     // Resolve projectId to route
     const enProjects = (content.en as any).projects;
@@ -48,6 +38,7 @@ export function ReviewsSection() {
     };
 
     const resolveProjectName = (review: any) => {
+        if (review.badgeName) return review.badgeName;
         if (review.projectName) return review.projectName;
         if (!review.projectId) return null;
         const idx = projectItems.findIndex((p: any) => (p.id || '') === review.projectId);
@@ -57,7 +48,7 @@ export function ReviewsSection() {
         return review.projectId;
     };
 
-    // Auto-scroll loop — increments scrollLeft each frame, resets at halfway for infinite loop
+    // Auto-scroll loop
     const autoScroll = useCallback(() => {
         const el = scrollRef.current;
         if (!el || isPaused.current) {
@@ -65,7 +56,6 @@ export function ReviewsSection() {
             return;
         }
         el.scrollLeft += 0.6;
-        // Seamless loop: when we've scrolled past the first copy, jump back to start
         if (el.scrollLeft >= el.scrollWidth / 2) {
             el.scrollLeft = 0;
         }
@@ -77,17 +67,18 @@ export function ReviewsSection() {
         return () => cancelAnimationFrame(rafRef.current);
     }, [autoScroll]);
 
-    // Pause on hover/touch
     const pause = () => { isPaused.current = true; };
     const resume = () => { isPaused.current = false; };
 
-    // Drag-to-scroll support
+    // Drag support
     const isDragging = useRef(false);
     const dragStartX = useRef(0);
     const dragStartScroll = useRef(0);
+    const hasDragged = useRef(false);
 
     const onMouseDown = (e: React.MouseEvent) => {
         isDragging.current = true;
+        hasDragged.current = false;
         isPaused.current = true;
         dragStartX.current = e.pageX;
         dragStartScroll.current = scrollRef.current?.scrollLeft ?? 0;
@@ -95,8 +86,8 @@ export function ReviewsSection() {
     const onMouseMove = (e: React.MouseEvent) => {
         if (!isDragging.current || !scrollRef.current) return;
         const dx = e.pageX - dragStartX.current;
+        if (Math.abs(dx) > 3) hasDragged.current = true;
         scrollRef.current.scrollLeft = dragStartScroll.current - dx;
-        // seamless loop while dragging
         const el = scrollRef.current;
         if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
         if (el.scrollLeft < 0) el.scrollLeft = el.scrollWidth / 2;
@@ -104,10 +95,12 @@ export function ReviewsSection() {
     const onMouseUp = () => { isDragging.current = false; isPaused.current = false; };
 
     const displayItems = items.slice(0, 4);
-    // Duplicate for seamless infinite loop
-    const loopItems = [...displayItems, ...displayItems];
+    // Only use marquee (duplicate) if 3+ items; for 1-2 items show them statically
+    const useMarquee = displayItems.length >= 3;
+    const loopItems = useMarquee ? [...displayItems, ...displayItems, ...displayItems] : displayItems;
 
-    if (!items || items.length === 0) return null;
+    // Hide section entirely if no admin-managed reviews
+    if (items.length === 0) return null;
 
     return (
         <section id="reviews" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12" ref={ref}>
@@ -129,20 +122,20 @@ export function ReviewsSection() {
                         </p>
                     </motion.div>
 
-                    {/* Infinite auto-scroll + manual drag carousel */}
+                    {/* Carousel — marquee for 3+ items, static for 1-2 */}
                     <div
-                        ref={scrollRef}
-                        className="overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing select-none"
-                        style={{ scrollbarWidth: 'none' }}
-                        onMouseEnter={pause}
-                        onMouseLeave={() => { resume(); onMouseUp(); }}
-                        onMouseDown={onMouseDown}
-                        onMouseMove={onMouseMove}
-                        onMouseUp={onMouseUp}
-                        onTouchStart={pause}
-                        onTouchEnd={resume}
+                        ref={useMarquee ? scrollRef : undefined}
+                        className={`${useMarquee ? 'overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing select-none' : 'flex justify-center'}`}
+                        style={useMarquee ? { scrollbarWidth: 'none' } : {}}
+                        onMouseEnter={useMarquee ? pause : undefined}
+                        onMouseLeave={useMarquee ? () => { resume(); onMouseUp(); } : undefined}
+                        onMouseDown={useMarquee ? onMouseDown : undefined}
+                        onMouseMove={useMarquee ? onMouseMove : undefined}
+                        onMouseUp={useMarquee ? onMouseUp : undefined}
+                        onTouchStart={useMarquee ? pause : undefined}
+                        onTouchEnd={useMarquee ? resume : undefined}
                     >
-                        <div className="flex gap-4 pb-2" style={{ width: 'max-content' }}>
+                        <div className={`flex gap-4 pb-2 ${useMarquee ? '' : 'flex-wrap justify-center'}`} style={useMarquee ? { width: 'max-content' } : {}}>
                             {loopItems.map((review: any, i: number) => {
                                 const projectRoute = resolveProjectRoute(review);
                                 const projectName = resolveProjectName(review);
@@ -156,7 +149,13 @@ export function ReviewsSection() {
                                         className="w-[260px] sm:w-[300px] flex-shrink-0"
                                         aria-hidden={i >= displayItems.length ? true : undefined}
                                     >
-                                        <div className="h-full rounded-xl premium-card-sub bg-white/[0.03] backdrop-blur-xl p-4 flex flex-col transition-all duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                        <div
+                                            className={`h-full rounded-xl premium-card-sub bg-white/[0.03] backdrop-blur-xl p-4 flex flex-col transition-all duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] ${projectRoute ? 'cursor-pointer' : ''}`}
+                                            onClick={() => {
+                                                if (hasDragged.current) return;
+                                                if (projectRoute) navigate(projectRoute);
+                                            }}
+                                        >
                                             {/* Top row: Stars + Project Badge */}
                                             <div className="flex items-center justify-between mb-2.5">
                                                 <div className="flex gap-0.5">
@@ -165,22 +164,16 @@ export function ReviewsSection() {
                                                     ))}
                                                 </div>
                                                 {projectName && (
-                                                    projectRoute ? (
-                                                        <Link
-                                                            to={projectRoute}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-transparent transition-all hover:gap-1.5"
-                                                            style={{
-                                                                background: 'linear-gradient(#10101a, #10101a) padding-box, linear-gradient(135deg, #10b981, #f59e0b) border-box',
-                                                                borderWidth: '1px', borderStyle: 'solid', borderColor: 'transparent',
-                                                            }}
-                                                        >
-                                                            <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">{projectName}</span>
-                                                            <ArrowRight className="w-2.5 h-2.5 text-emerald-400" />
-                                                        </Link>
-                                                    ) : (
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold text-muted-foreground bg-white/[0.04] border border-white/[0.06]">{projectName}</span>
-                                                    )
+                                                    <span
+                                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-transparent"
+                                                        style={{
+                                                            background: 'linear-gradient(#10101a, #10101a) padding-box, linear-gradient(135deg, #10b981, #f59e0b) border-box',
+                                                            borderWidth: '1px', borderStyle: 'solid', borderColor: 'transparent',
+                                                        }}
+                                                    >
+                                                        <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">{projectName}</span>
+                                                        {projectRoute && <ArrowRight className="w-2.5 h-2.5 text-emerald-400" />}
+                                                    </span>
                                                 )}
                                             </div>
 

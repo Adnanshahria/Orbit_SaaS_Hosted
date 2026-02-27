@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectionEditor, JsonPanel } from '@/components/admin/EditorComponents';
-import { Star, Plus, Trash2 } from 'lucide-react';
+import { Star, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useContent } from '@/contexts/ContentContext';
 
 interface ReviewItem {
@@ -10,9 +10,10 @@ interface ReviewItem {
     text: string;
     projectId: string;
     projectName: string;
+    badgeName: string;
 }
 
-const emptyReview: ReviewItem = { name: '', role: '', rating: 5, text: '', projectId: '', projectName: '' };
+const emptyReview: ReviewItem = { name: '', role: '', rating: 5, text: '', projectId: '', projectName: '', badgeName: '' };
 
 export default function AdminReviews() {
     const { lang, setLang, saving, saved, error, getData, save } = useSectionEditor('reviews');
@@ -39,6 +40,7 @@ export default function AdminReviews() {
                     text: item.text || '',
                     projectId: item.projectId || '',
                     projectName: item.projectName || '',
+                    badgeName: item.badgeName || '',
                 })));
             }
         }
@@ -51,15 +53,29 @@ export default function AdminReviews() {
             // Auto-fill project name from dropdown
             if (field === 'projectId' && typeof value === 'string') {
                 const proj = projectItems.find((p: any) => (p.id || '') === value);
-                if (proj) updated.projectName = proj.title || '';
+                if (proj) {
+                    updated.projectName = proj.title || '';
+                    // Auto-fill badge name only if empty
+                    if (!updated.badgeName) updated.badgeName = proj.title || '';
+                }
             }
             return updated;
         }));
     };
 
     const addItem = () => setItems(prev => [...prev, { ...emptyReview }]);
-
     const removeItem = (idx: number) => setItems(prev => prev.filter((_, i) => i !== idx));
+
+    // Reorder
+    const moveItem = (idx: number, dir: -1 | 1) => {
+        const newIdx = idx + dir;
+        if (newIdx < 0 || newIdx >= items.length) return;
+        setItems(prev => {
+            const next = [...prev];
+            [next[idx], next[newIdx]] = [next[newIdx], next[idx]];
+            return next;
+        });
+    };
 
     const currentPayload = { title, subtitle, items };
 
@@ -94,12 +110,31 @@ export default function AdminReviews() {
                     <div key={idx} className="bg-card rounded-xl p-5 border border-border space-y-4 relative">
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-bold text-muted-foreground">Review #{idx + 1}</span>
-                            <button
-                                onClick={() => removeItem(idx)}
-                                className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                                {/* Reorder Buttons */}
+                                <button
+                                    onClick={() => moveItem(idx, -1)}
+                                    disabled={idx === 0}
+                                    className="p-1.5 rounded-lg text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                    title="Move up"
+                                >
+                                    <ChevronUp className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => moveItem(idx, 1)}
+                                    disabled={idx === items.length - 1}
+                                    className="p-1.5 rounded-lg text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                    title="Move down"
+                                >
+                                    <ChevronDown className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => removeItem(idx)}
+                                    className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2">
@@ -125,13 +160,15 @@ export default function AdminReviews() {
                             </div>
                         </div>
 
+                        {/* Review Text — dark themed textarea */}
                         <div>
                             <label className="text-sm font-medium text-muted-foreground block mb-1.5">Review Text</label>
                             <textarea
                                 value={item.text}
                                 onChange={(e) => updateItem(idx, 'text', e.target.value)}
                                 rows={3}
-                                className="w-full rounded-lg bg-input-background border border-border px-3 py-2 text-sm text-foreground resize-y focus:outline-none focus:ring-1 focus:ring-primary"
+                                placeholder="Write the review text here..."
+                                className="w-full rounded-lg bg-secondary border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-y focus:outline-none focus:ring-1 focus:ring-primary"
                             />
                         </div>
 
@@ -141,7 +178,7 @@ export default function AdminReviews() {
                             <select
                                 value={item.projectId}
                                 onChange={(e) => updateItem(idx, 'projectId', e.target.value)}
-                                className="w-full rounded-lg bg-input-background border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                                className="w-full rounded-lg bg-secondary border border-border px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                             >
                                 <option value="">— None —</option>
                                 {projectItems.map((proj: any, pi: number) => (
@@ -150,6 +187,18 @@ export default function AdminReviews() {
                                     </option>
                                 ))}
                             </select>
+                        </div>
+
+                        {/* Badge Name (custom label for the project badge on the card) */}
+                        <div>
+                            <label className="text-sm font-medium text-muted-foreground block mb-1.5">Badge Name <span className="text-muted-foreground/50 text-xs">(custom name shown on the review card badge)</span></label>
+                            <input
+                                type="text"
+                                value={item.badgeName}
+                                onChange={(e) => updateItem(idx, 'badgeName', e.target.value)}
+                                placeholder={item.projectName || 'e.g. LifeSolver'}
+                                className="w-full rounded-lg bg-secondary border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary"
+                            />
                         </div>
                     </div>
                 ))}
@@ -178,6 +227,7 @@ export default function AdminReviews() {
                                 text: item.text || '',
                                 projectId: item.projectId || '',
                                 projectName: item.projectName || '',
+                                badgeName: item.badgeName || '',
                             })));
                         }
                     }}
