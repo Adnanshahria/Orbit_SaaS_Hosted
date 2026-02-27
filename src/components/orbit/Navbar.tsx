@@ -42,48 +42,81 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isNavCtaOpen]);
 
-  // Unified scroll handler — single listener with rAF throttling
+  // Unified scroll handler — deferred section detection to avoid lag
   useEffect(() => {
     let rafId = 0;
+    let sectionTimer = 0;
+
+    // Track previous values to avoid unnecessary React re-renders
+    let prevScrolled = isScrolled;
+    let prevSection = activeSection;
+    let prevShowCTA = showNavbarCTA;
+
+    const detectSection = () => {
+      sectionTimer = 0;
+      if (location.pathname !== '/') {
+        if (prevSection !== '') {
+          prevSection = '';
+          setActiveSection('');
+        }
+        return;
+      }
+
+      const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'reviews', 'contact'];
+      let current = 'hero';
+      const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
+      if (atBottom) {
+        current = 'contact';
+      } else {
+        for (const id of sections) {
+          const el = document.getElementById(id);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= 150) {
+              current = id;
+            }
+          }
+        }
+      }
+      const nextSection = `#${current}`;
+      if (nextSection !== prevSection) {
+        prevSection = nextSection;
+        setActiveSection(nextSection);
+      }
+
+      // CTA visibility
+      const heroBtn = document.getElementById('hero-book-appointment');
+      const contactEl = document.getElementById('contact');
+      const contactVisible = contactEl ? contactEl.getBoundingClientRect().top < window.innerHeight * 0.75 : false;
+      let nextShowCTA: boolean;
+      if (heroBtn) {
+        const rect = heroBtn.getBoundingClientRect();
+        nextShowCTA = rect.top < -50 && !contactVisible;
+      } else {
+        nextShowCTA = !contactVisible;
+      }
+      if (nextShowCTA !== prevShowCTA) {
+        prevShowCTA = nextShowCTA;
+        setShowNavbarCTA(nextShowCTA);
+      }
+    };
+
     const onScroll = () => {
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
         rafId = 0;
-        setIsScrolled(window.scrollY > 50);
 
-        // Detect active section (only on home page)
-        if (location.pathname !== '/') {
-          setActiveSection('');
-        } else {
-          const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'reviews', 'contact'];
-          let current = 'hero';
-          const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
-          if (atBottom) {
-            current = 'contact';
-          } else {
-            for (const id of sections) {
-              const el = document.getElementById(id);
-              if (el) {
-                const rect = el.getBoundingClientRect();
-                if (rect.top <= 150) {
-                  current = id;
-                }
-              }
-            }
-          }
-          setActiveSection(`#${current}`);
+        // isScrolled — immediate (affects navbar appearance)
+        const scrolled = window.scrollY > 50;
+        if (scrolled !== prevScrolled) {
+          prevScrolled = scrolled;
+          setIsScrolled(scrolled);
         }
 
-        // CTA visibility — show after hero CTA scrolls away, hide when contact section is visible
-        const heroBtn = document.getElementById('hero-book-appointment');
-        const contactEl = document.getElementById('contact');
-        const contactVisible = contactEl ? contactEl.getBoundingClientRect().top < window.innerHeight * 0.75 : false;
-        if (heroBtn) {
-          const rect = heroBtn.getBoundingClientRect();
-          setShowNavbarCTA(rect.top < -50 && !contactVisible);
-        } else {
-          setShowNavbarCTA(!contactVisible);
-        }
+        // Section detection — deferred by 100ms after scroll stops
+        // This prevents the "sticky section" feel during active scrolling
+        if (sectionTimer) clearTimeout(sectionTimer);
+        sectionTimer = window.setTimeout(detectSection, 100);
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -91,6 +124,7 @@ export function Navbar() {
     return () => {
       window.removeEventListener('scroll', onScroll);
       if (rafId) cancelAnimationFrame(rafId);
+      if (sectionTimer) clearTimeout(sectionTimer);
     };
   }, [location.pathname]);
 
