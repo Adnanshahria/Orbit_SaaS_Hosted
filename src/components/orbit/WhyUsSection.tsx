@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 
 import { Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud, Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase, Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette, Brain, Wrench } from 'lucide-react';
@@ -13,59 +13,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 const DEFAULT_ICONS = ['Brain', 'Wrench', 'Zap', 'Shield', 'Target', 'Rocket'];
 
-// ─── Falling Icons Background Effect ───
-const PARTICLE_COUNT = 22;
-const FALL_ICON_NAMES = Object.keys(ICON_MAP);
-const FALL_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#22d3ee'];
-
-function FallingIcons() {
-  const particles = useMemo(() =>
-    Array.from({ length: PARTICLE_COUNT }).map((_, i) => {
-      const iconName = FALL_ICON_NAMES[Math.floor(Math.random() * FALL_ICON_NAMES.length)];
-      const Icon = ICON_MAP[iconName] || Zap;
-      const size = 14 + Math.random() * 18; // 14-32px
-      const left = Math.random() * 100;      // 0-100%
-      const delay = Math.random() * 12;      // 0-12s stagger
-      const duration = 10 + Math.random() * 14; // 10-24s fall time
-      const drift = -30 + Math.random() * 60;   // horizontal sway
-      const rotation = Math.random() * 360;
-      const opacity = 0.06 + Math.random() * 0.1; // very subtle: 0.06-0.16
-      const color = FALL_COLORS[Math.floor(Math.random() * FALL_COLORS.length)];
-
-      return { Icon, size, left, delay, duration, drift, rotation, opacity, color, key: i };
-    }), []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden>
-      <style>{`
-        @keyframes iconFall {
-          0%   { transform: translateY(-60px) translateX(0px) rotate(0deg); opacity: 0; }
-          10%  { opacity: var(--particle-opacity); }
-          90%  { opacity: var(--particle-opacity); }
-          100% { transform: translateY(calc(100vh + 60px)) translateX(var(--drift)) rotate(var(--end-rotation)); opacity: 0; }
-        }
-      `}</style>
-      {particles.map(({ Icon, size, left, delay, duration, drift, rotation, opacity, color, key }) => (
-        <div
-          key={key}
-          className="absolute"
-          style={{
-            left: `${left}%`,
-            top: '-40px',
-            animation: `iconFall ${duration}s ${delay}s linear infinite`,
-            ['--drift' as any]: `${drift}px`,
-            ['--end-rotation' as any]: `${rotation + 180}deg`,
-            ['--particle-opacity' as any]: opacity,
-          }}
-        >
-          <Icon
-            style={{ width: size, height: size, color, opacity: 1, transform: `rotate(${rotation}deg)` }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 const containerVariants = {
   hidden: {},
@@ -97,12 +44,9 @@ export function WhyUsSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section id="why-us" className="py-10 sm:py-24 px-3 sm:px-6 lg:px-8 relative scroll-mt-12 overflow-hidden">
-      {/* Background falling icons */}
-      <FallingIcons />
+    <section id="why-us" className="py-10 sm:py-24 px-3 sm:px-6 lg:px-8 relative scroll-mt-12">
 
-
-      <div className="w-full mx-auto relative z-10" ref={ref}>
+      <div className="w-full mx-auto relative" ref={ref}>
         <div className="rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
           <div className="text-center mb-6 sm:mb-10">
             <motion.h2
