@@ -181,14 +181,15 @@
   pointer-events: none;
 }
 
-/* ── Performance: disable GPU-heavy blur effects on tablets and below ── */
+/* ── Performance: disable GPU-heavy effects on tablets and below ── */
 @media (max-width: 1024px) {
 
   /* Remove backdrop-blur from container cards — biggest perf win */
   .backdrop-blur-xl,
   .backdrop-blur-md,
   .backdrop-blur-2xl,
-  .backdrop-blur-sm {
+  .backdrop-blur-sm,
+  .backdrop-blur-\[2px\] {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
@@ -213,6 +214,37 @@
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     background: rgba(16, 16, 26, 0.9) !important;
+  }
+
+  /* ── Replace mask-composite gradient borders with simple borders ──
+     mask-composite creates a GPU-composited layer per element;
+     a solid border looks nearly identical but is far cheaper */
+  .premium-card::before,
+  .premium-card-sub::before {
+    display: none !important;
+  }
+
+  .premium-card {
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  }
+
+  .premium-card-sub {
+    border: 1px solid rgba(16, 185, 129, 0.12) !important;
+  }
+
+  /* ── Paint isolation — invisible, keeps repaint area small ── */
+  section {
+    contain: content;
+  }
+
+  /* ── Free compositor layers on mobile ── */
+  .will-change-transform {
+    will-change: auto !important;
+  }
+
+  /* ── Speed up transitions on touch (no hover anyway) ── */
+  .gentle-animation {
+    transition-duration: 0.15s !important;
   }
 }
 

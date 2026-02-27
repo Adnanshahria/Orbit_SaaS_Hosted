@@ -111,8 +111,6 @@ export function ProjectsSection() {
 
           {/* Projects Grid */}
           <motion.div
-            layout
-            transition={{ layout: { type: 'spring', stiffness: 40, damping: 20 } }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <AnimatePresence mode="popLayout">
@@ -121,8 +119,6 @@ export function ProjectsSection() {
 
                 return (
                   <motion.div
-                    layout
-                    layoutId={`project-${routeId}`}
                     key={routeId}
                     custom={idx}
                     variants={cardVariants}

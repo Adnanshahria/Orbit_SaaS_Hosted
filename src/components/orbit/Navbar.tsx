@@ -180,7 +180,6 @@ export function Navbar() {
 
             {/* Desktop nav links */}
             <motion.div
-              layout="position"
               transition={{ type: "spring", stiffness: 400, damping: 32 }}
               className="hidden md:flex items-center gap-2"
             >
@@ -306,7 +305,6 @@ export function Navbar() {
                 className="relative"
               >
                 <motion.div
-                  layout
                   className={`flex items-center gap-2 rounded-full gentle-animation cursor-pointer ${isActive
                     ? 'bg-primary/20 px-3 py-2 border border-primary/50 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
                     : 'px-2 py-2 hover:bg-[#141420] border border-transparent'

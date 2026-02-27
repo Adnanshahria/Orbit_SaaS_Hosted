@@ -87,7 +87,7 @@ export function LeadershipSection() {
                     boxShadow: '0 16px 32px rgba(108, 92, 231, 0.15)',
                     transition: { type: 'spring', stiffness: 300, damping: 20 },
                   }}
-                  className="glass-effect bg-card/40 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group transition-colors duration-300 premium-card-sub"
+                  className="glass-effect bg-card/40 rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group transition-colors duration-300 premium-card-sub"
                 >
                   {/* Circular photo or fallback icon */}
                   <motion.div
