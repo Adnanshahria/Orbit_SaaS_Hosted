@@ -28,7 +28,7 @@ export function ProjectCard({ item, routeId, isHovered, onMouseEnter, onMouseLea
 
     return (
         <div
-            className="group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full bg-white/[0.03] backdrop-blur-xl premium-card-sub transition-all duration-500 hover:shadow-[0_0_30px_rgba(108,92,231,0.2),0_0_60px_rgba(108,92,231,0.08)]"
+            className="group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full bg-white/[0.03] backdrop-blur-xl premium-card-sub transition-shadow duration-500 hover:shadow-[0_0_30px_rgba(108,92,231,0.2),0_0_60px_rgba(108,92,231,0.08)]"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >

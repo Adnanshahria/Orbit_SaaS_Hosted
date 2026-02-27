@@ -150,7 +150,7 @@ export function ReviewsSection() {
                                         aria-hidden={i >= displayItems.length ? true : undefined}
                                     >
                                         <div
-                                            className={`h-full rounded-xl premium-card-sub bg-white/[0.03] backdrop-blur-xl p-4 flex flex-col transition-all duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] ${projectRoute ? 'cursor-pointer' : ''}`}
+                                            className={`h-full rounded-xl premium-card-sub bg-white/[0.03] backdrop-blur-xl p-4 flex flex-col transition-shadow duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] ${projectRoute ? 'cursor-pointer' : ''}`}
                                             onClick={() => {
                                                 if (hasDragged.current) return;
                                                 if (projectRoute) navigate(projectRoute);

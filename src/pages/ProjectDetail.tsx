@@ -546,7 +546,7 @@ export default function ProjectDetail() {
                                                 <h2 className="font-display text-lg font-bold text-foreground mb-4 neon-text">Reviews</h2>
                                                 <div className="flex flex-col gap-3">
                                                     {projectReviews.map((review: any, ri: number) => (
-                                                        <div key={ri} className="rounded-xl bg-white/[0.03] backdrop-blur-xl border border-[#2a2a3e] p-4 flex flex-col transition-all duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                                        <div key={ri} className="rounded-xl bg-white/[0.03] backdrop-blur-xl border border-[#2a2a3e] p-4 flex flex-col transition-shadow duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]">
                                                             {/* Top row: Stars + (no badge needed — we're already on the project page) */}
                                                             <div className="flex gap-0.5 mb-2.5">
                                                                 {Array.from({ length: 5 }).map((_, si) => (
@@ -577,7 +577,7 @@ export default function ProjectDetail() {
                                                 <Link
                                                     key={routeId}
                                                     to={`/project/${routeId}`}
-                                                    className="group flex gap-3 rounded-xl overflow-hidden border-2 border-neon-purple/20 hover:border-neon-purple/50 bg-white/[0.03] backdrop-blur-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(108,92,231,0.15)] p-2"
+                                                    className="group flex gap-3 rounded-xl overflow-hidden border-2 border-neon-purple/20 hover:border-neon-purple/50 bg-white/[0.03] backdrop-blur-xl transition-[shadow,border-color] duration-300 hover:shadow-[0_0_20px_rgba(108,92,231,0.15)] p-2"
                                                 >
                                                     <div className="relative w-36 flex-shrink-0 aspect-video rounded-lg overflow-hidden bg-muted">
                                                         <img

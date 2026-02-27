@@ -256,6 +256,25 @@ html.low-perf .neon-text-cyan {
   text-shadow: none !important;
 }
 
+html.low-perf .shimmer-effect::after {
+  animation: none !important;
+}
+
+html.low-perf .premium-card::before,
+html.low-perf .premium-card-sub::before,
+html.low-perf .navbar-gradient-border::before {
+  animation: none !important;
+}
+
+/* Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -285,7 +304,7 @@ html.low-perf .neon-text-cyan {
   }
 
   .gentle-animation {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-effect {
@@ -324,13 +343,12 @@ html.low-perf .neon-text-cyan {
     inset: 0;
     border-radius: inherit;
     padding: 1.5px;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(20, 184, 166, 0.8));
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(245, 158, 11, 0.8));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderGradient 6s ease-in-out infinite;
   }
 
   .premium-card {
@@ -345,18 +363,18 @@ html.low-perf .neon-text-cyan {
     inset: 0;
     border-radius: inherit;
     padding: 1.2px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(245, 158, 11, 0.8));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderGradient 6s ease-in-out infinite;
   }
 
   .dark .navbar-gradient-border::before,
   .dark .premium-card::before,
   .dark .premium-card-sub::before {
-    animation: borderGradient 6s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(245, 158, 11, 0.8));
   }
 
   .premium-card-sub {
@@ -371,12 +389,12 @@ html.low-perf .neon-text-cyan {
     inset: 0;
     border-radius: inherit;
     padding: 0.8px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(245, 158, 11, 0.6));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    animation: borderGradient 6s ease-in-out infinite;
   }
 
   .neon-glow {
