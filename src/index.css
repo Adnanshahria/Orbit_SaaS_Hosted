@@ -202,7 +202,8 @@
 }
 
 /* ── Performance: disable GPU-heavy effects on tablets and below ── */
-@media (max-width: 1024px) {
+@media (max-width: 1024px),
+(hover: none) and (pointer: coarse) {
 
   /* Remove ALL backdrop-blur from every element — biggest perf win */
   .backdrop-blur-xl,
@@ -293,6 +294,28 @@
   /* ── Speed up transitions on touch (no hover anyway) ── */
   .gentle-animation {
     transition-duration: 0.15s !important;
+  }
+
+  /* ── Disable Framer Motion transform-based animations during scroll ──
+     Force GPU layer on fixed elements so they don't repaint with scroll */
+  .fixed {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* ── Smooth scrolling hint for Android compositor ── */
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Disable shimmer/sweep animations — saves GPU compositing ── */
+  .animate-text-shimmer-orbit,
+  .animate-text-shimmer-saas {
+    animation: none !important;
+    background: none !important;
+    color: var(--foreground) !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
   }
 }
 

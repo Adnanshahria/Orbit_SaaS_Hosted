@@ -62,10 +62,12 @@ export function ReviewsSection() {
         rafRef.current = requestAnimationFrame(autoScroll);
     }, []);
 
+    // Only run auto-scroll when section is visible on screen
     useEffect(() => {
+        if (!inView) return;
         rafRef.current = requestAnimationFrame(autoScroll);
         return () => cancelAnimationFrame(rafRef.current);
-    }, [autoScroll]);
+    }, [autoScroll, inView]);
 
     const pause = () => { isPaused.current = true; };
     const resume = () => { isPaused.current = false; };

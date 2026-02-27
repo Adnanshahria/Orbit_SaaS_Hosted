@@ -66,6 +66,8 @@ export function SolarSystemAnimation() {
         // Visibility tracking
         let isVisible = true;
         let isTabActive = true;
+        let isScrolling = false;
+        let scrollTimer = 0;
 
         const observer = new IntersectionObserver(
             ([entry]) => { isVisible = entry.isIntersecting; },
@@ -77,6 +79,14 @@ export function SolarSystemAnimation() {
             isTabActive = document.visibilityState === 'visible';
         };
         document.addEventListener('visibilitychange', onVisibilityChange);
+
+        // Pause rendering during scroll — frees CPU for scroll compositor
+        const onScroll = () => {
+            isScrolling = true;
+            if (scrollTimer) clearTimeout(scrollTimer);
+            scrollTimer = window.setTimeout(() => { isScrolling = false; }, 200);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
 
         const handleResize = () => {
             width = window.innerWidth;
@@ -185,7 +195,7 @@ export function SolarSystemAnimation() {
         function render(now: number) {
             animationFrameId = requestAnimationFrame(render);
 
-            if (!isVisible || !isTabActive) {
+            if (!isVisible || !isTabActive || isScrolling) {
                 prevTime = now;
                 return;
             }
@@ -326,7 +336,9 @@ export function SolarSystemAnimation() {
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            window.removeEventListener('scroll', onScroll);
             document.removeEventListener('visibilitychange', onVisibilityChange);
+            if (scrollTimer) clearTimeout(scrollTimer);
             observer.disconnect();
             cancelAnimationFrame(animationFrameId);
         };

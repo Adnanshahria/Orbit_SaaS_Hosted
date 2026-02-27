@@ -33,6 +33,12 @@ const SYSTEM_ROTATE_SPEED = 180;
 export function FallingIcons() {
     const { content } = useContent();
 
+    // Disable on mobile / low-perf — these DOM transforms compete with scroll compositor
+    const isMobileOrLowPerf = typeof window !== 'undefined' && (
+        window.innerWidth < 768 ||
+        document.documentElement.classList.contains('low-perf')
+    );
+
     const iconNames = useMemo(() => {
         const config = (content?.en as any)?.fallingIcons;
         if (config?.icons && typeof config.icons === 'object') {
@@ -120,7 +126,7 @@ export function FallingIcons() {
         return () => cancelAnimationFrame(rafId.current);
     }, [animate]);
 
-    if (!isEnabled) return null;
+    if (!isEnabled || isMobileOrLowPerf) return null;
 
     return (
         <div

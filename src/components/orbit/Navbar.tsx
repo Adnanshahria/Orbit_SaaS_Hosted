@@ -304,27 +304,19 @@ export function Navbar() {
                 }}
                 className="relative"
               >
-                <motion.div
+                <div
                   className={`flex items-center gap-1.5 rounded-full gentle-animation cursor-pointer ${isActive
                     ? 'bg-primary/20 px-2.5 py-1.5 border border-primary/50 shadow-[0_0_8px_rgba(16,185,129,0.25)]'
                     : 'px-1.5 py-1.5 hover:bg-[#141420] border border-transparent'
                     }`}
                 >
                   <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.span
-                        initial={{ width: 0, opacity: 0 }}
-                        animate={{ width: 'auto', opacity: 1 }}
-                        exit={{ width: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="text-xs font-semibold text-primary whitespace-nowrap overflow-hidden"
-                      >
-                        {link.label}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                  {isActive && (
+                    <span className="text-xs font-semibold text-primary whitespace-nowrap">
+                      {link.label}
+                    </span>
+                  )}
+                </div>
               </a>
             );
           })}

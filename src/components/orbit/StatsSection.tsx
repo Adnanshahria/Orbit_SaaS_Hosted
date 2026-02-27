@@ -18,7 +18,6 @@ function AnimatedCounter({ target, active }: { target: number; active: boolean }
 
     useEffect(() => {
         if (!active) return;
-        // Re-animate from 0 each time it becomes visible
         hasAnimated.current = true;
         let start = 0;
         const step = Math.max(1, Math.ceil(target / 60));
@@ -41,25 +40,8 @@ export function StatsSection() {
     const { content } = useContent();
     const { lang } = useLang();
     const ref = useRef(null);
+    // Simple inView check — no scroll listener needed
     const inView = useInView(ref, { margin: '-10px' });
-    const [isScrolling, setIsScrolling] = useState(false);
-    const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // Detect scrolling — show on scroll, hide when idle
-    useEffect(() => {
-        const onScroll = () => {
-            setIsScrolling(true);
-            if (scrollTimer.current) clearTimeout(scrollTimer.current);
-            scrollTimer.current = setTimeout(() => setIsScrolling(false), 1500);
-        };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            if (scrollTimer.current) clearTimeout(scrollTimer.current);
-        };
-    }, []);
-
-    const visible = inView && isScrolling;
 
     const enStats = (content.en as any).stats;
     const bnStats = (content.bn as any).stats;
@@ -76,7 +58,7 @@ export function StatsSection() {
         <div ref={ref} className="py-2 sm:py-4 px-4 sm:px-6 relative z-[100] flex items-center justify-center">
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
-                animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 className="pointer-events-none rounded-full px-4 sm:px-6 py-2 sm:py-2.5 border border-transparent relative overflow-hidden"
                 style={{
@@ -93,7 +75,7 @@ export function StatsSection() {
                             {i !== 0 && <span className="text-white/50 text-[8px] sm:text-[10px]">✦</span>}
                             <div className="flex items-center gap-1 sm:gap-1.5">
                                 <span className="text-sm sm:text-base font-bold text-foreground font-poppins tabular-nums">
-                                    <AnimatedCounter target={Number(stat.value) || 0} active={visible} />
+                                    <AnimatedCounter target={Number(stat.value) || 0} active={inView} />
                                     <span className="text-primary">{stat.suffix || '+'}</span>
                                 </span>
                                 <span className="text-[10px] sm:text-xs font-medium tracking-wide opacity-80 uppercase text-muted-foreground">

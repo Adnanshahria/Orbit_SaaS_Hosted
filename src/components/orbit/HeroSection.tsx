@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ChevronDown, Send, Loader2, Mail, MessageCircle } from 'lucide-react';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
@@ -14,6 +14,19 @@ export function HeroSection() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [showEmailBar, setShowEmailBar] = useState(true);
+
+  // Track scroll position to hide email bar when scrolled past hero
+  useEffect(() => {
+    const onScroll = () => {
+      const hero = sectionRef.current;
+      if (!hero) return;
+      const rect = hero.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, -rect.top / (rect.height || 1)));
+      setShowEmailBar(ratio < 0.15);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,16 +56,7 @@ export function HeroSection() {
       setStatus('idle');
     }
   };
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end start'],
-  });
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
 
-  // Hide email bar when user scrolls past hero on mobile
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    setShowEmailBar(v < 0.15);
-  });
 
   // Staggered word animation for the subtitle (memoized to prevent re-splits)
   const subtitle = t.hero.subtitle || '';
