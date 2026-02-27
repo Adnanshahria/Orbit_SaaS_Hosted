@@ -24,19 +24,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 15, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: 'tween' as const,
-      duration: 0.4,
-      ease: [0, 0, 0.2, 1] as const,
-    },
-  },
-};
+// Animations removed to prevent mobile scroll layout shifting
 
 export function WhyUsSection() {
   const { t } = useLang();
@@ -114,9 +102,8 @@ export function WhyUsSection() {
               const borderColor = item.border || 'border-border';
 
               return (
-                <motion.div
+                <div
                   key={i}
-                  variants={itemVariants}
                   className={`bg-card/60 backdrop-blur-md premium-card-sub rounded-2xl p-5 sm:pt-9 sm:px-7 sm:pb-8 text-center transition-all duration-300 group sm:hover:-translate-y-1`}
                   style={{ backgroundImage: item.bg?.includes('gradient') || item.bg?.includes('url') ? item.bg : undefined }}
                 >
@@ -131,7 +118,7 @@ export function WhyUsSection() {
                   </div>
                   <h3 className="text-[0.95rem] sm:text-[1.05rem] font-bold text-foreground mb-1.5 sm:mb-2.5 leading-tight">{item.title}</h3>
                   <p className="text-[0.75rem] sm:text-[0.875rem] text-muted-foreground leading-[1.5] sm:leading-[1.65]">{item.desc}</p>
-                </motion.div>
+                </div>
               );
             })}
           </motion.div>

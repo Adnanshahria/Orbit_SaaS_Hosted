@@ -141,11 +141,8 @@ export function ReviewsSection() {
                                 const projectName = resolveProjectName(review);
 
                                 return (
-                                    <motion.div
+                                    <div
                                         key={i}
-                                        initial={{ opacity: 0, y: 15 }}
-                                        animate={inView ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ type: 'tween', duration: 0.4, ease: [0, 0, 0.2, 1], delay: (i % displayItems.length) * 0.08 }}
                                         className="w-[260px] sm:w-[300px] flex-shrink-0"
                                         aria-hidden={i >= displayItems.length ? true : undefined}
                                     >
@@ -188,7 +185,7 @@ export function ReviewsSection() {
                                                 <span className="text-muted-foreground text-[11px]">{review.role}</span>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 );
                             })}
                         </div>

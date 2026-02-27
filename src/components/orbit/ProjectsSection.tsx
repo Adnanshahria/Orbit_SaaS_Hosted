@@ -6,20 +6,7 @@ import { useContent } from '@/contexts/ContentContext';
 import { Link } from 'react-router-dom';
 import { ProjectCard } from './ProjectCard';
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 15 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'tween' as const,
-      duration: 0.4,
-      ease: [0, 0, 0.2, 1] as const,
-      delay: i * 0.1,
-    },
-  }),
-  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
-};
+// Animations removed to prevent mobile scroll layout shifting
 
 // stripHtml and truncate are now in ProjectCard
 
@@ -110,34 +97,23 @@ export function ProjectsSection() {
           </motion.div>
 
           {/* Projects Grid */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <AnimatePresence mode="popLayout">
-              {items.map((item: any, idx: number) => {
-                const routeId = item._id || item._originalIndex;
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item: any, idx: number) => {
+              const routeId = item._id || item._originalIndex;
 
-                return (
-                  <motion.div
-                    key={routeId}
-                    custom={idx}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <ProjectCard
-                      item={item}
-                      routeId={routeId}
-                      isHovered={hoveredProject === item._originalIndex}
-                      onMouseEnter={() => setHoveredProject(item._originalIndex)}
-                      onMouseLeave={() => setHoveredProject(null)}
-                    />
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
+              return (
+                <div key={routeId}>
+                  <ProjectCard
+                    item={item}
+                    routeId={routeId}
+                    isHovered={hoveredProject === item._originalIndex}
+                    onMouseEnter={() => setHoveredProject(item._originalIndex)}
+                    onMouseLeave={() => setHoveredProject(null)}
+                  />
+                </div>
+              );
+            })}
+          </div>
 
           {/* Expand / Collapse Button */}
           {canExpand && (
@@ -171,6 +147,6 @@ export function ProjectsSection() {
           )}
         </div>{/* End Container Card */}
       </div>
-    </section>
+    </section >
   );
 }

@@ -11,22 +11,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 const DEFAULT_ICONS = [Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket];
 
-const cardVariants = {
-  hidden: {
-    opacity: 0,
-    y: 20,
-  },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'tween' as const,
-      duration: 0.4,
-      ease: [0, 0, 0.2, 1] as const,
-      delay: i * 0.08,
-    },
-  }),
-};
+// Animations removed to prevent mobile scroll layout shifting
 
 export function ServicesSection() {
   const { t } = useLang();
@@ -103,12 +88,8 @@ export function ServicesSection() {
               const border = item.border || cardBorder;
 
               return (
-                <motion.article
+                <article
                   key={i}
-                  custom={i}
-                  variants={cardVariants}
-                  initial="hidden"
-                  animate={inView ? 'visible' : 'hidden'}
                   className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-7 group cursor-default premium-card-sub overflow-hidden transition-shadow duration-300 flex flex-col bg-card/60 backdrop-blur-md sm:hover:-translate-y-1 sm:transition-transform sm:duration-300`}
                 >
                   {/* Hover glow */}
@@ -145,7 +126,7 @@ export function ServicesSection() {
                     className="absolute bottom-0 left-6 right-6 h-px opacity-0 group-hover:opacity-40 transition-opacity duration-500"
                     style={{ backgroundColor: accent }}
                   />
-                </motion.article>
+                </article>
               );
             })}
           </div>

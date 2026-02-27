@@ -9,29 +9,7 @@ const fallbackStyles = [
   { icon: Target, gradient: 'linear-gradient(135deg, #d946a8, #6c5ce7)', shadow: '0 8px 30px rgba(217, 70, 168, 0.35)' },
 ];
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.18,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const memberVariants = {
-  hidden: { opacity: 0, y: 15, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: 'tween' as const,
-      duration: 0.4,
-      ease: [0, 0, 0.2, 1] as const,
-    },
-  },
-};
+// Animations removed to prevent mobile scroll layout shifting
 
 const FALLBACK_MEMBERS = [
   { name: 'Adnan Shahria', role: 'Founder & CEO', image: '' },
@@ -68,20 +46,14 @@ export function LeadershipSection() {
             <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">{t.leadership.subtitle}</p>
           </motion.div>
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate={inView ? 'visible' : 'hidden'}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-          >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {sortedMembers.map((member: any, i: number) => {
               const style = fallbackStyles[i % fallbackStyles.length];
               const hasImage = !!member.image;
 
               return (
-                <motion.div
+                <div
                   key={i}
-                  variants={memberVariants}
                   className="glass-effect bg-card/40 rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 text-center group transition-all duration-300 premium-card-sub sm:hover:-translate-y-1"
                 >
                   {/* Circular photo or fallback icon */}
@@ -107,10 +79,10 @@ export function LeadershipSection() {
                   </motion.div>
                   <h3 className="font-display text-sm sm:text-xl lg:text-2xl font-bold text-foreground mb-0.5 sm:mb-1.5 leading-tight">{member.name}</h3>
                   <p className="text-neon-amber text-[10px] sm:text-sm lg:text-base font-bold tracking-wide uppercase">{member.role}</p>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
 
           {/* Optional Tagline Card below members */}
           {tagline && (
