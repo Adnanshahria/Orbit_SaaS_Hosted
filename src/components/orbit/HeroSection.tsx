@@ -56,7 +56,6 @@ export function HeroSection() {
 
   // Staggered word animation for the subtitle
   const subtitle = t.hero.subtitle || '';
-  const words = subtitle.split(' ');
 
   // Loader sync: Only delay if this is the absolute first visit (loader runs for 3.5s)
   const [isFirstVisit] = useState(!sessionStorage.getItem('orbit_has_visited'));
@@ -138,7 +137,7 @@ export function HeroSection() {
                 <motion.div
                   initial={{ scale: 0.3, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 2.5, opacity: 0 }}
+                  exit={{ scale: 1.8, opacity: 0 }}
                   transition={{
                     type: 'spring',
                     stiffness: 60,
@@ -160,8 +159,8 @@ export function HeroSection() {
                 revealedCount > i && (
                   <motion.span
                     key={letter}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{
                       duration: 0.8,
                       ease: [0.25, 0.46, 0.45, 0.94],
@@ -206,22 +205,18 @@ export function HeroSection() {
             </AnimatePresence>
           </div>
 
-          {/* Subtitle — word-by-word reveal */}
-          <motion.p className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-[2.5dvh] sm:mb-12 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
-            {words.map((word, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.4,
-                  delay: baseDelay + 0.9 + i * 0.04,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-              >
-                {word}
-              </motion.span>
-            ))}
+          {/* Subtitle — smooth fade-up reveal with no word-clipping */}
+          <motion.p
+            initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{
+              duration: 0.9,
+              delay: baseDelay + 0.85,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
+            className="text-muted-foreground text-xs sm:text-base md:text-lg max-w-3xl mx-auto mb-[2.5dvh] sm:mb-12 leading-relaxed font-medium text-center px-2"
+          >
+            {subtitle}
           </motion.p>
 
           {/* CTA buttons — slide up with spring */}

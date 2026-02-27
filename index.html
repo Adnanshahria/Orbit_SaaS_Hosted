@@ -1,7 +1,24 @@
 <!doctype html>
-<html lang="en" dir="ltr" class="dark">
+<html lang="en" dir="ltr" class="dark hide-scrollbar">
 
 <head>
+  <!-- Critical: hide scrollbar before any CSS/JS loads -->
+  <style>
+    html.hide-scrollbar,
+    html.hide-scrollbar body {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    html.hide-scrollbar::-webkit-scrollbar,
+    html.hide-scrollbar body::-webkit-scrollbar,
+    html.hide-scrollbar *::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+  </style>
   <meta charset="UTF-8" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content" />
@@ -340,7 +357,8 @@
           eCommerce platforms, and enterprise web applications.</p>
         <p>Whether you search for <strong>Orbot</strong>, <strong>Assa</strong>, <strong>Orbit SAS</strong>,
           <strong>orbit sass</strong>, or <strong>ORBIT SaaS</strong> — you've found the right place. ORBIT SaaS is the
-          premier software development agency you've been looking for.</p>
+          premier software development agency you've been looking for.
+        </p>
       </header>
 
       <nav>
@@ -444,6 +462,7 @@
   </noscript>
   <div id="root"></div>
   <script type="module" src="./src/main.tsx"></script>
+  <script>setTimeout(function () { document.documentElement.classList.remove('hide-scrollbar') }, 7000)</script>
 </body>
 
 </html>

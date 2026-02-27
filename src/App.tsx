@@ -87,6 +87,7 @@ function PublicSite() {
     return () => clearTimeout(timer);
   }, [isLoaded]);
 
+
   // Defer chatbot loading until well after page is loaded
   useEffect(() => {
     if (!isLoaded) return;

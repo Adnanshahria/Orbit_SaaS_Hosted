@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, BookOpen, Loader2 } from 'lucide-react';
+import { X, Send, Rocket, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLang } from '@/contexts/LanguageContext';
 
@@ -121,7 +121,7 @@ export function LeadMagnetPopup() {
                         <div className="px-5 sm:px-6 pb-6 sm:pb-8 pt-0 relative z-10 -mt-10 sm:-mt-12 text-center">
                             <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto bg-card border border-border shadow-lg rounded-2xl flex items-center justify-center mb-4 sm:mb-5 lg:mb-6 relative group">
                                 <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-                                <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-primary relative z-10" />
+                                <Rocket className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-primary relative z-10" />
                             </div>
 
                             <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold mb-2">

@@ -33,12 +33,20 @@ const memberVariants = {
   },
 };
 
+const FALLBACK_MEMBERS = [
+  { name: 'Adnan Shahria', role: 'Founder & CEO', image: '' },
+  { name: 'Lead Developer', role: 'Full Stack Engineer', image: '' },
+  { name: 'AI Engineer', role: 'AI & Automation Lead', image: '' },
+  { name: 'Design Lead', role: 'UI/UX Designer', image: '' },
+];
+
 export function LeadershipSection() {
   const { t } = useLang();
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
-  const members = t.leadership.members || [];
+  const rawMembers: any[] = t.leadership.members || [];
+  const members = rawMembers.length > 0 ? rawMembers : FALLBACK_MEMBERS;
   const sortedMembers = [...members].sort(
     (a: any, b: any) => (a.order ?? 999) - (b.order ?? 999)
   );
