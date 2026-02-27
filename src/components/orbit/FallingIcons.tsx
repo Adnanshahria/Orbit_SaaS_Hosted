@@ -6,6 +6,7 @@ import {
     Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette, Brain, Wrench
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import orbitLogo from '@/assets/orbit-logo.png';
 
 export const ICON_MAP: Record<string, LucideIcon> = {
     Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud,
@@ -13,12 +14,17 @@ export const ICON_MAP: Record<string, LucideIcon> = {
     Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette, Brain, Wrench
 };
 export const ALL_ICON_NAMES = Object.keys(ICON_MAP);
-const FALLBACK_ICONS = ['Brain', 'Wrench', 'Zap', 'Shield', 'Target', 'Rocket', 'Globe', 'Bot'];
+const FALLBACK_ICONS = ['Zap', 'Sparkles', 'Globe', 'Bot', 'Code', 'Database', 'Cpu', 'Smartphone'];
 const ORBIT_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#8b5cf6', '#22d3ee'];
 
+// 2D Projection constants
+const SQUASH = Math.cos((65 * Math.PI) / 180); // cos(65°) ≈ 0.4226
+const UNSQUASH = 1 / SQUASH; // ≈ 2.366
+
 /**
- * Global background with 3D planetary orbital rotation.
- * Reads enabled icons from content.en.fallingIcons.
+ * Global background with 2D projected planetary orbital rotation.
+ * Optimized for low-end devices with GPU compositing, will-change hints,
+ * CSS containment, reduced filter complexity, and prefers-reduced-motion support.
  */
 export function FallingIcons() {
     const { content } = useContent();
@@ -44,157 +50,209 @@ export function FallingIcons() {
         return true;
     }, [content]);
 
+    const ORBIT_RADII = [150, 250, 350, 450, 550, 650, 750, 850];
+
     const particles = useMemo(() => {
-        // Map over exactly the selected icons so each shows up only once
         return iconNames.map((iconName, i) => {
             const Icon = ICON_MAP[iconName] || Zap;
-
-            // Randomize orbit properties
-            const radius = 100 + Math.random() * 500; // Orbit distance from center
-            const orbitDuration = 30 + Math.random() * 60; // 30s-90s to complete one orbit
-            const delay = -Math.random() * orbitDuration; // Random phase start
-            const spinDuration = 4 + Math.random() * 8; // 4-12s spin on own 2D axis
-            const isReverse = Math.random() > 0.5; // Orbit direction
-
-            const size = 18 + Math.random() * 16;
-            const opacity = 0.40 + Math.random() * 0.4;
-            const color = ORBIT_COLORS[Math.floor(Math.random() * ORBIT_COLORS.length)];
-
+            const radius = ORBIT_RADII[i % ORBIT_RADII.length];
+            const orbitDuration = 80 - i * 7;
+            const delay = -Math.random() * orbitDuration;
+            const spinDuration = 4 + Math.random() * 8;
+            const isReverse = i % 2 === 1;
+            const size = 20 + Math.random() * 12;
+            const opacity = 0.50 + Math.random() * 0.3;
+            const color = ORBIT_COLORS[i % ORBIT_COLORS.length];
             return { Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key: i };
         });
     }, [iconNames]);
 
     if (!isEnabled) return null;
 
-    const TILT_ANGLE = 65; // Degrees of isometric tilt for the solar system
-    const SYSTEM_ROTATE_SPEED = 180; // Seconds for the entire solar system to align once
+    const SYSTEM_ROTATE_SPEED = 180;
 
     return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 flex items-center justify-center" aria-hidden style={{ perspective: '1200px' }}>
+        <div
+            className="fixed inset-0 overflow-hidden pointer-events-none z-0 flex items-center justify-center"
+            aria-hidden
+            style={{ contain: 'strict' }}
+        >
             <style>{`
-                /* Global slow rotation of the whole solar system */
+                /* ===== KEYFRAMES — only transform & opacity for GPU compositing ===== */
                 @keyframes systemSpin {
-                    0%   { transform: rotateZ(0deg); }
-                    100% { transform: rotateZ(360deg); }
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(360deg); }
                 }
-                /* Counter-rotation to keep icons oriented correctly relative to global spin */
                 @keyframes counterSystemSpin {
-                    0%   { transform: rotateZ(0deg); }
-                    100% { transform: rotateZ(-360deg); }
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(-360deg); }
                 }
-                /* Individual planet orbit around the sun */
                 @keyframes orbitAnim {
-                    0%   { transform: rotateZ(0deg); }
-                    100% { transform: rotateZ(360deg); }
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(360deg); }
                 }
-                /* Counter-rotation to keep icons oriented correctly relative to their orbit */
                 @keyframes counterOrbitAnim {
-                    0%   { transform: rotateZ(0deg); }
-                    100% { transform: rotateZ(-360deg); }
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(-360deg); }
                 }
-                /* 2D Spin (like a steering wheel) facing the camera */
                 @keyframes selfSpin {
-                    0%   { transform: rotateX(-${TILT_ANGLE}deg) rotateZ(0deg); }
-                    100% { transform: rotateX(-${TILT_ANGLE}deg) rotateZ(360deg); }
+                    from { transform: rotate(0deg); }
+                    to   { transform: rotate(360deg); }
                 }
-                /* Slow drift of the entire solar system across the screen */
                 @keyframes systemDrift {
-                    0%   { transform: translate(0px, 0px) rotateX(${TILT_ANGLE}deg); }
-                    33%  { transform: translate(3vw, -4vh) rotateX(${TILT_ANGLE}deg); }
-                    66%  { transform: translate(-2vw, 5vh) rotateX(${TILT_ANGLE}deg); }
-                    100% { transform: translate(0px, 0px) rotateX(${TILT_ANGLE}deg); }
+                    0%   { transform: translate(0px, 0px); }
+                    33%  { transform: translate(3vw, -4vh); }
+                    66%  { transform: translate(-2vw, 5vh); }
+                    100% { transform: translate(0px, 0px); }
+                }
+                @keyframes sunPulse {
+                    0%, 100% { transform: scale(1); opacity: 0.4; }
+                    50%      { transform: scale(1.15); opacity: 0.6; }
+                }
+
+                /* ===== REDUCED MOTION — respect user/device preference ===== */
+                @media (prefers-reduced-motion: reduce) {
+                    .orbit-animated { animation: none !important; }
+                    .orbit-glow-ring { animation: none !important; opacity: 0.3; }
                 }
             `}</style>
 
-            {/* The Solar System Container (Tilted in 3D space and drifting) */}
+            {/* Drift wrapper */}
             <div
-                className="relative"
+                className="relative orbit-animated"
                 style={{
-                    animation: `systemDrift 40s ease-in-out infinite`,
-                    transformStyle: 'preserve-3d',
+                    animation: 'systemDrift 40s ease-in-out infinite',
+                    willChange: 'transform',
                     width: 0,
                     height: 0
                 }}
             >
-                {/* Rotating Frame for everything inside the solar system */}
+                {/* ScaleY wrapper — squashes circles into ellipses */}
                 <div
                     className="absolute inset-0"
-                    style={{
-                        animation: `systemSpin ${SYSTEM_ROTATE_SPEED}s linear infinite`,
-                        transformStyle: 'preserve-3d',
-                    }}
+                    style={{ transform: `scaleY(${SQUASH})` }}
                 >
-                    {/* Orbit Rings (Dashed circles to show the planetary paths rotating) */}
-                    {[150, 250, 350, 450, 550, 650].map((r, idx) => (
+                    {/* Rotating Frame */}
+                    <div
+                        className="absolute inset-0 orbit-animated"
+                        style={{
+                            animation: `systemSpin ${SYSTEM_ROTATE_SPEED}s linear infinite`,
+                            willChange: 'transform',
+                        }}
+                    >
+                        {/* ===== SUN: Logo with layered glow ===== */}
                         <div
-                            key={`ring-${idx}`}
-                            className="absolute rounded-full border-primary/10 border-dashed"
-                            style={{
-                                width: r * 2,
-                                height: r * 2,
-                                left: -r,
-                                top: -r,
-                                transform: 'translateZ(-1px)', // Keep rings slightly below icons
-                                borderWidth: '1px'
-                            }}
-                        />
-                    ))}
-
-                    {/* Orbiting Icons */}
-                    {particles.map(({ Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key }) => (
-                        <div
-                            key={key}
                             className="absolute flex items-center justify-center"
                             style={{
-                                animation: `orbitAnim ${orbitDuration}s ${delay}s linear infinite`,
-                                animationDirection: isReverse ? 'reverse' : 'normal',
-                                transformStyle: 'preserve-3d',
+                                left: -60,
+                                top: -60,
+                                width: 120,
+                                height: 120,
+                                transform: `scaleY(${UNSQUASH})`,
+                                contain: 'layout style',
                             }}
                         >
-                            {/* Push the icon out to its orbit radius */}
+                            {/* Single combined glow ring instead of 3 separate layers */}
                             <div
+                                className="absolute rounded-full orbit-glow-ring"
                                 style={{
-                                    transform: `translateX(${radius}px)`,
-                                    transformStyle: 'preserve-3d',
+                                    width: 160,
+                                    height: 160,
+                                    background: 'radial-gradient(circle, rgba(251,191,36,0.4) 0%, rgba(251,191,36,0.15) 30%, rgba(16,185,129,0.08) 55%, transparent 70%)',
+                                    animation: 'sunPulse 4s ease-in-out infinite',
+                                    willChange: 'transform, opacity',
+                                }}
+                            />
+                            {/* The actual logo */}
+                            <img
+                                src={orbitLogo}
+                                alt=""
+                                className="relative z-10 orbit-animated"
+                                style={{
+                                    width: 36,
+                                    height: 36,
+                                    objectFit: 'contain',
+                                    opacity: 0.35,
+                                    filter: 'drop-shadow(0 0 12px rgba(251,191,36,0.9)) drop-shadow(0 0 30px rgba(16,185,129,0.4))',
+                                    animation: 'selfSpin 30s linear infinite',
+                                    willChange: 'transform',
+                                }}
+                            />
+                        </div>
+
+                        {/* Orbit Rings — pure CSS borders, no filters */}
+                        {ORBIT_RADII.slice(0, iconNames.length).map((r, idx) => (
+                            <div
+                                key={`ring-${idx}`}
+                                className="absolute rounded-full border-primary/10 border-dashed"
+                                style={{
+                                    width: r * 2,
+                                    height: r * 2,
+                                    left: -r,
+                                    top: -r,
+                                    borderWidth: '1px'
+                                }}
+                            />
+                        ))}
+
+                        {/* Orbiting Icons */}
+                        {particles.map(({ Icon, size, radius, delay, orbitDuration, spinDuration, isReverse, opacity, color, key }) => (
+                            <div
+                                key={key}
+                                className="absolute flex items-center justify-center orbit-animated"
+                                style={{
+                                    animation: `orbitAnim ${orbitDuration}s ${delay}s linear infinite`,
+                                    animationDirection: isReverse ? 'reverse' : 'normal',
+                                    willChange: 'transform',
+                                    contain: 'layout style',
                                 }}
                             >
-                                {/* Counter-rotate the local orbit so the icon faces 0 deg Z before self-spin */}
-                                <div
-                                    style={{
-                                        animation: `counterOrbitAnim ${orbitDuration}s ${delay}s linear infinite`,
-                                        animationDirection: isReverse ? 'reverse' : 'normal',
-                                        transformStyle: 'preserve-3d',
-                                    }}
-                                >
-                                    {/* Counter-rotate the global system spin so it stays perfectly aligned */}
+                                {/* Push icon out to orbit radius */}
+                                <div style={{ transform: `translateX(${radius}px)` }}>
+                                    {/* Counter-rotate */}
                                     <div
+                                        className="orbit-animated"
                                         style={{
-                                            animation: `counterSystemSpin ${SYSTEM_ROTATE_SPEED}s linear infinite`,
-                                            transformStyle: 'preserve-3d',
+                                            animation: `counterOrbitAnim ${orbitDuration}s ${delay}s linear infinite`,
+                                            animationDirection: isReverse ? 'reverse' : 'normal',
+                                            willChange: 'transform',
                                         }}
                                     >
-                                        {/* Tilt back to face the camera, then spin 2D */}
                                         <div
+                                            className="orbit-animated"
                                             style={{
-                                                animation: `selfSpin ${spinDuration}s linear infinite`,
-                                                transformStyle: 'preserve-3d',
+                                                animation: `counterSystemSpin ${SYSTEM_ROTATE_SPEED}s linear infinite`,
+                                                willChange: 'transform',
                                             }}
                                         >
-                                            <Icon
-                                                style={{
-                                                    width: size,
-                                                    height: size,
-                                                    color,
-                                                    opacity,
-                                                    filter: `drop-shadow(0px 8px 6px rgba(0,0,0,0.6)) drop-shadow(0px 3px 3px rgba(0,0,0,0.8))`
-                                                }}
-                                            />
+                                            {/* Un-squash */}
+                                            <div style={{ transform: `scaleY(${UNSQUASH})` }}>
+                                                {/* 2D self-spin */}
+                                                <div
+                                                    className="orbit-animated"
+                                                    style={{
+                                                        animation: `selfSpin ${spinDuration}s linear infinite`,
+                                                        willChange: 'transform',
+                                                    }}
+                                                >
+                                                    <Icon
+                                                        style={{
+                                                            width: size,
+                                                            height: size,
+                                                            color,
+                                                            opacity,
+                                                            // Single drop-shadow instead of double
+                                                            filter: `drop-shadow(0px 4px 4px rgba(0,0,0,0.5))`
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
