@@ -43,7 +43,6 @@ const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const Chatbot = lazy(() => import('./components/orbit/Chatbot').then(m => ({ default: m.Chatbot })));
 const LeadMagnetPopup = lazy(() => import('./components/orbit/LeadMagnetPopup').then(m => ({ default: m.LeadMagnetPopup })));
 import { GlobalBackground } from './components/orbit/GlobalBackground';
-import { FallingIcons } from './components/orbit/FallingIcons';
 
 // Low-end device detection — applies .low-perf class to <html>
 function detectLowEndDevice() {
@@ -123,7 +122,6 @@ function PublicSite() {
     <>
       <StructuredData />
       <GlobalBackground />
-      <FallingIcons />
       <div className="min-h-[100dvh] text-foreground relative z-0">
         <Navbar />
         <main>

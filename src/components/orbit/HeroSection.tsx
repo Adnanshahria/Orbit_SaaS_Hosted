@@ -117,6 +117,7 @@ export function HeroSection() {
 
       <div
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+        style={{ contain: 'none' }}
       >
         <div className="px-4 sm:px-14 py-[3dvh] sm:py-10 flex flex-col justify-between items-center min-h-[55dvh] sm:min-h-0">
           {/* Badge — slides down with spring */}
