@@ -10,10 +10,10 @@
  */
 
 // Generate random star data for the 3D zoom out effect
-const NUM_STARS = 45;
+const NUM_STARS = 60; // Increased count since some will be off-screen in the corners of the spinning box
 
-const ZOOM_STARS = Array.from({ length: NUM_STARS }).map((_, i) => {
-    // Random position across the screen
+const generateStars = (count: number) => Array.from({ length: count }).map((_, i) => {
+    // Random position across the container (0-100%)
     const rawX = Math.random() * 100;
     const rawY = Math.random() * 100;
 
@@ -23,56 +23,54 @@ const ZOOM_STARS = Array.from({ length: NUM_STARS }).map((_, i) => {
     const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
     // Calculate target translation (tx, ty) to move the star outward.
-    // We normalize the vector (dx/dist, dy/dist) and multiply by a large distance (e.g. 60-100vw/vh)
-    const travelDist = 60 + Math.random() * 60;
+    const travelDist = 60 + Math.random() * 80;
     const tx = (dx / dist) * travelDist;
     const ty = (dy / dist) * travelDist;
 
-    // We start them slightly clamped so they don't immediately spawn off-screen
-    const startX = 50 + dx * 0.3;
-    const startY = 50 + dy * 0.3;
+    // Start slightly clamped so they don't immediately spawn off-screen
+    const startX = 50 + dx * 0.2;
+    const startY = 50 + dy * 0.2;
 
     return {
         id: i,
-        // Start position
         x: startX,
         y: startY,
-        // Target translation passed as CSS custom properties
         tx: tx.toFixed(2),
         ty: ty.toFixed(2),
-        // Random properties
         size: 0.8 + Math.random() * 1.5,
         opacity: 0.4 + Math.random() * 0.6,
         // Theme Colors: Amber-400 (#fbbf24), Emerald-400 (#34d399), White (#ffffff)
-        color: Math.random() > 0.8 ? '#fbbf24' : Math.random() > 0.6 ? '#34d399' : '#ffffff',
-        // Animation timing
-        dur: 6 + Math.random() * 14, // 6 to 20 seconds to reach camera
+        color: Math.random() > 0.85 ? '#fbbf24' : Math.random() > 0.7 ? '#34d399' : '#ffffff',
+        dur: 8 + Math.random() * 16,
         delay: Math.random() * -20, // Negative delay so they start already flying!
-        // How big they get as they approach camera
-        scale: 2 + Math.random() * 3,
+        scale: 2 + Math.random() * 3.5,
     };
 });
 
+// Split into two sets for counter-rotating fields
+const ZOOM_STARS_1 = generateStars(NUM_STARS / 2);
+const ZOOM_STARS_2 = generateStars(NUM_STARS / 2);
+
 const SHOOTING_STARS = [
-    { id: 1, x: 5, y: 5, width: 120, angle: 35, dur: 1.8, delay: 2, opacity: 0.85 },
-    { id: 2, x: 70, y: -5, width: 100, angle: 42, dur: 1.5, delay: 9, opacity: 0.7 },
-    { id: 3, x: 20, y: 10, width: 140, angle: 30, dur: 2.0, delay: 17, opacity: 0.9 },
-    { id: 4, x: 85, y: 0, width: 90, angle: 45, dur: 1.4, delay: 25, opacity: 0.6 },
-    { id: 5, x: 40, y: -5, width: 110, angle: 38, dur: 1.7, delay: 35, opacity: 0.8 },
+    { id: 1, x: 15, y: 5, width: 120, angle: 35, dur: 1.8, delay: 2, opacity: 0.85 },
+    { id: 2, x: 80, y: -5, width: 100, angle: 42, dur: 1.5, delay: 9, opacity: 0.7 },
+    { id: 3, x: 25, y: 15, width: 140, angle: 30, dur: 2.0, delay: 17, opacity: 0.9 },
+    { id: 4, x: 90, y: 0, width: 90, angle: 45, dur: 1.4, delay: 25, opacity: 0.6 },
+    { id: 5, x: 45, y: -5, width: 110, angle: 38, dur: 1.7, delay: 35, opacity: 0.8 },
 ];
 
 export function MobileStarField() {
     return (
         <div
             className="fixed inset-0 w-full h-[100dvh] pointer-events-none select-none overflow-hidden"
-            style={{ zIndex: -49 }} // Removed opacity fade to keep stars crisp
+            style={{ zIndex: -49 }}
             aria-hidden
         >
             {/* ── 1. Deep Cosmic Void Base ── */}
             <div className="absolute inset-0 bg-[#000000]" />
 
-            {/* ── 2. Rich Deep Galaxy Dust & Nebulas (Mix-blend for richness) ── */}
-            {/* Neon Green / Emerald Cloud - Darker */}
+            {/* ── 2. Rich Deep Galaxy Dust & Nebulas ── */}
+            {/* Neon Green / Emerald Cloud */}
             <div className="absolute inset-0"
                 style={{
                     background: 'radial-gradient(ellipse at 30% 70%, rgba(16, 185, 129, 0.08) 0%, rgba(4, 47, 46, 0.03) 50%, transparent 100%)',
@@ -82,7 +80,7 @@ export function MobileStarField() {
                     ['--neb-hi' as any]: '1'
                 }}
             />
-            {/* Orange-Gold / Amber Cloud - Darker */}
+            {/* Orange-Gold / Amber Cloud */}
             <div className="absolute inset-0"
                 style={{
                     background: 'radial-gradient(ellipse at 80% 30%, rgba(245, 158, 11, 0.06) 0%, rgba(120, 53, 15, 0.02) 60%, transparent 100%)',
@@ -92,7 +90,7 @@ export function MobileStarField() {
                     ['--neb-hi' as any]: '0.9'
                 }}
             />
-            {/* Ambient Cosmic Dust Diagonal (Emerald/Amber mix) - Very faint */}
+            {/* Ambient Cosmic Dust Diagonal */}
             <div className="absolute inset-0"
                 style={{
                     background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, transparent 40%, rgba(245, 158, 11, 0.03) 100%)'
@@ -101,7 +99,7 @@ export function MobileStarField() {
 
             {/* ── 3. Distant Beautiful Spiral Galaxy Element ── */}
             <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vw] sm:w-[90vw] sm:h-[90vw] mix-blend-screen opacity-50">
-                {/* Galactic Core Glow (Amber/Gold) - Smaller, dimmer */}
+                {/* Galactic Core Glow */}
                 <div className="absolute inset-0 rounded-full"
                     style={{
                         background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(245,158,11,0.08) 10%, rgba(217,119,6,0.03) 30%, transparent 50%)',
@@ -111,7 +109,7 @@ export function MobileStarField() {
                     }}
                 />
 
-                {/* Spiral Disk Body (Neon Green / Teal) - Darker */}
+                {/* Spiral Disk Body */}
                 <div className="absolute inset-0 rounded-full"
                     style={{
                         background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, rgba(20,184,166,0.03) 40%, transparent 60%)',
@@ -122,7 +120,7 @@ export function MobileStarField() {
                     }}
                 />
 
-                {/* Second Spiral Arm (Amber) - Darker */}
+                {/* Second Spiral Arm */}
                 <div className="absolute inset-0 rounded-full"
                     style={{
                         background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.05) 0%, rgba(217,119,6,0.02) 30%, transparent 50%)',
@@ -134,29 +132,60 @@ export function MobileStarField() {
                 />
             </div>
 
-            {/* ── 4. Floating 3D Zooming Stars (Flying through space) ── */}
-            {ZOOM_STARS.map((s) => (
-                <div
-                    key={`z-${s.id}`}
-                    className="absolute rounded-full"
-                    style={{
-                        left: `${s.x}%`,
-                        top: `${s.y}%`,
-                        width: `${s.size}px`,
-                        height: `${s.size}px`,
-                        background: s.color,
-                        // The opacity is controlled by the animation, but we pass the max opacity
-                        ['--star-op' as any]: s.opacity,
-                        ['--tx' as any]: s.tx,
-                        ['--ty' as any]: s.ty,
-                        ['--star-scale' as any]: s.scale,
-                        boxShadow: `0 0 ${s.size * 2}px ${s.color}`,
-                        animation: `starZoom ${s.dur}s ease-in ${s.delay}s infinite`,
-                        opacity: 0, // Starts at 0 until animation kicks in
-                        willChange: 'transform, opacity',
-                    }}
-                />
-            ))}
+            {/* ── 4. Floating 3D Zooming Stars (Dynamic Infinite Variation) ── */}
+            {/* By placing the stars in a massive spinning container, their outward flight paths 
+                rotate over time. This makes the CSS keyframes feel infinitely random as no star 
+                will ever cross exactly the same path twice. */}
+
+            {/* Layer 1: Forward Rotation */}
+            <div className="absolute top-1/2 left-1/2 w-[180vw] h-[180vw]"
+                style={{ animation: 'starFieldRotate 180s linear infinite' }}
+            >
+                {ZOOM_STARS_1.map((s) => (
+                    <div
+                        key={`z1-${s.id}`}
+                        className="absolute rounded-full"
+                        style={{
+                            left: `${s.x}%`, top: `${s.y}%`,
+                            width: `${s.size}px`, height: `${s.size}px`,
+                            background: s.color,
+                            ['--star-op' as any]: s.opacity,
+                            ['--tx' as any]: s.tx,
+                            ['--ty' as any]: s.ty,
+                            ['--star-scale' as any]: s.scale,
+                            boxShadow: `0 0 ${s.size * 2}px ${s.color}`,
+                            animation: `starZoom ${s.dur}s ease-in ${s.delay}s infinite`,
+                            opacity: 0,
+                            willChange: 'transform, opacity',
+                        }}
+                    />
+                ))}
+            </div>
+
+            {/* Layer 2: Counter-Rotation */}
+            <div className="absolute top-1/2 left-1/2 w-[180vw] h-[180vw]"
+                style={{ animation: 'starFieldRotateReverse 240s linear infinite' }}
+            >
+                {ZOOM_STARS_2.map((s) => (
+                    <div
+                        key={`z2-${s.id}`}
+                        className="absolute rounded-full"
+                        style={{
+                            left: `${s.x}%`, top: `${s.y}%`,
+                            width: `${s.size}px`, height: `${s.size}px`,
+                            background: s.color,
+                            ['--star-op' as any]: s.opacity,
+                            ['--tx' as any]: s.tx,
+                            ['--ty' as any]: s.ty,
+                            ['--star-scale' as any]: s.scale,
+                            boxShadow: `0 0 ${s.size * 2}px ${s.color}`,
+                            animation: `starZoom ${s.dur}s ease-in ${s.delay}s infinite`,
+                            opacity: 0,
+                            willChange: 'transform, opacity',
+                        }}
+                    />
+                ))}
+            </div>
 
             {/* ── 5. Shooting Stars ── */}
             {SHOOTING_STARS.map((s) => (

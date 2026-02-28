@@ -179,6 +179,27 @@
 
 /* ── Deep Space Flight (3D Zoom Parallax) ── */
 
+/* Continuous slow rotation to randomize flight paths */
+@keyframes starFieldRotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes starFieldRotateReverse {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+}
+
 @keyframes starZoom {
   0% {
     transform: scale(0.1) translate(0, 0);
