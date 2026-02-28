@@ -326,7 +326,8 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
               transition={{ type: 'spring', stiffness: 60, damping: 16 }}
-              className={`hidden sm:block relative mt-6 w-[450px] max-w-full mx-auto px-0 z-[100] ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+              className={`hidden sm:block absolute -bottom-16 left-1/2 -translate-x-1/2 w-[450px] max-w-full z-[100] ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+              style={{ visibility: (!showEmailBar || isCtaOpen) ? 'hidden' : 'visible' }}
             >
               <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
                 <input
