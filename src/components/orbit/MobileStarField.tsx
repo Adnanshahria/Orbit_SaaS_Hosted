@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 /**
  * MobileStarField — "3D Deep Space Flight" background for mobile / low-perf devices.
  *
@@ -5,8 +7,8 @@
  * - Deep dark space background with rich cosmic clouds (Neon Green, Emerald, Orange-Gold).
  * - "Flying through space" parallax: stars start from center, move outwards, and scale up (3D zoom effect).
  * - Distant galaxies and nebula clouds that pulse slowly.
- * - Shooting stars to add dynamism.
- * - All animated via CSS keyframes (`starZoom`, `nebulaBreath`) for 60fps compositor performance.
+ * - Dynamic Shooting stars generated via React to ensure 100% infinite variation in path/direction.
+ * - All animated via CSS keyframes (`starZoom`, `nebulaBreath`, `shootingStarDynamic`) for 60fps compositor performance.
  */
 
 // Generate random star data for the 3D zoom out effect
@@ -39,7 +41,6 @@ const generateStars = (count: number) => Array.from({ length: count }).map((_, i
         ty: ty.toFixed(2),
         size: 0.8 + Math.random() * 1.5,
         opacity: 0.4 + Math.random() * 0.6,
-        // Theme Colors: Amber-400 (#fbbf24), Emerald-400 (#34d399), White (#ffffff)
         color: Math.random() > 0.85 ? '#fbbf24' : Math.random() > 0.7 ? '#34d399' : '#ffffff',
         dur: 8 + Math.random() * 16,
         delay: Math.random() * -20, // Negative delay so they start already flying!
@@ -51,15 +52,74 @@ const generateStars = (count: number) => Array.from({ length: count }).map((_, i
 const ZOOM_STARS_1 = generateStars(NUM_STARS / 2);
 const ZOOM_STARS_2 = generateStars(NUM_STARS / 2);
 
-const SHOOTING_STARS = [
-    { id: 1, x: 15, y: 5, width: 120, angle: 35, dur: 1.8, delay: 2, opacity: 0.85 },
-    { id: 2, x: 80, y: -5, width: 100, angle: 42, dur: 1.5, delay: 9, opacity: 0.7 },
-    { id: 3, x: 25, y: 15, width: 140, angle: 30, dur: 2.0, delay: 17, opacity: 0.9 },
-    { id: 4, x: 90, y: 0, width: 90, angle: 45, dur: 1.4, delay: 25, opacity: 0.6 },
-    { id: 5, x: 45, y: -5, width: 110, angle: 38, dur: 1.7, delay: 35, opacity: 0.8 },
-];
-
 export function MobileStarField() {
+    // Dynamic shooting stars spawner logic
+    const [shootingStars, setShootingStars] = useState<{
+        id: number;
+        left: string;
+        top: string;
+        angle: number;
+        dur: number;
+        travel: string;
+        width: number;
+        opacity: number;
+    }[]>([]);
+
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        let nextId = 0;
+
+        function spawnStar() {
+            const origin = Math.random();
+            let left, top, angle;
+
+            if (origin < 0.33) {
+                // Originate from Top, travel down and slightly across
+                left = -10 + (Math.random() * 120) + '%';
+                top = '-10%';
+                angle = 20 + Math.random() * 140; // 20 to 160 deg (downwards)
+            } else if (origin < 0.66) {
+                // Originate from Left edge, travel rightwards
+                left = '-10%';
+                top = -10 + (Math.random() * 80) + '%';
+                angle = -20 + Math.random() * 80; // -20 to 60 deg (rightwards)
+            } else {
+                // Originate from Right edge, travel leftwards
+                left = '110%';
+                top = -10 + (Math.random() * 80) + '%';
+                angle = 120 + Math.random() * 80; // 120 to 200 deg (leftwards)
+            }
+
+            const dur = 1.0 + Math.random() * 2.0; // 1s to 3s duration
+            const newStar = {
+                id: ++nextId,
+                left,
+                top,
+                angle,
+                dur,
+                travel: 100 + Math.random() * 100 + 'vw', // distance to travel visually
+                width: 60 + Math.random() * 100, // trail length
+                opacity: 0.5 + Math.random() * 0.5
+            };
+
+            setShootingStars(prev => [...prev, newStar]);
+
+            // Remove star node exactly when animation completes + 100ms safety buffer
+            setTimeout(() => {
+                setShootingStars(prev => prev.filter(s => s.id !== newStar.id));
+            }, dur * 1000 + 100);
+
+            // Schedule the NEXT shooting star (appear every 1s to 6s)
+            const nextDelay = 1000 + Math.random() * 5000;
+            timeoutId = setTimeout(spawnStar, nextDelay);
+        }
+
+        // Start initial spawn quickly
+        timeoutId = setTimeout(spawnStar, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, []);
+
     return (
         <div
             className="fixed inset-0 w-full h-[100dvh] pointer-events-none select-none overflow-hidden"
@@ -70,7 +130,7 @@ export function MobileStarField() {
             <div className="absolute inset-0 bg-[#000000]" />
 
             {/* ── 2. Rich Deep Galaxy Dust & Nebulas ── */}
-            {/* Neon Green / Emerald Cloud */}
+            {/* Neon Green / Emerald Cloud - Darker */}
             <div className="absolute inset-0"
                 style={{
                     background: 'radial-gradient(ellipse at 30% 70%, rgba(16, 185, 129, 0.08) 0%, rgba(4, 47, 46, 0.03) 50%, transparent 100%)',
@@ -80,7 +140,7 @@ export function MobileStarField() {
                     ['--neb-hi' as any]: '1'
                 }}
             />
-            {/* Orange-Gold / Amber Cloud */}
+            {/* Orange-Gold / Amber Cloud - Darker */}
             <div className="absolute inset-0"
                 style={{
                     background: 'radial-gradient(ellipse at 80% 30%, rgba(245, 158, 11, 0.06) 0%, rgba(120, 53, 15, 0.02) 60%, transparent 100%)',
@@ -133,10 +193,6 @@ export function MobileStarField() {
             </div>
 
             {/* ── 4. Floating 3D Zooming Stars (Dynamic Infinite Variation) ── */}
-            {/* By placing the stars in a massive spinning container, their outward flight paths 
-                rotate over time. This makes the CSS keyframes feel infinitely random as no star 
-                will ever cross exactly the same path twice. */}
-
             {/* Layer 1: Forward Rotation */}
             <div className="absolute top-1/2 left-1/2 w-[180vw] h-[180vw]"
                 style={{ animation: 'starFieldRotate 180s linear infinite' }}
@@ -187,18 +243,19 @@ export function MobileStarField() {
                 ))}
             </div>
 
-            {/* ── 5. Shooting Stars ── */}
-            {SHOOTING_STARS.map((s) => (
+            {/* ── 5. Dynamic Shooting Stars (React Generated) ── */}
+            {shootingStars.map((s) => (
                 <div
                     key={`ss-${s.id}`}
                     className="absolute"
                     style={{
-                        left: `${s.x}%`, top: `${s.y}%`,
+                        left: s.left, top: s.top,
                         width: `${s.width}px`, height: '2px', borderRadius: '9999px',
-                        background: `linear-gradient(to right, transparent, rgba(255,255,255,${s.opacity}), rgba(16,185,129,0.4), transparent)`,
+                        // Bright white head, with a neon emerald/transparent tail
+                        background: `linear-gradient(to right, transparent 0%, rgba(16,185,129,0.3) 40%, rgba(255,255,255,${s.opacity}) 100%)`,
                         ['--angle' as any]: `${s.angle}deg`,
-                        animation: `shootingStar ${s.dur}s ease-out ${s.delay}s infinite`,
-                        opacity: 0,
+                        ['--travel' as any]: s.travel,
+                        animation: `shootingStarDynamic ${s.dur}s ease-in forwards`,
                         willChange: 'transform, opacity',
                     }}
                 />

@@ -220,24 +220,23 @@
   }
 }
 
-/* Shooting / falling star */
-@keyframes shootingStar {
+/* Shooting / falling star (Dynamic Trajectory) */
+@keyframes shootingStarDynamic {
   0% {
-    transform: translate(0, 0) rotate(var(--angle, 35deg));
+    transform: rotate(var(--angle)) translateX(0);
     opacity: 0;
   }
 
-  3% {
+  10% {
     opacity: 1;
   }
 
-  55% {
-    transform: translate(55vw, 55vw) rotate(var(--angle, 35deg));
+  70% {
     opacity: 0;
   }
 
   100% {
-    transform: translate(55vw, 55vw) rotate(var(--angle, 35deg));
+    transform: rotate(var(--angle)) translateX(var(--travel));
     opacity: 0;
   }
 }
