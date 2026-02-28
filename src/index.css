@@ -241,18 +241,16 @@
   }
 }
 
-/* Nebula pulse — glow breathes in and out */
+/* Nebula pulse — opacity only (compositor-friendly, no layout) */
 @keyframes nebulaBreath {
 
   0%,
   100% {
     opacity: var(--neb-lo, 0.5);
-    transform: scale(1);
   }
 
   50% {
     opacity: var(--neb-hi, 1);
-    transform: scale(1.05);
   }
 }
 
@@ -859,6 +857,19 @@ html {
   .animate-text-shimmer-orbit,
   .animate-text-shimmer-saas {
     animation: none !important;
+  }
+}
+
+/* ── Low-end mobile: slower / fewer animations ── */
+@media (max-width: 768px) {
+
+  /* Slow down the massive rotating containers to reduce GPU rasterization churn */
+  .star-layer-rotate {
+    animation-duration: 300s !important;
+  }
+
+  .star-layer-rotate-reverse {
+    animation-duration: 400s !important;
   }
 }
 
