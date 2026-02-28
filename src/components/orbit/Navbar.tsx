@@ -134,8 +134,15 @@ export function Navbar() {
       const id = href.substring(1);
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        window.history.pushState(null, '', href);
+        const doScroll = () => {
+          el.scrollIntoView({ behavior: 'smooth' });
+          window.history.pushState(null, '', href);
+        };
+        if ((document as any).startViewTransition) {
+          (document as any).startViewTransition(doScroll);
+        } else {
+          doScroll();
+        }
       }
     } else {
       navigate('/' + href);
