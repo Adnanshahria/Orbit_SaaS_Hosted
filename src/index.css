@@ -227,18 +227,66 @@
     opacity: 0;
   }
 
-  10% {
+  5% {
     opacity: 1;
   }
 
-  70% {
-    opacity: 0;
+  85% {
+    opacity: 0.8;
   }
 
   100% {
     transform: rotate(var(--angle)) translateX(var(--travel));
     opacity: 0;
   }
+}
+
+/* Spinning coding icon comet */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(var(--spin-to, 360deg)); }
+}
+
+/* Icon comet flight — stays fully visible throughout */
+@keyframes iconCometFly {
+  0% {
+    transform: rotate(var(--angle)) translateX(0);
+    opacity: 0;
+  }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% {
+    transform: rotate(var(--angle)) translateX(var(--travel));
+    opacity: 0;
+  }
+}
+
+/* Collision streak converging */
+@keyframes collisionStreak {
+  0% { opacity: 0; transform: rotate(var(--angle, 0deg)) scaleX(0.3); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--angle, 0deg)) scaleX(0); }
+}
+
+/* Comet approaching collision point */
+@keyframes cometApproach {
+  0% { opacity: 0; transform: translate(0, 0); }
+  10% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--toX), var(--toY)); }
+}
+
+/* Collision flash */
+@keyframes burstFlash {
+  0% { transform: translate(-50%,-50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-50%,-50%) scale(3); opacity: 0.8; }
+  100% { transform: translate(-50%,-50%) scale(5); opacity: 0; }
+}
+
+/* Collision particle */
+@keyframes burstParticle {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; }
 }
 
 /* Nebula pulse — opacity only (compositor-friendly, no layout) */

@@ -17,7 +17,7 @@ import { useEffect, useRef, useCallback } from 'react';
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
 // Adaptive star count: fewer on mobile
-const NUM_STARS = isMobile ? 20 : 40;
+const NUM_STARS = isMobile ? 40 : 80;
 
 const generateStars = (count: number) => Array.from({ length: count }).map((_, i) => {
     const rawX = Math.random() * 100;
@@ -76,7 +76,7 @@ export function MobileStarField() {
             angle = 120 + Math.random() * 80;
         }
 
-        const dur = 1.0 + Math.random() * 2.0;
+        const dur = 2.0 + Math.random() * 2.5;
         const travel = 100 + Math.random() * 100 + 'vw';
         const width = 60 + Math.random() * 100;
         const opacity = 0.5 + Math.random() * 0.5;
@@ -85,7 +85,7 @@ export function MobileStarField() {
         el.style.cssText = `
             position:absolute;
             left:${left};top:${top};
-            width:${width}px;height:2px;border-radius:9999px;
+            width:${width}px;height:5px;border-radius:9999px;
             background:linear-gradient(to right, transparent 0%, rgba(16,185,129,0.3) 40%, rgba(255,255,255,${opacity}) 100%);
             --angle:${angle}deg;
             --travel:${travel};
@@ -99,22 +99,233 @@ export function MobileStarField() {
             el.remove();
         }, dur * 1000 + 100);
 
-        // Schedule the next shooting star (2–8s on mobile, 1–6s on desktop)
-        const nextDelay = isMobile ? 2000 + Math.random() * 6000 : 1000 + Math.random() * 5000;
+        // Schedule the next shooting star
+        const nextDelay = isMobile ? 1500 + Math.random() * 3500 : 800 + Math.random() * 3200;
         timeoutRef.current = setTimeout(spawnStar, nextDelay);
     }, []);
 
+    // Service icon comet spawner — launches every 4s
+    // Inline SVG paths for: Zap, Sparkles, Globe, Bot, Code, Database, Cpu, Smartphone
+    const SERVICE_ICONS = [
+        // Zap
+        '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+        // Sparkles
+        '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 3v4M19 17v4M3 5h4M17 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+        // Globe
+        '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20" stroke="currentColor" stroke-width="2" fill="none"/>',
+        // Bot
+        '<path d="M12 8V4H8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><rect width="16" height="12" x="4" y="8" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+        // Code
+        '<polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+        // Database
+        '<ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3 5V19A9 3 0 0 0 21 19V5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3 12A9 3 0 0 0 21 12" stroke="currentColor" stroke-width="2" fill="none"/>',
+        // Cpu
+        '<rect width="16" height="16" x="4" y="4" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect width="6" height="6" x="9" y="9" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+        // Smartphone
+        '<rect width="14" height="20" x="5" y="2" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 18h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+    ];
+    const codeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+    const spawnCodeComet = useCallback(() => {
+        const container = shootingContainerRef.current;
+        if (!container) return;
+
+        const svgPath = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
+        const top = 5 + Math.random() * 70 + '%';
+        const fromLeft = Math.random() > 0.5;
+        const left = fromLeft ? '-5%' : '105%';
+        const angle = fromLeft ? (25 + Math.random() * 35) : (125 + Math.random() * 35);
+        const dur = 4 + Math.random() * 3;
+        const travel = (120 + Math.random() * 80) + 'vw';
+        const colors = ['#10b981', '#14b8a6', '#f59e0b', '#34d399', '#a78bfa'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = 16 + Math.random() * 8;
+        const spinDur = 1.5 + Math.random() * 2;
+        const spinDir = Math.random() > 0.5 ? '360deg' : '-360deg';
+
+        const el = document.createElement('div');
+        el.style.cssText = `
+            position:absolute;
+            left:${left};top:${top};
+            --angle:${angle}deg;
+            --travel:${travel};
+            animation:iconCometFly ${dur}s linear forwards;
+            opacity:0;
+            pointer-events:none;
+        `;
+        // Wrapper: icon + trail in one unit
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = `position:relative;display:inline-block;`;
+        // The SVG icon
+        const iconEl = document.createElement('div');
+        iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" style="color:${color};filter:drop-shadow(0 0 6px ${color}88) drop-shadow(0 0 12px ${color}44);">${svgPath}</svg>`;
+        iconEl.style.cssText = `
+            animation:spin ${spinDur}s linear infinite;
+            display:inline-block;
+            line-height:0;
+        `;
+        iconEl.style.setProperty('--spin-to', spinDir);
+        // Trail: absolutely positioned, extending behind the icon
+        const trail = document.createElement('div');
+        trail.style.cssText = `
+            position:absolute;
+            right:100%;top:50%;
+            transform:translateY(-50%);
+            width:100px;height:5px;border-radius:9999px;
+            background:linear-gradient(to right, transparent, ${color}44, ${color}cc);
+        `;
+        wrapper.appendChild(iconEl);
+        wrapper.appendChild(trail);
+        el.appendChild(wrapper);
+        container.appendChild(el);
+
+        setTimeout(() => { el.remove(); }, dur * 1000 + 100);
+        codeTimeoutRef.current = setTimeout(spawnCodeComet, 4000);
+    }, []);
+
+    // ── Collision burst system ──
+    const burstTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    const ICON_COLORS = ['#10b981', '#14b8a6', '#f59e0b', '#34d399', '#a78bfa'];
+
+    const createBurst = (container: HTMLElement, cx: number, cy: number, particleColors: string[], flashColor: string, count: number, spread: number) => {
+        const flash = document.createElement('div');
+        flash.style.cssText = `
+            position:absolute;left:${cx}%;top:${cy}%;
+            width:16px;height:16px;border-radius:50%;
+            background:${flashColor};
+            transform:translate(-50%,-50%);
+            box-shadow:0 0 30px ${flashColor}, 0 0 60px ${flashColor}88, 0 0 90px ${flashColor}44;
+            animation:burstFlash 0.6s ease-out forwards;
+        `;
+        container.appendChild(flash);
+        setTimeout(() => flash.remove(), 700);
+        for (let i = 0; i < count; i++) {
+            const pAngle = (360 / count) * i + (Math.random() * 30 - 15);
+            const pDist = spread * (0.6 + Math.random() * 0.8);
+            const pRad = (pAngle * Math.PI) / 180;
+            const px = Math.cos(pRad) * pDist;
+            const py = Math.sin(pRad) * pDist;
+            const pSize = 2 + Math.random() * 4;
+            const pDur = 0.6 + Math.random() * 0.8;
+            const pColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+            const p = document.createElement('div');
+            p.style.cssText = `
+                position:absolute;left:${cx}%;top:${cy}%;
+                width:${pSize}px;height:${pSize}px;border-radius:50%;
+                background:${pColor};
+                box-shadow:0 0 8px ${pColor}, 0 0 16px ${pColor}66;
+                --px:${px}px;--py:${py}px;
+                animation:burstParticle ${pDur}s ease-out forwards;
+            `;
+            container.appendChild(p);
+            setTimeout(() => p.remove(), pDur * 1000 + 50);
+        }
+    };
+
+    const createIncomingComet = (container: HTMLElement, fromX: number, fromY: number, toX: number, toY: number, color: string, dur: number, withIcon?: string) => {
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        const comet = document.createElement('div');
+        comet.style.cssText = `
+            position:absolute;left:${fromX}%;top:${fromY}%;
+            display:flex;align-items:center;gap:2px;
+            animation:cometApproach ${dur}s ease-in forwards;
+            --toX:${dx}vw;--toY:${dy}vh;
+            pointer-events:none;
+        `;
+        const trail = document.createElement('div');
+        trail.style.cssText = `
+            width:${withIcon ? 50 : 80}px;height:${withIcon ? 4 : 5}px;border-radius:9999px;
+            background:linear-gradient(to right, transparent, ${color}66, ${color});
+            transform:rotate(${angle}deg);
+        `;
+        comet.appendChild(trail);
+        if (withIcon) {
+            const iconHead = document.createElement('div');
+            iconHead.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="color:${color};filter:drop-shadow(0 0 6px ${color});">${withIcon}</svg>`;
+            iconHead.style.cssText = `display:inline-block;line-height:0;animation:spin 2s linear infinite;`;
+            iconHead.style.setProperty('--spin-to', '360deg');
+            comet.appendChild(iconHead);
+        } else {
+            const head = document.createElement('div');
+            head.style.cssText = `width:6px;height:6px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};`;
+            comet.appendChild(head);
+        }
+        container.appendChild(comet);
+        setTimeout(() => comet.remove(), dur * 1000 + 50);
+    };
+
+    const spawnCollision = useCallback(() => {
+        const container = shootingContainerRef.current;
+        if (!container) return;
+        const cx = 10 + Math.random() * 80;
+        const cy = 10 + Math.random() * 60;
+        const isSpecialVsSpecial = Math.random() > 0.5;
+        const approachDur = 1.2 + Math.random() * 0.6;
+
+        if (isSpecialVsSpecial) {
+            const color1 = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)];
+            const color2 = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)];
+            const icon1 = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
+            const icon2 = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
+            const a1 = Math.random() * 360;
+            const a2 = a1 + 150 + Math.random() * 60;
+            const dist = 35 + Math.random() * 15;
+            const r1 = (a1 * Math.PI) / 180;
+            const r2 = (a2 * Math.PI) / 180;
+            createIncomingComet(container, cx + Math.cos(r1) * dist, cy + Math.sin(r1) * dist * 0.6, cx, cy, color1, approachDur, icon1);
+            createIncomingComet(container, cx + Math.cos(r2) * dist, cy + Math.sin(r2) * dist * 0.6, cx, cy, color2, approachDur, icon2);
+            setTimeout(() => {
+                const fireColors = ['#ff6b00', '#ff4500', '#ff8c00', '#ffd700', '#ff3300', '#ffaa00', color1, color2];
+                createBurst(container, cx, cy, fireColors, '#ff6b00', 14, 80);
+                for (let i = 0; i < 6; i++) {
+                    const eAngle = Math.random() * 360;
+                    const eDist = 20 + Math.random() * 40;
+                    const eRad = (eAngle * Math.PI) / 180;
+                    const ember = document.createElement('div');
+                    ember.style.cssText = `
+                        position:absolute;left:${cx}%;top:${cy}%;
+                        width:${3 + Math.random() * 4}px;height:${8 + Math.random() * 12}px;
+                        border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+                        background:linear-gradient(to top, #ff4500, #ffd700, transparent);
+                        --px:${Math.cos(eRad) * eDist}px;--py:${Math.sin(eRad) * eDist - 20}px;
+                        animation:burstParticle ${0.8 + Math.random() * 0.5}s ease-out forwards;
+                        opacity:0.9;
+                    `;
+                    container.appendChild(ember);
+                    setTimeout(() => ember.remove(), 1500);
+                }
+            }, approachDur * 1000);
+        } else {
+            const iconColor = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)];
+            const icon = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
+            const a1 = Math.random() * 360;
+            const a2 = a1 + 160 + Math.random() * 40;
+            const dist = 35 + Math.random() * 15;
+            const r1 = (a1 * Math.PI) / 180;
+            const r2 = (a2 * Math.PI) / 180;
+            createIncomingComet(container, cx + Math.cos(r1) * dist, cy + Math.sin(r1) * dist * 0.6, cx, cy, '#ffffff', approachDur);
+            createIncomingComet(container, cx + Math.cos(r2) * dist, cy + Math.sin(r2) * dist * 0.6, cx, cy, iconColor, approachDur, icon);
+            setTimeout(() => {
+                createBurst(container, cx, cy, [iconColor, '#ffffff', iconColor + 'cc'], iconColor, 10, 60);
+            }, approachDur * 1000);
+        }
+        burstTimeoutRef.current = setTimeout(spawnCollision, 6000);
+    }, []);
+
     useEffect(() => {
-        // Respect reduced motion preference
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReduced) return;
-
-        // Start first shooting star after a short delay
         timeoutRef.current = setTimeout(spawnStar, 800);
+        codeTimeoutRef.current = setTimeout(spawnCodeComet, 2000);
+        burstTimeoutRef.current = setTimeout(spawnCollision, 5000);
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (codeTimeoutRef.current) clearTimeout(codeTimeoutRef.current);
+            if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current);
         };
-    }, [spawnStar]);
+    }, [spawnStar, spawnCodeComet, spawnCollision]);
 
     return (
         <div
