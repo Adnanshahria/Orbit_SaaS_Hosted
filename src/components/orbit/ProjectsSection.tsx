@@ -67,7 +67,7 @@ export function ProjectsSection() {
   const sectionSubtitle = lang === 'bn' && bnData.subtitle ? bnData.subtitle : (enData.subtitle || 'Real solutions we\'ve built for real businesses.');
 
   return (
-    <section id="project" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12">
+    <section id="project" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative scroll-mt-12" style={{ contain: 'none' }}>
 
 
 

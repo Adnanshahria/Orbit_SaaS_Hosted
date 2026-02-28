@@ -105,7 +105,7 @@ export function ReviewsSection() {
     if (items.length === 0) return null;
 
     return (
-        <section id="reviews" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12" ref={ref}>
+        <section id="reviews" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative scroll-mt-12" ref={ref} style={{ contain: 'none' }}>
             <div className="w-full mx-auto relative">
                 {/* Big Container Card */}
                 <div className="relative rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-6 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">

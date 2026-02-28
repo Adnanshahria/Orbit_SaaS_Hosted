@@ -326,10 +326,7 @@
     border-color: rgba(255, 255, 255, 0.08) !important;
   }
 
-  /* Paint isolation for section containers (content-visibility removed for scroll stability) */
-  section>div {
-    contain: paint;
-  }
+  /* Paint isolation removed to fix clipping line and scroll jumping */
 
   /* Reduce complex box-shadow to simpler single-layer version */
   .shadow-\[0_0_40px_rgba\(108\,92\,231\,0\.08\)\] {
@@ -352,10 +349,7 @@
     border: 1px solid rgba(16, 185, 129, 0.12) !important;
   }
 
-  /* ── Paint isolation — invisible, keeps repaint area small ── */
-  section {
-    contain: content;
-  }
+  /* ── Paint isolation removed to prevent clipping and scroll jump ── */
 
   /* ── Free compositor layers on mobile ── */
   .will-change-transform {
@@ -439,10 +433,7 @@ html.low-perf .neon-text-cyan {
   text-shadow: none !important;
 }
 
-/* Defer off-screen content rendering on low-perf (content-visibility removed for scroll stability) */
-html.low-perf section>div {
-  contain: paint;
-}
+/* Defer off-screen content removed for scroll stability */
 
 html.low-perf .shadow-\[0_0_40px_rgba\(108\,92\,231\,0\.08\)\] {
   box-shadow: 0 0 8px rgba(108, 92, 231, 0.05) !important;
@@ -486,10 +477,7 @@ html.low-perf .hero-dice-cube {
   transform-style: flat !important;
 }
 
-/* Content containment for all viewports — major render perf win (content-visibility removed for scroll stability) */
-section>div {
-  contain: layout style paint;
-}
+/* Content containment removed for all viewports — fixes clipping and scroll jumping */
 
 /* ── Touch devices: disable custom cursor (invisible anyway) ── */
 @media (hover: none) and (pointer: coarse) {
