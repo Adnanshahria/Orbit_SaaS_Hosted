@@ -177,39 +177,25 @@
   position: relative;
 }
 
-/* ── Mobile space-flight star field — compositor-only animations ── */
+/* ── Deep Space Flight (3D Zoom Parallax) ── */
 
-/* Parallax layers: stars flow bottom-to-top at different speeds */
-/* Fast layer = close stars (larger, faster) */
-@keyframes spaceFlightFast {
-  from {
-    transform: translateY(0);
+@keyframes starZoom {
+  0% {
+    transform: scale(0.1) translate(0, 0);
+    opacity: 0;
   }
 
-  to {
-    transform: translateY(-110vh);
-  }
-}
-
-/* Medium layer */
-@keyframes spaceFlightMed {
-  from {
-    transform: translateY(0);
+  15% {
+    opacity: var(--star-op, 0.8);
   }
 
-  to {
-    transform: translateY(-110vh);
-  }
-}
-
-/* Slow layer = far stars (smaller, dimmer, slower) */
-@keyframes spaceFlightSlow {
-  from {
-    transform: translateY(0);
+  80% {
+    opacity: var(--star-op, 0.8);
   }
 
-  to {
-    transform: translateY(-110vh);
+  100% {
+    transform: scale(var(--star-scale, 2.5)) translate(calc(var(--tx) * 1vw), calc(var(--ty) * 1vh));
+    opacity: 0;
   }
 }
 
@@ -246,10 +232,9 @@
 
   50% {
     opacity: var(--neb-hi, 1);
-    transform: scale(1.08);
+    transform: scale(1.05);
   }
 }
-
 
 .orbit-ring-portal::before {
   content: '';

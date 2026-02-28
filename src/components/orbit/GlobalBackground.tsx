@@ -10,16 +10,16 @@ function isMobileOrLowPerf(): boolean {
 }
 
 export function GlobalBackground() {
-    const useLightMode = isMobileOrLowPerf();
+    const isDesktop = !isMobileOrLowPerf();
 
     return (
         <>
-            {useLightMode ? (
-                // Mobile / low-perf: CSS-only star field (zero CPU during scroll)
-                <MobileStarField />
-            ) : (
-                // Desktop: full canvas solar system animation
-                <div className="fixed inset-0 w-full h-[100dvh] -z-50 overflow-hidden pointer-events-none select-none bg-black opacity-50">
+            {/* The new immersive 3D space flight & galaxy background is active for everyone */}
+            <MobileStarField />
+
+            {/* Desktop only: keep the original solar system at low opacity to maintain cosmic elements theme */}
+            {isDesktop && (
+                <div className="fixed inset-0 w-full h-[100dvh] -z-40 overflow-hidden pointer-events-none select-none bg-black/10 opacity-20 mix-blend-screen">
                     <SolarSystemAnimation />
                 </div>
             )}

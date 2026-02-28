@@ -1,153 +1,143 @@
 /**
- * MobileStarField — "Flying through space" background for mobile / low-perf devices.
+ * MobileStarField — "3D Deep Space Flight" background for mobile / low-perf devices.
  *
- * Creates a sense of moving through space / orbiting a galaxy:
- * - 3 parallax star layers (slow/medium/fast) flow top → bottom
- * - Fast (close) stars: large, bright — zoom past quickly
- * - Slow (far) stars: small, dim — drift gently
- * - 5 shooting stars at random intervals
- * - Pulsing nebula glows (emerald, amber, indigo) for "galaxy nearby" feel
- * - All CSS keyframe animations: compositor-only, zero CPU during scroll
+ * Implements a rich, immersive 3D space-flight aesthetic via CSS:
+ * - Extremely deep dark space background with subtle cosmic clouds (Neon Green, Emerald, Orange-Gold).
+ * - "Flying through space" parallax: stars start from center, move outwards, and scale up (3D zoom effect).
+ * - Distant galaxies and nebula clouds that pulse slowly at very low opacity.
+ * - Shooting stars to add dynamism.
+ * - All animated via CSS keyframes (`starZoom`, `nebulaBreath`) for 60fps compositor performance.
  */
 
-// ── Parallax star data — each layer scrolls at a different speed ─────────────
+// Generate random star data for the 3D zoom out effect
+const NUM_STARS = 45;
 
-// FAST layer — large, bright, close stars (loop from bottom so they refill)
-const FAST_STARS = [
-    { x: 12, y: 0, size: 2.8, opacity: 0.95, color: '#ffffff', delay: 0 },
-    { x: 34, y: 15, size: 2.2, opacity: 0.85, color: '#ffd580', delay: 2 },
-    { x: 58, y: 5, size: 3.0, opacity: 0.9, color: '#d0ffe8', delay: 4 },
-    { x: 78, y: 30, size: 2.5, opacity: 0.88, color: '#80ffea', delay: 1 },
-    { x: 92, y: 0, size: 2.0, opacity: 0.82, color: '#ffffff', delay: 3 },
-    { x: 22, y: 55, size: 3.2, opacity: 0.95, color: '#ffd580', delay: 5 },
-    { x: 48, y: 80, size: 2.6, opacity: 0.9, color: '#d0ffe8', delay: 0.5 },
-    { x: 68, y: 65, size: 2.2, opacity: 0.85, color: '#80ffea', delay: 6 },
-];
+const ZOOM_STARS = Array.from({ length: NUM_STARS }).map((_, i) => {
+    // Random position across the screen
+    const rawX = Math.random() * 100;
+    const rawY = Math.random() * 100;
 
-// MED layer — mid-sized stars
-const MED_STARS = [
-    { x: 8, y: 10, size: 1.6, opacity: 0.7, color: '#e0f0ff', delay: 0 },
-    { x: 25, y: 40, size: 1.4, opacity: 0.65, color: '#ffffff', delay: 3 },
-    { x: 45, y: 20, size: 1.8, opacity: 0.75, color: '#ffd580', delay: 1.5 },
-    { x: 62, y: 50, size: 1.5, opacity: 0.68, color: '#d0ffe8', delay: 4 },
-    { x: 82, y: 15, size: 1.7, opacity: 0.72, color: '#80ffea', delay: 2 },
-    { x: 15, y: 75, size: 1.4, opacity: 0.65, color: '#e0f0ff', delay: 6 },
-    { x: 55, y: 90, size: 1.9, opacity: 0.78, color: '#ffffff', delay: 0.8 },
-    { x: 88, y: 70, size: 1.5, opacity: 0.67, color: '#ffd580', delay: 5 },
-    { x: 35, y: 60, size: 1.6, opacity: 0.70, color: '#ffffff', delay: 7 },
-    { x: 72, y: 35, size: 1.3, opacity: 0.60, color: '#d0ffe8', delay: 9 },
-];
+    // Calculate distance from center (50, 50)
+    const dx = rawX - 50;
+    const dy = rawY - 50;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-// SLOW layer — tiny, dim, far stars
-const SLOW_STARS = [
-    { x: 5, y: 5, size: 0.9, opacity: 0.4, color: '#aabbdd', delay: 0 },
-    { x: 18, y: 25, size: 0.8, opacity: 0.35, color: '#aabbdd', delay: 4 },
-    { x: 32, y: 50, size: 1.0, opacity: 0.42, color: '#aabbdd', delay: 8 },
-    { x: 50, y: 35, size: 0.8, opacity: 0.35, color: '#aabbdd', delay: 2 },
-    { x: 65, y: 78, size: 0.9, opacity: 0.38, color: '#aabbdd', delay: 12 },
-    { x: 80, y: 45, size: 0.8, opacity: 0.33, color: '#aabbdd', delay: 6 },
-    { x: 92, y: 88, size: 1.0, opacity: 0.40, color: '#aabbdd', delay: 10 },
-    { x: 42, y: 12, size: 0.8, opacity: 0.35, color: '#aabbdd', delay: 16 },
-    { x: 72, y: 60, size: 0.9, opacity: 0.38, color: '#aabbdd', delay: 14 },
-];
+    // Calculate target translation (tx, ty) to move the star outward.
+    // We normalize the vector (dx/dist, dy/dist) and multiply by a large distance (e.g. 60-100vw/vh)
+    const travelDist = 60 + Math.random() * 60;
+    const tx = (dx / dist) * travelDist;
+    const ty = (dy / dist) * travelDist;
 
-// ── Shooting stars — timing staggered so they appear every ~8s on average ───
+    // We start them slightly clamped so they don't immediately spawn off-screen
+    const startX = 50 + dx * 0.3;
+    const startY = 50 + dy * 0.3;
+
+    return {
+        id: i,
+        // Start position
+        x: startX,
+        y: startY,
+        // Target translation passed as CSS custom properties
+        tx: tx.toFixed(2),
+        ty: ty.toFixed(2),
+        // Random properties
+        size: 0.8 + Math.random() * 1.5,
+        opacity: 0.3 + Math.random() * 0.5, // Slightly dimmer stars
+        // Theme Colors: Amber-400 (#fbbf24), Emerald-400 (#34d399), White (#ffffff)
+        color: Math.random() > 0.8 ? '#fbbf24' : Math.random() > 0.6 ? '#34d399' : '#ffffff',
+        // Animation timing
+        dur: 6 + Math.random() * 14, // 6 to 20 seconds to reach camera
+        delay: Math.random() * -20, // Negative delay so they start already flying!
+        // How big they get as they approach camera
+        scale: 2 + Math.random() * 3,
+    };
+});
+
 const SHOOTING_STARS = [
-    { x: 10, y: 5, width: 110, angle: 32, dur: 1.6, delay: 1, opacity: 0.9 },
-    { x: 60, y: 3, width: 90, angle: 38, dur: 1.4, delay: 9, opacity: 0.75 },
-    { x: 30, y: 8, width: 130, angle: 30, dur: 1.8, delay: 18, opacity: 0.85 },
-    { x: 75, y: 5, width: 100, angle: 35, dur: 1.5, delay: 27, opacity: 0.8 },
-    { x: 48, y: 2, width: 85, angle: 40, dur: 1.7, delay: 38, opacity: 0.7 },
+    { id: 1, x: 5, y: 5, width: 120, angle: 35, dur: 1.8, delay: 2, opacity: 0.6 },
+    { id: 2, x: 70, y: -5, width: 100, angle: 42, dur: 1.5, delay: 9, opacity: 0.45 },
+    { id: 3, x: 20, y: 10, width: 140, angle: 30, dur: 2.0, delay: 17, opacity: 0.7 },
+    { id: 4, x: 85, y: 0, width: 90, angle: 45, dur: 1.4, delay: 25, opacity: 0.5 },
+    { id: 5, x: 40, y: -5, width: 110, angle: 38, dur: 1.7, delay: 35, opacity: 0.6 },
 ];
-
-// ── Flight durations per layer ───────────────────────────────────────────────
-const FAST_DUR = 8;  // seconds to cross screen
-const MED_DUR = 16;
-const SLOW_DUR = 35;
 
 export function MobileStarField() {
     return (
         <div
             className="fixed inset-0 w-full h-[100dvh] pointer-events-none select-none overflow-hidden"
-            style={{ zIndex: -49 }}
+            style={{ zIndex: -49, opacity: 0.9 }}
             aria-hidden
         >
-            {/* ── Deep space base ── */}
-            <div
-                className="absolute inset-0"
-                style={{
-                    background: 'radial-gradient(ellipse at 50% 20%, #07071a 0%, #03030c 55%, #000000 100%)',
-                }}
-            />
+            {/* ── 1. Deep Cosmic Void Base (Very dark) ── */}
+            <div className="absolute inset-0 bg-[#020302]" />
 
-            {/* ── Nebula glow 1: Emerald — top-right, galaxy core ── */}
-            <div
-                className="absolute"
+            {/* ── 2. Subtle Dark Galaxy Dust (Mix-blend for richness, deeply reduced opacity) ── */}
+            {/* Dark Emerald Cloud */}
+            <div className="absolute inset-0"
                 style={{
-                    width: '80vw', height: '80vw',
-                    top: '-30vw', right: '-20vw',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(16,185,129,0.22) 0%, rgba(16,185,129,0.08) 45%, transparent 72%)',
-                    animation: 'nebulaBreath 8s ease-in-out infinite',
+                    background: 'radial-gradient(ellipse at 30% 70%, rgba(16, 185, 129, 0.08) 0%, rgba(4, 47, 46, 0.05) 50%, transparent 100%)',
+                    mixBlendMode: 'screen',
+                    animation: 'nebulaBreath 15s ease-in-out infinite alternate',
                     ['--neb-lo' as any]: '0.7',
-                    ['--neb-hi' as any]: '1',
+                    ['--neb-hi' as any]: '1'
                 }}
             />
-
-            {/* ── Nebula glow 2: Amber — left center, passing star cluster ── */}
-            <div
-                className="absolute"
+            {/* Dark Amber Cloud */}
+            <div className="absolute inset-0"
                 style={{
-                    width: '65vw', height: '65vw',
-                    top: '20vw', left: '-18vw',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0.05) 55%, transparent 78%)',
-                    animation: 'nebulaBreath 11s ease-in-out 3s infinite',
+                    background: 'radial-gradient(ellipse at 80% 30%, rgba(245, 158, 11, 0.06) 0%, rgba(120, 53, 15, 0.04) 60%, transparent 100%)',
+                    mixBlendMode: 'screen',
+                    animation: 'nebulaBreath 12s ease-in-out 3s infinite alternate',
                     ['--neb-lo' as any]: '0.6',
-                    ['--neb-hi' as any]: '1',
+                    ['--neb-hi' as any]: '1'
                 }}
             />
-
-            {/* ── Nebula glow 3: Indigo — bottom, distant galaxy arm ── */}
-            <div
-                className="absolute"
+            {/* Barely visible Cosmic Dust Diagonal */}
+            <div className="absolute inset-0"
                 style={{
-                    width: '90vw', height: '70vw',
-                    bottom: '-25vw', left: '5vw',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(99,102,241,0.16) 0%, rgba(99,102,241,0.05) 50%, transparent 75%)',
-                    animation: 'nebulaBreath 14s ease-in-out 6s infinite',
-                    ['--neb-lo' as any]: '0.55',
-                    ['--neb-hi' as any]: '1',
+                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, transparent 40%, rgba(245, 158, 11, 0.02) 100%)'
                 }}
             />
 
-            {/* ── Nebula glow 4: Teal — center, core light ── */}
-            <div
-                className="absolute"
-                style={{
-                    width: '55vw', height: '55vw',
-                    top: '30vw', right: '5vw',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(20,184,166,0.12) 0%, transparent 70%)',
-                    animation: 'nebulaBreath 10s ease-in-out 1.5s infinite',
-                    ['--neb-lo' as any]: '0.5',
-                    ['--neb-hi' as any]: '1',
-                }}
-            />
+            {/* ── 3. Distant Spiral Galaxy Element (Much darker, very distant) ── */}
+            <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vw] sm:w-[90vw] sm:h-[90vw] mix-blend-screen opacity-40">
+                {/* Galactic Core Glow (Subtle Amber) */}
+                <div className="absolute inset-0 rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(245,158,11,0.08) 15%, rgba(217,119,6,0.03) 35%, transparent 60%)',
+                        animation: 'nebulaBreath 10s ease-in-out infinite alternate',
+                        ['--neb-lo' as any]: '0.8',
+                        ['--neb-hi' as any]: '1.2'
+                    }}
+                />
 
-            {/* ── Milky way band ── */}
-            <div
-                className="absolute inset-0"
-                style={{
-                    background: 'linear-gradient(115deg, transparent 10%, rgba(130,150,255,0.05) 50%, transparent 90%)',
-                }}
-            />
+                {/* Spiral Disk Body (Subtle Teal/Emerald) */}
+                <div className="absolute inset-0 rounded-full"
+                    style={{
+                        background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, rgba(20,184,166,0.03) 50%, transparent 70%)',
+                        transform: 'scaleY(0.3) rotate(15deg)',
+                        animation: 'nebulaBreath 18s ease-in-out 2s infinite alternate',
+                        ['--neb-lo' as any]: '0.6',
+                        ['--neb-hi' as any]: '1'
+                    }}
+                />
 
-            {/* ══ FAST stars (close, fly past quickly) ══ */}
-            {FAST_STARS.map((s, i) => (
+                {/* Second Spiral Arm (Subtle Amber) */}
+                <div className="absolute inset-0 rounded-full"
+                    style={{
+                        background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.04) 0%, rgba(217,119,6,0.02) 40%, transparent 60%)',
+                        transform: 'scaleY(0.25) rotate(-20deg)',
+                        animation: 'nebulaBreath 14s ease-in-out 5s infinite alternate',
+                        ['--neb-lo' as any]: '0.5',
+                        ['--neb-hi' as any]: '1.1'
+                    }}
+                />
+            </div>
+
+            {/* ── 4. Floating 3D Zooming Stars (Flying through space) ── */}
+            {ZOOM_STARS.map((s) => (
                 <div
-                    key={`f-${i}`}
+                    key={`z-${s.id}`}
                     className="absolute rounded-full"
                     style={{
                         left: `${s.x}%`,
@@ -155,64 +145,28 @@ export function MobileStarField() {
                         width: `${s.size}px`,
                         height: `${s.size}px`,
                         background: s.color,
-                        opacity: s.opacity,
-                        boxShadow: `0 0 ${s.size * 2.5}px ${s.color}`,
-                        animation: `spaceFlightFast ${FAST_DUR}s linear ${s.delay}s infinite`,
-                        willChange: 'transform',
+                        // The opacity is controlled by the animation, but we pass the max opacity
+                        ['--star-op' as any]: s.opacity,
+                        ['--tx' as any]: s.tx,
+                        ['--ty' as any]: s.ty,
+                        ['--star-scale' as any]: s.scale,
+                        boxShadow: `0 0 ${s.size * 2}px ${s.color}`,
+                        animation: `starZoom ${s.dur}s ease-in ${s.delay}s infinite`,
+                        opacity: 0, // Starts at 0 until animation kicks in
+                        willChange: 'transform, opacity',
                     }}
                 />
             ))}
 
-            {/* ══ MEDIUM stars ══ */}
-            {MED_STARS.map((s, i) => (
+            {/* ── 5. Shooting Stars ── */}
+            {SHOOTING_STARS.map((s) => (
                 <div
-                    key={`m-${i}`}
-                    className="absolute rounded-full"
-                    style={{
-                        left: `${s.x}%`,
-                        top: `${s.y}%`,
-                        width: `${s.size}px`,
-                        height: `${s.size}px`,
-                        background: s.color,
-                        opacity: s.opacity,
-                        boxShadow: s.size > 1.5 ? `0 0 ${s.size * 2}px ${s.color}` : 'none',
-                        animation: `spaceFlightMed ${MED_DUR}s linear ${s.delay}s infinite`,
-                        willChange: 'transform',
-                    }}
-                />
-            ))}
-
-            {/* ══ SLOW (far) stars ══ */}
-            {SLOW_STARS.map((s, i) => (
-                <div
-                    key={`sl-${i}`}
-                    className="absolute rounded-full"
-                    style={{
-                        left: `${s.x}%`,
-                        top: `${s.y}%`,
-                        width: `${s.size}px`,
-                        height: `${s.size}px`,
-                        background: s.color,
-                        opacity: s.opacity,
-                        animation: `spaceFlightSlow ${SLOW_DUR}s linear ${s.delay}s infinite`,
-                        willChange: 'transform',
-                    }}
-                />
-            ))}
-
-            {/* ══ Shooting / falling stars ══ */}
-            {SHOOTING_STARS.map((s, i) => (
-                <div
-                    key={`ss-${i}`}
+                    key={`ss-${s.id}`}
                     className="absolute"
                     style={{
-                        left: `${s.x}%`,
-                        top: `${s.y}%`,
-                        // Tail: long narrow gradient
-                        width: `${s.width}px`,
-                        height: '1.5px',
-                        borderRadius: '9999px',
-                        background: `linear-gradient(to right, transparent, rgba(255,255,255,${s.opacity}), rgba(255,255,255,0.2), transparent)`,
+                        left: `${s.x}%`, top: `${s.y}%`,
+                        width: `${s.width}px`, height: '2px', borderRadius: '9999px',
+                        background: `linear-gradient(to right, transparent, rgba(255,255,255,${s.opacity}), rgba(16,185,129,0.2), transparent)`,
                         ['--angle' as any]: `${s.angle}deg`,
                         animation: `shootingStar ${s.dur}s ease-out ${s.delay}s infinite`,
                         opacity: 0,
