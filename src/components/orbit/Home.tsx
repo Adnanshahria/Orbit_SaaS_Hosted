@@ -160,7 +160,7 @@ export function Home() {
             </AnimatePresence>
 
             {/* ORBIT SaaS title — letters materialize inside the ring */}
-            <div className="flex items-center justify-center whitespace-nowrap relative z-10">
+            <div className="flex items-center justify-center flex-wrap relative z-10">
               {/* Materialized letters */}
               {letters.map((letter, i) => (
                 revealedCount > i && (
@@ -172,7 +172,7 @@ export function Home() {
                       duration: 0.8,
                       ease: [0.25, 0.46, 0.45, 0.94],
                     }}
-                    className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit pb-1"
+                    className="text-[clamp(2rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit pb-1"
                   >
                     {letter}
                   </motion.span>
@@ -185,7 +185,7 @@ export function Home() {
                   initial={{ opacity: 0, scale: 0.85, x: -6 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="text-[clamp(2.5rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas pb-1"
+                  className="text-[clamp(2rem,13vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas pb-1"
                 >
                   SaaS
                 </motion.span>
@@ -363,7 +363,7 @@ export function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
           transition={{ type: 'spring', stiffness: 60, damping: 16 }}
-          className={`fixed bottom-[12dvh] left-4 right-[80px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+          className={`fixed bottom-[13dvh] left-4 right-[80px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
         >
           <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
             <input
