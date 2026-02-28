@@ -6,8 +6,8 @@ import { toast } from 'sonner';
 
 
 
-/* ── Hero component ───────────────────────────────────────────── */
-export function HeroSection() {
+/* ── Home component ───────────────────────────────────────────── */
+export function Home() {
   const { t, lang } = useLang();
   const sectionRef = useRef<HTMLElement>(null);
   const [isCtaOpen, setIsCtaOpen] = useState(false);

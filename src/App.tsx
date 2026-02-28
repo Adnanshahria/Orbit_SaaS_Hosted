@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ContentProvider } from './contexts/ContentContext';
 import { Navbar } from './components/orbit/Navbar';
-import { HeroSection } from './components/orbit/HeroSection';
+import { Home } from './components/orbit/Home';
 import { StatsSection } from './components/orbit/StatsSection';
 import { ServicesSection } from './components/orbit/ServicesSection';
 import { TechStackSection } from './components/orbit/TechStackSection';
@@ -125,7 +125,7 @@ function PublicSite() {
       <div className="min-h-[100dvh] text-foreground relative z-0">
         <Navbar />
         <main>
-          <HeroSection />
+          <Home />
           {isLoaded && (
             <>
               <StatsSection />
