@@ -282,33 +282,7 @@
 @media (max-width: 1024px),
 (hover: none) and (pointer: coarse) {
 
-  /* Remove ALL backdrop-blur from every element — biggest perf win */
-  .backdrop-blur-xl,
-  .backdrop-blur-md,
-  .backdrop-blur-2xl,
-  .backdrop-blur-sm,
-  .backdrop-blur-lg,
-  [class*="backdrop-blur"] {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  /* Make semi-transparent cards look solid against dark BG */
-  .bg-white\/\[0\.02\],
-  .bg-white\/\[0\.03\],
-  .bg-white\/\[0\.05\] {
-    background-color: rgba(14, 14, 26, 0.85) !important;
-  }
-
-  .bg-background\/90 {
-    background-color: #0c0c14 !important;
-  }
-
-  /* Solid fallback for card backgrounds that had blur */
-  .bg-card\/60,
-  .bg-card\/40 {
-    background-color: rgba(18, 18, 26, 0.92) !important;
-  }
+  /* Card backgrounds: same as desktop (semi-transparent with blur) */
 
   /* Hide massive decorative blur orbs that tank GPU */
   .blur-\[120px\],
@@ -318,36 +292,11 @@
     display: none !important;
   }
 
-  /* Solid background for glass-effect instead of blur */
-  .glass-effect {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(18, 18, 26, 0.92) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-  }
+  /* glass-effect: same as desktop */
 
   /* Paint isolation removed to fix clipping line and scroll jumping */
 
-  /* Reduce complex box-shadow to simpler single-layer version */
-  .shadow-\[0_0_40px_rgba\(108\,92\,231\,0\.08\)\] {
-    box-shadow: 0 0 12px rgba(108, 92, 231, 0.06) !important;
-  }
-
-  /* ── Replace mask-composite gradient borders with simple borders ──
-     mask-composite creates a GPU-composited layer per element;
-     a solid border looks nearly identical but is far cheaper */
-  .premium-card::before,
-  .premium-card-sub::before {
-    display: none !important;
-  }
-
-  .premium-card {
-    border: 1px solid rgba(16, 185, 129, 0.2) !important;
-  }
-
-  .premium-card-sub {
-    border: 1px solid rgba(16, 185, 129, 0.12) !important;
-  }
+  /* premium-card borders: same gradient as desktop */
 
   /* ── Paint isolation removed to prevent clipping and scroll jump ── */
 
@@ -385,27 +334,7 @@
 }
 
 /* ── JS-triggered low-perf mode: disable all heavy effects ── */
-html.low-perf .backdrop-blur-xl,
-html.low-perf .backdrop-blur-md,
-html.low-perf .backdrop-blur-2xl,
-html.low-perf .backdrop-blur-sm,
-html.low-perf .backdrop-blur-lg,
-html.low-perf [class*="backdrop-blur"] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
-html.low-perf .glass-effect {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background: rgba(18, 18, 26, 0.92) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-html.low-perf .bg-card\/60,
-html.low-perf .bg-card\/40 {
-  background-color: rgba(18, 18, 26, 0.92) !important;
-}
+/* low-perf: card backgrounds match desktop */
 
 html.low-perf .blur-\[120px\],
 html.low-perf .blur-\[130px\],

@@ -60,7 +60,7 @@ export function StatsSection() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="pointer-events-none rounded-full px-4 sm:px-6 py-2 sm:py-2.5 border border-transparent relative overflow-hidden"
+                className="pointer-events-none rounded-2xl sm:rounded-full px-4 sm:px-6 py-3 sm:py-2.5 border border-transparent relative overflow-hidden"
                 style={{
                     background: 'linear-gradient(#0a0a12, #0a0a12) padding-box, linear-gradient(135deg, #10b981, #f59e0b, #10b981) border-box',
                     borderWidth: '1px',
@@ -69,9 +69,9 @@ export function StatsSection() {
                     boxShadow: '0 0 20px rgba(16, 185, 129, 0.08), 0 0 40px rgba(245, 158, 11, 0.05)',
                 }}
             >
-                <div className="flex items-center gap-1.5 sm:gap-3 whitespace-nowrap overflow-hidden">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3 whitespace-nowrap">
                     {items.map((stat: any, i: number) => (
-                        <div key={i} className="flex items-center gap-1.5 sm:gap-3">
+                        <div key={i} className="flex items-center gap-1.5 sm:gap-3 justify-center sm:justify-start">
                             {i !== 0 && <span className="text-white/50 text-[8px] sm:text-[10px]">✦</span>}
                             <div className="flex items-center gap-1 sm:gap-1.5">
                                 <span className="text-sm sm:text-base font-bold text-foreground font-poppins tabular-nums">

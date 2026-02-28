@@ -850,7 +850,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.5 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed bottom-[22dvh] mb-5 sm:mb-8 md:bottom-28 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
+            className="fixed bottom-[22dvh] mb-2 sm:mb-6 md:bottom-24 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
           >
             <div className="relative pointer-events-auto cursor-pointer group" onClick={() => setOpen(true)}>
               {/* Main Speech Bubble */}

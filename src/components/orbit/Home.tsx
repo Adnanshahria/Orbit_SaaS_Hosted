@@ -13,16 +13,33 @@ export function Home() {
   const [isCtaOpen, setIsCtaOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
-  const [showEmailBar, setShowEmailBar] = useState(true);
+  const emailBarRef = useRef<HTMLDivElement>(null);
+  const mobileEmailBarRef = useRef<HTMLDivElement>(null);
 
-  // Track scroll position to hide email bar when scrolled past hero
+  // Track scroll position to hide email bar — uses refs to avoid React re-renders
   useEffect(() => {
+    let wasVisible = true;
     const onScroll = () => {
       const hero = sectionRef.current;
       if (!hero) return;
       const rect = hero.getBoundingClientRect();
       const ratio = Math.max(0, Math.min(1, -rect.top / (rect.height || 1)));
-      setShowEmailBar(ratio < 0.15);
+      const shouldShow = ratio < 0.15;
+      if (shouldShow === wasVisible) return; // no change, skip DOM work
+      wasVisible = shouldShow;
+      // Toggle visibility via CSS classes directly — zero React re-renders
+      if (emailBarRef.current) {
+        emailBarRef.current.style.opacity = shouldShow ? '1' : '0';
+        emailBarRef.current.style.visibility = shouldShow ? 'visible' : 'hidden';
+        emailBarRef.current.style.pointerEvents = shouldShow ? 'auto' : 'none';
+        emailBarRef.current.style.transform = shouldShow ? 'translateY(0)' : 'translateY(16px)';
+      }
+      if (mobileEmailBarRef.current) {
+        mobileEmailBarRef.current.style.opacity = shouldShow ? '1' : '0';
+        mobileEmailBarRef.current.style.visibility = shouldShow ? 'visible' : 'hidden';
+        mobileEmailBarRef.current.style.pointerEvents = shouldShow ? 'auto' : 'none';
+        mobileEmailBarRef.current.style.transform = shouldShow ? 'translateY(0)' : 'translateY(16px)';
+      }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -320,50 +337,59 @@ export function Home() {
               {t.hero.learnMore}
             </motion.a>
           </motion.div>
-          {/* Newsletter Subscribe — Desktop block (inside card for relative flow) */}
+          {/* Newsletter Subscribe — Desktop block (centered, fixed-height wrapper) */}
           {isHeroLoaded && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
-              transition={{ type: 'spring', stiffness: 60, damping: 16 }}
-              className={`hidden sm:block absolute -bottom-16 left-1/2 -translate-x-1/2 w-[450px] max-w-full z-[100] ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
-              style={{ visibility: (!showEmailBar || isCtaOpen) ? 'hidden' : 'visible' }}
-            >
-              <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
-                <input
-                  type="email"
-                  placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={status === 'loading'}
-                  className="w-full bg-card/80 border border-border/60 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
-                />
-                <button
-                  type="submit"
-                  disabled={status === 'loading'}
-                  className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer border-[0.5px] border-amber-400/40"
-                >
-                  {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
-                </button>
-              </form>
-              {status === 'success' && (
-                <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-                  {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
-                </p>
-              )}
-            </motion.div>
+            <div className="hidden sm:block w-full mt-6" style={{ height: '56px' }}>
+              <div
+                ref={emailBarRef}
+                className={`w-[450px] max-w-full mx-auto z-[100] ${isCtaOpen ? 'pointer-events-none' : ''}`}
+                style={{
+                  opacity: isCtaOpen ? 0 : 1,
+                  visibility: isCtaOpen ? 'hidden' : 'visible',
+                  transition: 'opacity 0.4s ease, transform 0.4s ease, visibility 0.4s',
+                  transform: 'translateY(0)',
+                }}
+              >
+                <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
+                  <input
+                    type="email"
+                    placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={status === 'loading'}
+                    className="w-full bg-card/80 border border-border/60 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer border-[0.5px] border-amber-400/40"
+                  >
+                    {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
+                  </button>
+                </form>
+                {status === 'success' && (
+                  <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+                    {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
         </div>{/* End Hero Container Card */}
       </div>
 
       {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
       {isHeroLoaded && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={showEmailBar ? (isCtaOpen ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1, y: 0 }) : { opacity: 0, y: 16 }}
-          transition={{ type: 'spring', stiffness: 60, damping: 16 }}
-          className={`fixed bottom-[13dvh] left-4 right-[80px] z-[100] sm:hidden ${(!showEmailBar || isCtaOpen) ? 'pointer-events-none' : 'pointer-events-auto'}`}
+        <div
+          ref={mobileEmailBarRef}
+          className={`fixed bottom-[13dvh] left-4 right-[80px] z-[100] sm:hidden ${isCtaOpen ? 'pointer-events-none' : ''}`}
+          style={{
+            opacity: isCtaOpen ? 0 : 1,
+            visibility: isCtaOpen ? 'hidden' : 'visible',
+            transition: 'opacity 0.4s ease, transform 0.4s ease, visibility 0.4s',
+            transform: 'translateY(0)',
+          }}
         >
           <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
             <input
@@ -388,7 +414,7 @@ export function Home() {
               {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
             </p>
           )}
-        </motion.div>
+        </div>
       )}
 
 
