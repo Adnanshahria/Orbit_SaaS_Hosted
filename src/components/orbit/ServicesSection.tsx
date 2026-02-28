@@ -45,7 +45,7 @@ export function ServicesSection() {
   const words = useMemo(() => subtitle.split(' '), [subtitle]);
 
   return (
-    <section id="services" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-12">
+    <section id="services" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative scroll-mt-12" style={{ contain: 'none' }}>
 
       <div className="w-full mx-auto relative" ref={ref}>
         <div className="rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-4 sm:py-8 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
