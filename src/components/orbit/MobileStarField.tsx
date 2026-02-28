@@ -147,36 +147,39 @@ export function MobileStarField() {
         el.style.cssText = `
             position:absolute;
             left:${left};top:${top};
+            width:0;height:0;
             --angle:${angle}deg;
             --travel:${travel};
             animation:iconCometFly ${dur}s linear forwards;
             opacity:0;
             pointer-events:none;
         `;
-        // Wrapper: icon + trail in one unit
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = `position:relative;display:inline-block;`;
-        // The SVG icon
-        const iconEl = document.createElement('div');
-        iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" style="color:${color};filter:drop-shadow(0 0 6px ${color}88) drop-shadow(0 0 12px ${color}44);">${svgPath}</svg>`;
-        iconEl.style.cssText = `
-            animation:spin ${spinDur}s linear infinite;
-            display:inline-block;
-            line-height:0;
-        `;
-        iconEl.style.setProperty('--spin-to', spinDir);
-        // Trail: absolutely positioned, extending behind the icon
+
+        // Trailing glow line (anchored exactly behind 0,0)
         const trail = document.createElement('div');
         trail.style.cssText = `
             position:absolute;
-            right:100%;top:50%;
-            transform:translateY(-50%);
+            right:0;top:0;
+            margin-top:-2.5px;
             width:100px;height:5px;border-radius:9999px;
             background:linear-gradient(to right, transparent, ${color}44, ${color}cc);
         `;
-        wrapper.appendChild(iconEl);
-        wrapper.appendChild(trail);
-        el.appendChild(wrapper);
+
+        // The SVG icon (centered exactly at 0,0)
+        const iconEl = document.createElement('div');
+        iconEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" style="color:${color};filter:drop-shadow(0 0 6px ${color}88) drop-shadow(0 0 12px ${color}44);">${svgPath}</svg>`;
+        iconEl.style.cssText = `
+            position:absolute;
+            left:0;top:0;
+            margin-left:-${size / 2}px;
+            margin-top:-${size / 2}px;
+            animation:spin ${spinDur}s linear infinite;
+            line-height:0;
+        `;
+        iconEl.style.setProperty('--spin-to', spinDir);
+
+        el.appendChild(trail);
+        el.appendChild(iconEl);
         container.appendChild(el);
 
         setTimeout(() => { el.remove(); }, dur * 1000 + 100);
@@ -229,29 +232,53 @@ export function MobileStarField() {
         const comet = document.createElement('div');
         comet.style.cssText = `
             position:absolute;left:${fromX}%;top:${fromY}%;
-            display:flex;align-items:center;gap:2px;
+            width:0;height:0;
             animation:cometApproach ${dur}s ease-in forwards;
             --toX:${dx}vw;--toY:${dy}vh;
             pointer-events:none;
         `;
-        const trail = document.createElement('div');
-        trail.style.cssText = `
-            width:${withIcon ? 50 : 80}px;height:${withIcon ? 4 : 5}px;border-radius:9999px;
-            background:linear-gradient(to right, transparent, ${color}66, ${color});
+
+        // Trail wrapper rotated to face target
+        const trailLayer = document.createElement('div');
+        trailLayer.style.cssText = `
+            position:absolute;left:0;top:0;
             transform:rotate(${angle}deg);
         `;
-        comet.appendChild(trail);
+        const trail = document.createElement('div');
+        const tLen = withIcon ? 50 : 80;
+        const tHeight = withIcon ? 4 : 5;
+        trail.style.cssText = `
+            position:absolute;
+            right:0;top:0;
+            margin-top:-${tHeight / 2}px;
+            width:${tLen}px;height:${tHeight}px;border-radius:9999px;
+            background:linear-gradient(to right, transparent, ${color}66, ${color});
+        `;
+        trailLayer.appendChild(trail);
+        comet.appendChild(trailLayer);
+
         if (withIcon) {
             const iconHead = document.createElement('div');
             iconHead.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="color:${color};filter:drop-shadow(0 0 6px ${color});">${withIcon}</svg>`;
-            iconHead.style.cssText = `display:inline-block;line-height:0;animation:spin 2s linear infinite;`;
+            iconHead.style.cssText = `
+                position:absolute;left:0;top:0;
+                margin-left:-9px;margin-top:-9px;
+                animation:spin 2s linear infinite;
+                line-height:0;
+            `;
             iconHead.style.setProperty('--spin-to', '360deg');
             comet.appendChild(iconHead);
         } else {
             const head = document.createElement('div');
-            head.style.cssText = `width:6px;height:6px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};`;
+            head.style.cssText = `
+                position:absolute;left:0;top:0;
+                margin-left:-3px;margin-top:-3px;
+                width:6px;height:6px;border-radius:50%;
+                background:${color};box-shadow:0 0 8px ${color};
+            `;
             comet.appendChild(head);
         }
+
         container.appendChild(comet);
         setTimeout(() => comet.remove(), dur * 1000 + 50);
     };
