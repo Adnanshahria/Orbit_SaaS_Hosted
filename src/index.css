@@ -326,13 +326,7 @@
     border-color: rgba(255, 255, 255, 0.08) !important;
   }
 
-  /* Sections off-screen: defer rendering entirely */
-  section {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 600px;
-  }
-
-  /* Paint isolation for section containers */
+  /* Paint isolation for section containers (content-visibility removed for scroll stability) */
   section>div {
     contain: paint;
   }
@@ -445,12 +439,7 @@ html.low-perf .neon-text-cyan {
   text-shadow: none !important;
 }
 
-/* Defer off-screen content rendering on low-perf */
-html.low-perf section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 600px;
-}
-
+/* Defer off-screen content rendering on low-perf (content-visibility removed for scroll stability) */
 html.low-perf section>div {
   contain: paint;
 }
@@ -497,12 +486,7 @@ html.low-perf .hero-dice-cube {
   transform-style: flat !important;
 }
 
-/* Content containment for all viewports — major render perf win */
-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 500px;
-}
-
+/* Content containment for all viewports — major render perf win (content-visibility removed for scroll stability) */
 section>div {
   contain: layout style paint;
 }
