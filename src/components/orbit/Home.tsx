@@ -126,7 +126,7 @@ export function Home() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-x-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
+      className="relative min-h-screen flex items-center justify-center overflow-x-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
     >
 
 
@@ -134,7 +134,7 @@ export function Home() {
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
         style={{ contain: 'none' }}
       >
-        <div className="px-4 sm:px-14 py-[3dvh] sm:py-10 flex flex-col justify-between items-center min-h-[55dvh] sm:min-h-0">
+        <div className="px-4 sm:px-14 py-8 sm:py-10 flex flex-col justify-between items-center min-h-[550px] sm:min-h-0">
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (() => {
             const line1 = t.hero.tagline;
@@ -158,7 +158,7 @@ export function Home() {
                   initial={{ opacity: 0, y: -12, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
-                  className="flex sm:hidden flex-col items-center w-full max-w-[95%] mx-auto mb-[2dvh] -mt-[2dvh] font-playfair italic font-bold text-[14px] tracking-wide relative"
+                  className="flex sm:hidden flex-col items-center w-full max-w-[95%] mx-auto mb-4 -mt-4 font-playfair italic font-bold text-[14px] tracking-wide relative"
                 >
                   {/* Fusion Glow Effect (behind intersection) */}
                   <motion.div
@@ -214,7 +214,7 @@ export function Home() {
             );
           })()}
 
-          <div className="text-foreground leading-[1] mb-[2.5dvh] sm:mb-10 min-h-[20dvh] sm:min-h-[180px] flex flex-col items-center justify-center relative">
+          <div className="text-foreground leading-[1] mb-10 sm:mb-10 min-h-[200px] sm:min-h-[180px] flex flex-col items-center justify-center relative">
 
             {/* ─── Holographic Ring Portal ────────────────── */}
             <AnimatePresence>
@@ -449,7 +449,7 @@ export function Home() {
           animate={{
             width: isNewsletterFocused ? 'calc(100% - 32px)' : '140px',
             right: isNewsletterFocused ? '16px' : '80px',
-            bottom: isNewsletterFocused ? '15dvh' : '13dvh',
+            bottom: isNewsletterFocused ? '120px' : '100px',
           }}
           transition={{ type: 'spring', stiffness: 500, damping: 40 }}
           className={`fixed left-4 z-[100] sm:hidden ${isCtaOpen ? 'pointer-events-none' : ''}`}
