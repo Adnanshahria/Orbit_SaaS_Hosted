@@ -480,6 +480,27 @@ export function Home() {
         </div>{/* End Hero Container Card */}
       </div>
 
+      {/* Full-Screen Blur Overlay for Mobile Newsletter Focus */}
+      <AnimatePresence>
+        {isNewsletterFocused && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[90] bg-background/60 backdrop-blur-md sm:hidden"
+            onClick={() => {
+              if (!email) setIsNewsletterFocused(false);
+              // Small hack to blur the input & hide keyboard when backdrop is clicked
+              if (mobileEmailBarRef.current) {
+                const input = mobileEmailBarRef.current.querySelector('input');
+                if (input) input.blur();
+              }
+            }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
       {isHeroLoaded && (
         <motion.div

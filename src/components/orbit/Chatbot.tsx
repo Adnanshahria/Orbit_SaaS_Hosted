@@ -162,7 +162,8 @@ export function Chatbot() {
     };
 
     const hideAndReset = () => {
-      // Hide popup IMMEDIATELY when user starts interacting heavily (scrolling, clicking)
+      // Only hide if the user specifically interacts with the UI in a major way (click/tap), 
+      // otherwise natural scrolling shouldn't punish them by hiding the popup instantly.
       setShowWelcomePopup((prev) => {
         if (prev) return false;
         return prev;
@@ -171,11 +172,10 @@ export function Chatbot() {
     };
 
     // Listeners for user activity
-    // Mousemove only resets the timer, but DOES NOT hide an already open popup (allows user to move mouse to click it)
     window.addEventListener('mousemove', resetIdleTimer, { passive: true });
+    window.addEventListener('scroll', resetIdleTimer, { passive: true }); // Scroll only resets timer, doesn't hide
 
-    // Heavy interactions that should instantly hide the popup and reset the timer
-    window.addEventListener('scroll', hideAndReset, { passive: true });
+    // Hard interactions that hide the popup
     window.addEventListener('keydown', hideAndReset, { passive: true });
     window.addEventListener('mousedown', hideAndReset, { passive: true });
     window.addEventListener('touchstart', hideAndReset, { passive: true });
@@ -187,7 +187,7 @@ export function Chatbot() {
       if (idleTimer.current) clearTimeout(idleTimer.current);
       if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
       window.removeEventListener('mousemove', resetIdleTimer);
-      window.removeEventListener('scroll', hideAndReset);
+      window.removeEventListener('scroll', resetIdleTimer);
       window.removeEventListener('keydown', hideAndReset);
       window.removeEventListener('mousedown', hideAndReset);
       window.removeEventListener('touchstart', hideAndReset);
