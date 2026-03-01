@@ -867,7 +867,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.5 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="fixed bottom-[22dvh] mb-2 sm:mb-6 md:bottom-24 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
+            className="fixed bottom-[16dvh] mb-2 sm:mb-6 md:bottom-24 right-4 sm:right-6 z-[195] flex flex-col items-end pointer-events-none origin-[calc(100%-24px)_calc(100%+24px)]"
           >
             <div className="relative pointer-events-auto cursor-pointer group" onClick={() => setOpen(true)}>
               {/* Main Speech Bubble */}
@@ -927,7 +927,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setOpen(!open)}
-        className={`fixed bottom-[14dvh] md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
+        className={`fixed bottom-[8dvh] md:bottom-6 right-4 sm:right-6 z-[200] flex items-center justify-center cursor-pointer transition-all duration-300 ${open
           ? 'w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground neon-glow shadow-2xl hidden md:flex'
           : 'w-[12vw] h-[12vw] max-w-[60px] max-h-[60px] sm:w-[80px] sm:h-[80px] sm:max-w-[80px] sm:max-h-[80px] bg-transparent'
           }`}
