@@ -122,13 +122,21 @@ export function Home() {
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
+  // Force exactly the screen height ONCE to prevent shrinking when mobile keyboard opens
+  const [heroHeight, setHeroHeight] = useState('100vh');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHeroHeight(`${window.innerHeight}px`);
+    }
+  }, []);
+
   return (
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-x-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
+      className="relative flex items-center justify-center overflow-x-hidden pt-0 pb-24 sm:pt-20 sm:pb-0"
+      style={{ minHeight: heroHeight }}
     >
-
 
       <div
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
