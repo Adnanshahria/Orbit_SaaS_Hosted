@@ -14,6 +14,7 @@ export function Home() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const emailBarRef = useRef<HTMLDivElement>(null);
+  const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
   const mobileEmailBarRef = useRef<HTMLDivElement>(null);
 
   // Track scroll position to hide email bar — uses refs to avoid React re-renders
@@ -34,12 +35,9 @@ export function Home() {
         emailBarRef.current.style.pointerEvents = shouldShow ? 'auto' : 'none';
         emailBarRef.current.style.transform = shouldShow ? 'translateY(0)' : 'translateY(16px)';
       }
-      if (mobileEmailBarRef.current) {
-        mobileEmailBarRef.current.style.opacity = shouldShow ? '1' : '0';
-        mobileEmailBarRef.current.style.visibility = shouldShow ? 'visible' : 'hidden';
-        mobileEmailBarRef.current.style.pointerEvents = shouldShow ? 'auto' : 'none';
-        mobileEmailBarRef.current.style.transform = shouldShow ? 'translateY(0)' : 'translateY(16px)';
-      }
+      // The mobileEmailBarRef is now controlled by Framer Motion's animate prop for position and size,
+      // and its style prop for opacity/visibility based on isCtaOpen.
+      // The scroll-based visibility for the mobile bar is no longer handled here.
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -444,40 +442,69 @@ export function Home() {
 
       {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
       {isHeroLoaded && (
-        <div
+        <motion.div
           ref={mobileEmailBarRef}
-          className={`fixed bottom-[13dvh] left-4 right-[80px] z-[100] sm:hidden ${isCtaOpen ? 'pointer-events-none' : ''}`}
+          layout
+          initial={false}
+          animate={{
+            width: isNewsletterFocused ? 'calc(100% - 32px)' : '140px',
+            right: isNewsletterFocused ? '16px' : '80px',
+            bottom: isNewsletterFocused ? '15dvh' : '13dvh',
+          }}
+          transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+          className={`fixed left-4 z-[100] sm:hidden ${isCtaOpen ? 'pointer-events-none' : ''}`}
           style={{
             opacity: isCtaOpen ? 0 : 1,
             visibility: isCtaOpen ? 'hidden' : 'visible',
-            transition: 'opacity 0.4s ease, transform 0.4s ease, visibility 0.4s',
-            transform: 'translateY(0)',
+            transition: 'opacity 0.4s ease, visibility 0.4s',
           }}
         >
-          <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
-            <input
+          <form
+            onSubmit={handleSubscribe}
+            className="relative flex justify-center w-full"
+            onClick={() => !isNewsletterFocused && setIsNewsletterFocused(true)}
+          >
+            <motion.input
+              layout
               type="email"
-              placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+              placeholder={!isNewsletterFocused ? (lang === 'bn' ? 'যুক্ত হোন' : 'Stay Updated') : (lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...')}
               value={email}
+              autoFocus={isNewsletterFocused}
+              onFocus={() => setIsNewsletterFocused(true)}
+              onBlur={() => !email && setIsNewsletterFocused(false)}
               onChange={(e) => setEmail(e.target.value)}
               disabled={status === 'loading'}
-              className="w-full bg-card/80 border border-border/60 rounded-full py-2 pl-5 pr-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
+              className={`w-full bg-card/90 border border-primary/30 rounded-full py-2.5 transition-all shadow-xl text-foreground placeholder:text-muted-foreground/60 ${isNewsletterFocused ? 'pl-5 pr-[120px] text-sm' : 'pl-10 pr-4 text-xs font-bold'
+                }`}
             />
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-full bg-primary text-primary-foreground font-semibold text-[12px] flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
-            >
-              {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
-            </button>
+
+            {!isNewsletterFocused && (
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary animate-pulse" />
+            )}
+
+            <AnimatePresence>
+              {isNewsletterFocused && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-full bg-primary text-primary-foreground font-bold text-[12px] flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all"
+                >
+                  {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  <span>{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
+                </motion.button>
+              )}
+            </AnimatePresence>
           </form>
+
           {status === 'success' && (
-            <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-              {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
+            <p className="text-emerald-400 text-[10px] mt-2 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+              {lang === 'bn' ? 'স্বাগতম!' : 'Welcome!'}
             </p>
           )}
-        </div>
+        </motion.div>
       )}
 
 
