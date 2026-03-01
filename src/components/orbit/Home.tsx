@@ -155,24 +155,61 @@ export function Home() {
                   {line2 ? `${line1} ${line2}` : line1}
                 </motion.div>
 
-                {/* Mobile: two separate rectangles, stacked and offset */}
+                {/* Mobile: two overlapping rectangles, offset like chain links */}
                 <motion.div
                   initial={{ opacity: 0, y: -12, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
-                  className="flex sm:hidden flex-col items-start gap-0 w-full max-w-[95%] mx-auto mb-[3dvh]"
-                  style={{ color: taglineColor }}
+                  className="flex sm:hidden flex-col items-center w-full max-w-[95%] mx-auto mb-[2dvh] -mt-[2dvh] font-playfair italic font-bold text-[14px] tracking-wide relative"
                 >
-                  {/* Row 1 — left-aligned rectangle */}
-                  <div className="self-start inline-flex items-center gap-2 px-6 py-2.5 rounded-sm bg-[#1A1C1A]/80 border border-white/10 backdrop-blur-md text-[14px] font-playfair italic tracking-wide shadow-lg">
-                    <span className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] shrink-0" />
-                    <span className="font-bold">{line1}</span>
-                  </div>
-                  {/* Row 2 — right-aligned rectangle */}
-                  {line2 && (
-                    <div className="self-end inline-flex items-center gap-2 px-6 py-2.5 rounded-sm bg-[#1A1C1A]/80 border border-white/10 border-t-0 backdrop-blur-md text-[14px] font-playfair italic tracking-wide shadow-lg">
-                      <span className="font-bold">{line2}</span>
+                  {/* Fusion Glow Effect (behind intersection) */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: baseDelay + 0.8, duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-10 bg-gradient-to-r from-emerald-500/40 to-amber-500/40 blur-xl z-[8] mix-blend-screen pointer-events-none"
+                  />
+
+                  {/* Row 1 — slightly left, skewed parallelogram */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -80, skewX: -24 }}
+                    animate={{ opacity: 1, x: -40, skewX: -24 }}
+                    transition={{ type: "spring", stiffness: 120, damping: 15, delay: baseDelay + 0.4 }}
+                    viewport={{ once: true }}
+                    className="relative z-10 flex items-center justify-center gap-2 px-10 py-2 backdrop-blur-md shadow-lg"
+                    style={{
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      border: '1.5px solid rgba(16, 185, 129, 0.6)',
+                      color: taglineColor,
+                      borderRadius: '0px',
+                    }}
+                  >
+                    <div style={{ transform: 'skewX(24deg)' }} className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] shrink-0" />
+                      <span>{line1}</span>
                     </div>
+                  </motion.div>
+                  {/* Row 2 — slightly right, skewed parallelogram, overlapping row 1 */}
+                  {line2 && (
+                    <motion.div
+                      initial={{ opacity: 0, x: 80, skewX: -24 }}
+                      animate={{ opacity: 1, x: 40, skewX: -24 }}
+                      transition={{ type: "spring", stiffness: 120, damping: 15, delay: baseDelay + 0.6 }}
+                      viewport={{ once: true }}
+                      className="relative z-[5] flex items-center justify-center gap-2 px-10 py-2 backdrop-blur-md shadow-lg"
+                      style={{
+                        marginTop: '-0px',
+                        background: 'rgba(245, 158, 11, 0.12)',
+                        border: '1.5px solid rgba(245, 158, 11, 0.6)',
+                        color: '#f59e0b',
+                        borderRadius: '0px',
+                      }}
+                    >
+                      <div style={{ transform: 'skewX(24deg)' }} className="flex items-center gap-2">
+                        <span>{line2}</span>
+                      </div>
+                    </motion.div>
                   )}
                 </motion.div>
               </>
