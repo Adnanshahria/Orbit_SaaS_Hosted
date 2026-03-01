@@ -4,6 +4,7 @@ import { SectionHeader, LangToggle, SaveButton, TextField, ErrorAlert, useSectio
 export default function AdminHero() {
     const { lang, setLang, saving, saved, error, getData, save } = useSectionEditor('hero');
     const [tagline, setTagline] = useState('');
+    const [tagline2, setTagline2] = useState('');
     const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
     const [cta, setCta] = useState('');
@@ -19,6 +20,7 @@ export default function AdminHero() {
         const d = getData();
         if (d) {
             setTagline(d.tagline || '');
+            setTagline2(d.tagline2 || '');
             setTitle(d.title || '');
             setSubtitle(d.subtitle || '');
             setCta(d.cta || '');
@@ -33,7 +35,7 @@ export default function AdminHero() {
     }, [getData]);
 
     const currentPayload = {
-        tagline, title, subtitle, cta, learnMore,
+        tagline, tagline2, title, subtitle, cta, learnMore,
         taglineColor, titleColor, ctaGradientStart, ctaGradientEnd
     };
 
@@ -51,7 +53,8 @@ export default function AdminHero() {
                     <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
                         📝 Content
                     </h3>
-                    <TextField label="Tagline" value={tagline} onChange={setTagline} lang={lang} />
+                    <TextField label="Tagline (Row 1)" value={tagline} onChange={setTagline} lang={lang} />
+                    <TextField label="Tagline (Row 2 — Mobile)" value={tagline2} onChange={setTagline2} lang={lang} />
                     <TextField label="Title" value={title} onChange={setTitle} lang={lang} />
                     <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} multiline lang={lang} />
                     <TextField label="CTA Button Text" value={cta} onChange={setCta} lang={lang} />
@@ -95,6 +98,7 @@ export default function AdminHero() {
                     data={currentPayload}
                     onImport={(parsed) => {
                         setTagline(parsed.tagline || '');
+                        setTagline2(parsed.tagline2 || '');
                         setTitle(parsed.title || '');
                         setSubtitle(parsed.subtitle || '');
                         setCta(parsed.cta || '');

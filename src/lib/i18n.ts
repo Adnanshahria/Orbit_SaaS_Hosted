@@ -14,6 +14,7 @@ export const translations = {
     hero: {
       title: 'We Build What Others Dream',
       tagline: '✦ Full-Service Software & AI Agency',
+      tagline2: '',
       subtitle: 'Web apps, AI chatbots, agentic automation, mobile apps, eCommerce & PWAs — end-to-end solutions powered by cutting-edge technology.',
       cta: 'Book an Appointment',
       learnMore: 'Explore Services',
@@ -140,6 +141,7 @@ export const translations = {
     hero: {
       title: 'আমরা তৈরি করি যা অন্যরা স্বপ্ন দেখে',
       tagline: '✦ ফুল-সার্ভিস সফটওয়্যার ও এআই এজেন্সি',
+      tagline2: '',
       subtitle: 'ওয়েব অ্যাপস, এআই চ্যাটবট, এজেন্টিক অটোমেশন, মোবাইল অ্যাপস, ই-কমার্স ও PWA — অত্যাধুনিক প্রযুক্তি দিয়ে এন্ড-টু-এন্ড সলিউশন।',
       cta: 'অ্যাপয়েন্টমেন্ট বুক করুন',
       learnMore: 'সেবাসমূহ দেখুন',

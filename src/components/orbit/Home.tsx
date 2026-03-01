@@ -138,20 +138,46 @@ export function Home() {
       >
         <div className="px-4 sm:px-14 py-[3dvh] sm:py-10 flex flex-col justify-between items-center min-h-[55dvh] sm:min-h-0">
           {/* Badge — slides down with spring */}
-          {t.hero.tagline && (
-            <motion.div
-              initial={{ opacity: 0, y: -12, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
-              className="inline-flex items-center gap-3 px-6 sm:px-5 py-3 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-[14px] sm:text-sm font-playfair italic font-bold mb-[2dvh] sm:mb-6 tracking-wide w-auto max-w-[95%] text-left md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
-              style={{ color: taglineColor }}
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]"
-              />
-              {t.hero.tagline}
-            </motion.div>
-          )}
+          {t.hero.tagline && (() => {
+            const line1 = t.hero.tagline;
+            const line2 = (t.hero as any).tagline2 || '';
+            return (
+              <>
+                {/* Desktop: single pill (combines both if tagline2 exists) */}
+                <motion.div
+                  initial={{ opacity: 0, y: -12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
+                  className="hidden sm:inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-sm font-playfair italic font-bold mb-6 tracking-wide w-auto max-w-[95%] md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+                  style={{ color: taglineColor }}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]" />
+                  {line2 ? `${line1} ${line2}` : line1}
+                </motion.div>
+
+                {/* Mobile: two separate rectangles, stacked and offset */}
+                <motion.div
+                  initial={{ opacity: 0, y: -12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
+                  className="flex sm:hidden flex-col items-start gap-0 w-full max-w-[95%] mx-auto mb-[3dvh]"
+                  style={{ color: taglineColor }}
+                >
+                  {/* Row 1 — left-aligned rectangle */}
+                  <div className="self-start inline-flex items-center gap-2 px-6 py-2.5 rounded-sm bg-[#1A1C1A]/80 border border-white/10 backdrop-blur-md text-[14px] font-playfair italic tracking-wide shadow-lg">
+                    <span className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] shrink-0" />
+                    <span className="font-bold">{line1}</span>
+                  </div>
+                  {/* Row 2 — right-aligned rectangle */}
+                  {line2 && (
+                    <div className="self-end inline-flex items-center gap-2 px-6 py-2.5 rounded-sm bg-[#1A1C1A]/80 border border-white/10 border-t-0 backdrop-blur-md text-[14px] font-playfair italic tracking-wide shadow-lg">
+                      <span className="font-bold">{line2}</span>
+                    </div>
+                  )}
+                </motion.div>
+              </>
+            );
+          })()}
 
           <div className="text-foreground leading-[1] mb-[2.5dvh] sm:mb-10 min-h-[20dvh] sm:min-h-[180px] flex flex-col items-center justify-center relative">
 
