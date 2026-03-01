@@ -130,6 +130,32 @@ export function Home() {
     }
   }, []);
 
+  // Rigorous body scroll lock when newsletter is focused to prevent browser from auto-scrolling hero content upwards
+  useEffect(() => {
+    if (isNewsletterFocused && window.innerWidth < 768) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.height = '100%';
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.documentElement.style.height = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isNewsletterFocused]);
+
   return (
     <section
       ref={sectionRef}
@@ -337,7 +363,13 @@ export function Home() {
             <div className="relative w-auto sm:w-auto">
               <motion.button
                 id="hero-book-appointment"
-                onClick={() => setIsCtaOpen(!isCtaOpen)}
+                onClick={() => {
+                  const newState = !isCtaOpen;
+                  setIsCtaOpen(newState);
+                  if (newState) {
+                    window.dispatchEvent(new CustomEvent('orbit-cta-open'));
+                  }
+                }}
                 whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
@@ -357,7 +389,7 @@ export function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-4 w-full sm:w-[240px] z-30 flex flex-col gap-2"
+                    className="absolute top-full left-0 right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-4 w-full sm:w-[240px] z-[150] flex flex-col gap-2"
                   >
                     <motion.a
                       href={whatsappUrl}

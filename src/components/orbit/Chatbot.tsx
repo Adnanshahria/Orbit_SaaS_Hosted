@@ -120,6 +120,23 @@ export function Chatbot() {
     return msgs[Math.floor(Math.random() * msgs.length)];
   };
 
+  // Listen to external interactions to mute the popup (e.g., CTA dropdown opened)
+  useEffect(() => {
+    const handleRemoteDismiss = () => setHasDismissedPopup(true);
+    window.addEventListener('orbit-cta-open', handleRemoteDismiss);
+    return () => window.removeEventListener('orbit-cta-open', handleRemoteDismiss);
+  }, []);
+
+  // Auto-hide the welcome popup after 8 seconds if ignored
+  useEffect(() => {
+    if (showWelcomePopup) {
+      const t = setTimeout(() => {
+        setShowWelcomePopup(false);
+      }, 8000);
+      return () => clearTimeout(t);
+    }
+  }, [showWelcomePopup]);
+
   // Idle tracking logic
   useEffect(() => {
     if (open || messages.length > 0 || hasDismissedPopup) {
@@ -134,14 +151,14 @@ export function Chatbot() {
       if (hidePopupTimer.current) clearTimeout(hidePopupTimer.current);
 
       idleTimer.current = setTimeout(() => {
-        // User has been idle for 3 seconds
+        // User has been idle for 10 seconds
         if (!open && messages.length === 0 && !hasDismissedPopup) {
           const activeSec = getActiveSection();
           const newMessage = getRandomContextMessage(activeSec);
           setPopupMessage(newMessage);
           setShowWelcomePopup(true);
         }
-      }, 3000); // 3 seconds idle triggers popup instantly
+      }, 10000); // 10 seconds idle triggers popup
     };
 
     const hideAndReset = () => {
