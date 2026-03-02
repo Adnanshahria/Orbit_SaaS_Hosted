@@ -183,7 +183,7 @@ export function Home() {
                   initial={{ opacity: 0, y: -12, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
-                  className="flex sm:hidden flex-col items-center w-full max-w-[95%] mx-auto mb-4 -mt-4 font-playfair italic font-bold text-[14px] tracking-wide relative"
+                  className="flex sm:hidden flex-col items-center w-full max-w-[95%] mx-auto mb-4 mt-6 font-playfair italic font-bold text-[14px] tracking-wide relative"
                 >
                   {/* Fusion Glow Effect (behind intersection) - Moved down to overlap */}
                   <motion.div
@@ -452,20 +452,22 @@ export function Home() {
       </AnimatePresence>
 
       {/* Newsletter — Compact button (fixed, bottom-left, inline with chatbot) */}
-      {isHeroLoaded && !isNewsletterFocused && (
-        <div
-          className={`fixed bottom-[10dvh] sm:bottom-6 left-4 sm:left-6 z-[260] transition-all duration-500 ease-out ${(!isInHero || isCtaOpen) ? 'opacity-0 pointer-events-none translate-y-4 scale-90 invisible' : 'opacity-100 translate-y-0 scale-100 visible'}`}
-        >
-          <button
-            type="button"
-            onClick={() => setIsNewsletterFocused(true)}
-            className="flex items-center gap-2 bg-card/90 border border-primary/50 rounded-full py-2.5 pl-3.5 pr-5 text-xs font-bold text-foreground cursor-pointer newsletter-attract backdrop-blur-sm"
+      {
+        isHeroLoaded && !isNewsletterFocused && (
+          <div
+            className={`fixed bottom-[10dvh] sm:bottom-6 left-4 sm:left-6 z-[260] transition-all duration-500 ease-out ${(!isInHero || isCtaOpen) ? 'opacity-0 pointer-events-none translate-y-4 scale-90 invisible' : 'opacity-100 translate-y-0 scale-100 visible'}`}
           >
-            <Mail className="w-4 h-4 text-primary animate-bounce" />
-            <span>{lang === 'bn' ? 'যুক্ত হোন' : 'Stay Updated'}</span>
-          </button>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={() => setIsNewsletterFocused(true)}
+              className="flex items-center gap-2 bg-card/90 border border-primary/50 rounded-full py-2.5 pl-3.5 pr-5 text-xs font-bold text-foreground cursor-pointer newsletter-attract backdrop-blur-sm"
+            >
+              <Mail className="w-4 h-4 text-primary animate-bounce" />
+              <span>{lang === 'bn' ? 'যুক্ত হোন' : 'Stay Updated'}</span>
+            </button>
+          </div>
+        )
+      }
 
       {/* Newsletter — Expanded email form (centered overlay) */}
       <AnimatePresence>
