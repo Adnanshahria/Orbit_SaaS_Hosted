@@ -1,10 +1,12 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
+import { BOOM_DATA_URL } from './boomDataUrl';
 
 /**
  * useCollisionSound — synthesized "dhurum" impact sound via Web Audio API.
  *
  * Returns `playBoom()` function. Sound respects user's mute preference
  * stored in localStorage ('orbit_sound_muted').
+ * Sound only plays while the hero section is visible.
  *
  * AudioContext is lazily created and unlocked on first user interaction.
  */
@@ -12,17 +14,22 @@ export function useCollisionSound() {
     const audioPoolRef = useRef<HTMLAudioElement[]>([]);
     const mutedRef = useRef(false);
     const poolIndexRef = useRef(0);
+    const volumeRef = useRef(0.15);
 
     // Load mute preference and pre-create audio pool
     useEffect(() => {
         mutedRef.current = localStorage.getItem('orbit_sound_muted') === 'true';
 
-        // Pre-create a small pool of Audio objects for overlapping playback
+        // Read volume (0-100 scale), default to 15% if not set
+        const savedVol = localStorage.getItem('orbit_sound_volume');
+        const vol = savedVol !== null ? Number(savedVol) / 100 : 0.15;
+        volumeRef.current = vol > 0 ? vol : 0.15; // Never default to 0
+
+        // Pre-create a small pool of Audio objects using inline data URL (no HTTP request, no IDM trigger)
         const pool: HTMLAudioElement[] = [];
         for (let i = 0; i < 3; i++) {
-            const audio = new Audio('/boom.mp3');
-            audio.volume = 0.4;
-            audio.preload = 'auto';
+            const audio = new Audio(BOOM_DATA_URL);
+            audio.volume = volumeRef.current;
             pool.push(audio);
         }
         audioPoolRef.current = pool;
@@ -48,6 +55,8 @@ export function useCollisionSound() {
     useEffect(() => {
         const handler = () => {
             mutedRef.current = localStorage.getItem('orbit_sound_muted') === 'true';
+            const savedVol = localStorage.getItem('orbit_sound_volume');
+            if (savedVol !== null) volumeRef.current = Number(savedVol) / 100;
         };
         window.addEventListener('orbit-sound-toggle', handler);
         return () => window.removeEventListener('orbit-sound-toggle', handler);
@@ -62,6 +71,14 @@ export function useCollisionSound() {
 
         if (mutedRef.current) return;
 
+        // Only play sound when user is in the hero section
+        const hero = document.getElementById('hero');
+        if (hero) {
+            const rect = hero.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, -rect.top / (rect.height || 1)));
+            if (ratio >= 0.15) return; // user has scrolled past hero
+        }
+
         try {
             const pool = audioPoolRef.current;
             if (pool.length === 0) return;
@@ -71,7 +88,10 @@ export function useCollisionSound() {
             poolIndexRef.current++;
 
             audio.currentTime = 0;
-            audio.volume = 0.35 + Math.random() * 0.15; // Slight variation
+            // Re-read volume from localStorage for real-time admin updates
+            const savedVol = localStorage.getItem('orbit_sound_volume');
+            const base = savedVol !== null ? Math.max(0.01, Number(savedVol) / 100) : volumeRef.current;
+            audio.volume = Math.max(0, Math.min(1, base * (0.85 + Math.random() * 0.3))); // ±15% variation
             audio.play().catch(() => { });
         } catch {
             // Silently fail

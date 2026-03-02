@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Globe, Home, Layers, MessageSquare, Trophy, Users, Phone, FolderOpen, ChevronDown, MessageCircle, Mail, Star, Volume2, VolumeX } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
+import { useContent } from '@/contexts/ContentContext';
 import orbitLogo from '@/assets/orbit-logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -18,6 +19,7 @@ const mobileNavItems = [
 
 export function Navbar() {
   const { t, lang, toggleLang } = useLang();
+  const { content } = useContent();
 
   // Dynamic WhatsApp URL from admin settings
   const whatsappNumber = (t.contact as any).whatsapp || '';
@@ -30,9 +32,20 @@ export function Navbar() {
   const [showNavbarCTA, setShowNavbarCTA] = useState(false);
   const [isNavCtaOpen, setIsNavCtaOpen] = useState(false);
   const navCtaRef = useRef<HTMLDivElement>(null);
-  const [isSoundMuted, setIsSoundMuted] = useState(
-    () => localStorage.getItem('orbit_sound_muted') === 'true'
-  );
+
+  // Sound defaults: ON by default, 15% volume (hardcoded)
+  const [isSoundMuted, setIsSoundMuted] = useState(() => {
+    const saved = localStorage.getItem('orbit_sound_muted');
+    if (saved !== null) return saved === 'true';
+    return false; // Sound ON by default
+  });
+
+  // Initialize volume to 15% for new visitors
+  useEffect(() => {
+    if (localStorage.getItem('orbit_sound_volume') === null) {
+      localStorage.setItem('orbit_sound_volume', '15');
+    }
+  }, []);
 
   const toggleSound = () => {
     const next = !isSoundMuted;
@@ -74,7 +87,7 @@ export function Navbar() {
 
       const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'reviews', 'contact'];
       let current = 'hero';
-      const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
+      const atBottom = window.scrollY > 100 && (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
       if (atBottom) {
         current = 'contact';
       } else {
@@ -123,10 +136,9 @@ export function Navbar() {
           setIsScrolled(scrolled);
         }
 
-        // Section detection — deferred by 100ms after scroll stops
-        // This prevents the "sticky section" feel during active scrolling
+        // Section detection — run almost immediately (1 frame delay)
         if (sectionTimer) clearTimeout(sectionTimer);
-        sectionTimer = window.setTimeout(detectSection, 100);
+        sectionTimer = window.setTimeout(detectSection, 16);
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -205,10 +217,20 @@ export function Navbar() {
                   key={l.href}
                   href={l.href}
                   onClick={(e) => scrollToSection(e, l.href)}
-                  className={`px-4 py-1.5 rounded-full border font-medium gentle-animation text-sm ${activeSection === l.href
-                    ? 'bg-primary text-primary-foreground border-primary shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+                  className={`relative px-4 py-1.5 rounded-full border font-medium text-sm transition-colors duration-300 ${activeSection === l.href
+                    ? 'text-primary-foreground border-transparent'
                     : 'border-[#2a2a3e] text-[#b0b0c0] hover:text-foreground hover:border-[#3a3a50] hover:bg-[#141420]'
-                    }`}>{l.label}</a>
+                    }`}
+                >
+                  {activeSection === l.href && (
+                    <motion.div
+                      layoutId="desktop-active-pill"
+                      className="absolute inset-0 rounded-full bg-primary shadow-[0_0_10px_rgba(16,185,129,0.3)] border border-primary"
+                      transition={{ type: 'spring', stiffness: 600, damping: 35 }}
+                    />
+                  )}
+                  <span className="relative z-10">{l.label}</span>
+                </a>
               ))}
             </motion.div>
 
@@ -301,48 +323,66 @@ export function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile bottom pill navbar */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-        className="md:hidden fixed bottom-[2dvh] left-4 right-4 z-[120]"
-      >
-        <div className="navbar-gradient-border flex items-center gap-0 px-2 py-2 rounded-[22px] bg-[#0a0a0f] shadow-[0_10px_30px_rgba(0,0,0,0.3)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
-          {links.map((link) => {
-            const isActive = activeSection === link.href;
-            // Map href to icon
-            const Icon = mobileNavItems.find(i => i.href === link.href)?.icon || Layers;
+      {/* Mobile bottom pill navbar — hidden on project pages */}
+      {!location.pathname.startsWith('/project') && (
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="md:hidden fixed bottom-[2dvh] left-4 right-4 z-[120]"
+        >
+          <div className="navbar-gradient-border flex items-center gap-0 px-2 py-2 rounded-[22px] bg-[#0a0a0f] shadow-[0_10px_30px_rgba(0,0,0,0.3)] overflow-x-auto scrollbar-hide mx-auto w-fit max-w-full">
+            {links.map((link) => {
+              const isActive = activeSection === link.href;
+              // Map href to icon
+              const Icon = mobileNavItems.find(i => i.href === link.href)?.icon || Layers;
 
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(e, link.href);
-                  setActiveSection(link.href);
-                }}
-                className="relative"
-              >
-                <div
-                  className={`flex items-center gap-1.5 rounded-full gentle-animation cursor-pointer ${isActive
-                    ? 'bg-primary/20 px-2.5 py-1.5 border border-primary/50 shadow-[0_0_8px_rgba(16,185,129,0.25)]'
-                    : 'px-1.5 py-1.5 hover:bg-[#141420] border border-transparent'
-                    }`}
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(e, link.href);
+                    setActiveSection(link.href);
+                  }}
+                  className="relative"
                 >
-                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                  {isActive && (
-                    <span className="text-xs font-semibold text-primary whitespace-nowrap">
-                      {link.label}
-                    </span>
-                  )}
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      </motion.div>
+                  <div
+                    className={`relative flex items-center gap-1.5 rounded-full cursor-pointer transition-all duration-300 ${isActive
+                      ? 'px-2.5 py-1.5'
+                      : 'px-1.5 py-1.5 hover:bg-[#141420]'
+                      }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="mobile-active-pill"
+                        className="absolute inset-0 rounded-full bg-primary/20 border border-primary/50 shadow-[0_0_8px_rgba(16,185,129,0.25)]"
+                        transition={{ type: 'spring', stiffness: 600, damping: 35 }}
+                      />
+                    )}
+                    <Icon className={`relative z-10 w-3.5 h-3.5 shrink-0 transition-colors duration-300 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <AnimatePresence mode="wait">
+                      {isActive && (
+                        <motion.span
+                          key={link.href}
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: 'auto' }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ type: 'spring', stiffness: 600, damping: 35 }}
+                          className="relative z-10 text-xs font-semibold text-primary whitespace-nowrap overflow-hidden"
+                        >
+                          {link.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
     </>
   );
 }

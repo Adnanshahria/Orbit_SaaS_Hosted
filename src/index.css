@@ -302,8 +302,32 @@
   inset: 0;
   pointer-events: none;
   z-index: 99999;
-  box-shadow: inset 0 0 80px 20px rgba(255, 80, 0, 0.25), inset 0 0 200px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 60px 15px var(--flash-color, rgba(255, 80, 0, 0.20)), inset 0 0 120px 30px rgba(0, 0, 0, 0.20);
   animation: collisionFlash 0.45s ease-out forwards;
+}
+
+/* Newsletter button attention animation */
+.newsletter-attract {
+  animation: newsletterPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes newsletterPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.1);
+    transform: scale(1);
+  }
+  25% {
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.4), 0 0 35px rgba(16, 185, 129, 0.2), 0 0 50px rgba(245, 158, 11, 0.1);
+    transform: scale(1.04);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3), 0 0 25px rgba(245, 158, 11, 0.15);
+    transform: scale(1);
+  }
+  75% {
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.4), 0 0 35px rgba(16, 185, 129, 0.2), 0 0 50px rgba(16, 185, 129, 0.1);
+    transform: scale(1.04);
+  }
 }
 
 /* Nebula pulse — opacity only (compositor-friendly, no layout) */
@@ -387,15 +411,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Disable shimmer/sweep animations — saves GPU compositing ── */
-  .animate-text-shimmer-orbit,
-  .animate-text-shimmer-saas {
-    animation: none !important;
-    background: none !important;
-    color: var(--foreground) !important;
-    -webkit-background-clip: unset !important;
-    background-clip: unset !important;
-  }
+
 }
 
 /* ── JS-triggered low-perf mode: disable all heavy effects ── */
@@ -433,11 +449,7 @@ html.low-perf .shadow-\[0_0_40px_rgba\(108\,92\,231\,0\.08\)\] {
   box-shadow: 0 0 8px rgba(108, 92, 231, 0.05) !important;
 }
 
-/* Disable shimmer/sweep animations on low-perf — use static gradient */
-html.low-perf .animate-text-shimmer-orbit,
-html.low-perf .animate-text-shimmer-saas {
-  animation: none !important;
-}
+
 
 /* Disable custom cursor on low-perf — saves GPU compositing */
 html.low-perf body,

@@ -11,6 +11,7 @@ export default function AdminNavbar() {
     const [projects, setProjects] = useState('');
     const [bookCall, setBookCall] = useState('');
 
+
     useEffect(() => {
         const d = getData();
         if (d) {
@@ -21,6 +22,7 @@ export default function AdminNavbar() {
             setContact(d.contact || '');
             setProjects(d.projects || '');
             setBookCall(d.bookCall || '');
+
         }
     }, [getData]);
 
@@ -40,6 +42,9 @@ export default function AdminNavbar() {
                 <TextField label="Contact Link" value={contact} onChange={setContact} lang={lang} />
                 <TextField label="Book Call Button Text" value={bookCall} onChange={setBookCall} lang={lang} />
             </div>
+
+
+
             <SaveButton onClick={() => save({ services, techStack, whyUs, leadership, contact, projects, bookCall })} saving={saving} saved={saved} />
 
             <div className="mt-8 pt-8 border-t border-border">

@@ -10,6 +10,8 @@ export const translations = {
       contact: 'Contact',
       projects: 'Projects',
       bookCall: 'Book an Appointment',
+      defaultSoundMuted: false,
+      defaultVolume: 40,
     },
     hero: {
       title: 'We Build What Others Dream',
@@ -137,6 +139,8 @@ export const translations = {
       contact: 'যোগাযোগ',
       projects: 'প্রকল্পসমূহ',
       bookCall: 'অ্যাপয়েন্টমেন্ট বুক করুন',
+      defaultSoundMuted: false,
+      defaultVolume: 40,
     },
     hero: {
       title: 'আমরা তৈরি করি যা অন্যরা স্বপ্ন দেখে',

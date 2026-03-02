@@ -13,11 +13,11 @@ export function Home() {
   const [isCtaOpen, setIsCtaOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
-  const emailBarRef = useRef<HTMLDivElement>(null);
   const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
   const mobileEmailBarRef = useRef<HTMLDivElement>(null);
+  const [isInHero, setIsInHero] = useState(true);
 
-  // Track scroll position to hide email bar — uses refs to avoid React re-renders
+  // Track scroll position to hide newsletter button
   useEffect(() => {
     let wasVisible = true;
     const onScroll = () => {
@@ -26,18 +26,9 @@ export function Home() {
       const rect = hero.getBoundingClientRect();
       const ratio = Math.max(0, Math.min(1, -rect.top / (rect.height || 1)));
       const shouldShow = ratio < 0.15;
-      if (shouldShow === wasVisible) return; // no change, skip DOM work
+      if (shouldShow === wasVisible) return;
       wasVisible = shouldShow;
-      // Toggle visibility via CSS classes directly — zero React re-renders
-      if (emailBarRef.current) {
-        emailBarRef.current.style.opacity = shouldShow ? '1' : '0';
-        emailBarRef.current.style.visibility = shouldShow ? 'visible' : 'hidden';
-        emailBarRef.current.style.pointerEvents = shouldShow ? 'auto' : 'none';
-        emailBarRef.current.style.transform = shouldShow ? 'translateY(0)' : 'translateY(16px)';
-      }
-      // The mobileEmailBarRef is now controlled by Framer Motion's animate prop for position and size,
-      // and its style prop for opacity/visibility based on isCtaOpen.
-      // The scroll-based visibility for the mobile bar is no longer handled here.
+      setIsInHero(shouldShow);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -436,49 +427,11 @@ export function Home() {
               {t.hero.learnMore}
             </motion.a>
           </motion.div>
-          {/* Newsletter Subscribe — Desktop block (centered, fixed-height wrapper) */}
-          {isHeroLoaded && (
-            <div className="hidden sm:block w-full mt-6" style={{ height: '56px' }}>
-              <div
-                ref={emailBarRef}
-                className={`w-[450px] max-w-full mx-auto z-[100] ${isCtaOpen ? 'pointer-events-none' : ''}`}
-                style={{
-                  opacity: isCtaOpen ? 0 : 1,
-                  visibility: isCtaOpen ? 'hidden' : 'visible',
-                  transition: 'opacity 0.4s ease, transform 0.4s ease, visibility 0.4s',
-                  transform: 'translateY(0)',
-                }}
-              >
-                <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
-                  <input
-                    type="email"
-                    placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={status === 'loading'}
-                    className="w-full bg-card/80 border border-border/60 rounded-full py-2.5 pl-6 pr-[150px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-lg text-foreground placeholder:text-muted-foreground"
-                  />
-                  <button
-                    type="submit"
-                    disabled={status === 'loading'}
-                    className="absolute right-1.5 top-1.5 bottom-1.5 px-6 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer border-[0.5px] border-amber-400/40"
-                  >
-                    {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span className="inline">{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
-                  </button>
-                </form>
-                {status === 'success' && (
-                  <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-                    {lang === 'bn' ? 'আমাদের এক্সক্লুসিভ ওয়েটলিস্টে স্বাগতম!' : 'Welcome to the exclusive waitlist!'}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+
         </div>{/* End Hero Container Card */}
       </div>
 
-      {/* Full-Screen Blur Overlay for Mobile Newsletter Focus */}
+      {/* Full-Screen Blur Overlay for Newsletter Focus */}
       <AnimatePresence>
         {isNewsletterFocused && (
           <motion.div
@@ -486,10 +439,9 @@ export function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[250] bg-background/60 backdrop-blur-md sm:hidden"
+            className="fixed inset-0 z-[250] bg-background/60 backdrop-blur-md"
             onClick={() => {
               if (!email) setIsNewsletterFocused(false);
-              // Small hack to blur the input & hide keyboard when backdrop is clicked
               if (mobileEmailBarRef.current) {
                 const input = mobileEmailBarRef.current.querySelector('input');
                 if (input) input.blur();
@@ -499,74 +451,64 @@ export function Home() {
         )}
       </AnimatePresence>
 
-      {/* Newsletter Subscribe — Mobile block (fixed to viewport, outside transform) */}
-      {isHeroLoaded && (
-        <motion.div
-          ref={mobileEmailBarRef}
-          layout
-          initial={{ opacity: 0, y: 30, scale: 0.9 }}
-          animate={{
-            opacity: isCtaOpen ? 0 : 1,
-            y: 0,
-            scale: 1,
-            width: isNewsletterFocused ? 'calc(100% - 32px)' : '140px',
-            right: isNewsletterFocused ? '16px' : '80px',
-            bottom: isNewsletterFocused ? '120px' : '100px',
-          }}
-          transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-          className={`fixed left-4 z-[260] sm:hidden ${isCtaOpen ? 'pointer-events-none' : ''}`}
-          style={{
-            visibility: isCtaOpen ? 'hidden' : 'visible',
-            pointerEvents: isCtaOpen ? 'none' : 'auto',
-          }}
+      {/* Newsletter — Compact button (fixed, bottom-left, inline with chatbot) */}
+      {isHeroLoaded && !isNewsletterFocused && (
+        <div
+          className={`fixed bottom-[10dvh] sm:bottom-6 left-4 sm:left-6 z-[260] transition-all duration-500 ease-out ${(!isInHero || isCtaOpen) ? 'opacity-0 pointer-events-none translate-y-4 scale-90 invisible' : 'opacity-100 translate-y-0 scale-100 visible'}`}
         >
-          <form
-            onSubmit={handleSubscribe}
-            className="relative flex justify-center w-full"
-            onClick={() => !isNewsletterFocused && setIsNewsletterFocused(true)}
+          <button
+            type="button"
+            onClick={() => setIsNewsletterFocused(true)}
+            className="flex items-center gap-2 bg-card/90 border border-primary/50 rounded-full py-2.5 pl-3.5 pr-5 text-xs font-bold text-foreground cursor-pointer newsletter-attract backdrop-blur-sm"
           >
-            <motion.input
-              layout
-              type="email"
-              placeholder={!isNewsletterFocused ? (lang === 'bn' ? 'যুক্ত হোন' : 'Stay Updated') : (lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...')}
-              value={email}
-              autoFocus={isNewsletterFocused}
-              onFocus={() => setIsNewsletterFocused(true)}
-              onBlur={() => !email && setIsNewsletterFocused(false)}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={status === 'loading'}
-              className={`w-full bg-card/90 border border-primary/30 rounded-full py-2.5 transition-all shadow-xl text-foreground placeholder:text-muted-foreground/60 ${isNewsletterFocused ? 'pl-5 pr-[120px] text-sm' : 'pl-10 pr-4 text-xs font-bold'
-                }`}
-            />
+            <Mail className="w-4 h-4 text-primary animate-bounce" />
+            <span>{lang === 'bn' ? 'যুক্ত হোন' : 'Stay Updated'}</span>
+          </button>
+        </div>
+      )}
 
-            {!isNewsletterFocused && (
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary animate-pulse" />
-            )}
-
-            <AnimatePresence>
-              {isNewsletterFocused && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
+      {/* Newsletter — Expanded email form (centered overlay) */}
+      <AnimatePresence>
+        {isHeroLoaded && isNewsletterFocused && (
+          <div className="fixed inset-0 z-[260] flex items-center justify-center px-4">
+            <div className="absolute inset-0" onClick={() => { if (!email) setIsNewsletterFocused(false); }} />
+            <motion.div
+              ref={mobileEmailBarRef}
+              initial={{ opacity: 0, scale: 0.85, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: 30 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="relative w-full max-w-[420px]"
+            >
+              <form onSubmit={handleSubscribe} className="relative flex justify-center w-full">
+                <input
+                  type="email"
+                  placeholder={lang === 'bn' ? 'আপনার ইমেইল...' : 'Enter your email...'}
+                  value={email}
+                  autoFocus
+                  onBlur={() => !email && setIsNewsletterFocused(false)}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === 'loading'}
+                  className="w-full bg-card/95 border border-primary/30 rounded-full py-3 pl-5 pr-[130px] text-sm shadow-2xl text-amber-500 font-bold tracking-wider placeholder:text-muted-foreground/60 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-xl"
+                />
+                <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-full bg-primary text-primary-foreground font-bold text-[12px] flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all"
+                  className="absolute right-1.5 top-1.5 bottom-1.5 px-5 rounded-full bg-primary text-primary-foreground font-bold text-[12px] flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                 >
                   {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   <span>{lang === 'bn' ? 'যুক্ত হোন' : "Let's Build"}</span>
-                </motion.button>
+                </button>
+              </form>
+              {status === 'success' && (
+                <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+                  {lang === 'bn' ? 'স্বাগতম!' : 'Welcome to the waitlist!'}
+                </p>
               )}
-            </AnimatePresence>
-          </form>
-
-          {status === 'success' && (
-            <p className="text-emerald-400 text-[10px] mt-2 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
-              {lang === 'bn' ? 'স্বাগতম!' : 'Welcome!'}
-            </p>
-          )}
-        </motion.div>
-      )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
 
       {/* Scroll indicator — hidden on mobile, shown on desktop */}

@@ -201,7 +201,7 @@ export function MobileStarField() {
             width:16px;height:16px;border-radius:50%;
             background:${flashColor};
             transform:translate(-50%,-50%);
-            box-shadow:0 0 30px ${flashColor}, 0 0 60px ${flashColor}88, 0 0 90px ${flashColor}44;
+            box-shadow:0 0 15px ${flashColor}, 0 0 30px ${flashColor}44;
             animation:burstFlash 0.6s ease-out forwards;
         `;
         container.appendChild(flash);
@@ -220,7 +220,7 @@ export function MobileStarField() {
                 position:absolute;left:${cx}%;top:${cy}%;
                 width:${pSize}px;height:${pSize}px;border-radius:50%;
                 background:${pColor};
-                box-shadow:0 0 8px ${pColor}, 0 0 16px ${pColor}66;
+                box-shadow:0 0 6px ${pColor}, 0 0 10px ${pColor}44;
                 --px:${px}px;--py:${py}px;
                 animation:burstParticle ${pDur}s ease-out forwards;
             `;
@@ -314,6 +314,7 @@ export function MobileStarField() {
                 // Collision vignette flash — overlay, no transforms on content
                 const flash = document.createElement('div');
                 flash.className = 'collision-shake';
+                flash.style.setProperty('--flash-color', `rgba(255, 107, 0, 0.20)`);
                 document.body.appendChild(flash);
                 setTimeout(() => flash.remove(), 500);
                 for (let i = 0; i < 6; i++) {
@@ -350,6 +351,11 @@ export function MobileStarField() {
                 // Collision vignette flash — overlay, no transforms on content
                 const flash = document.createElement('div');
                 flash.className = 'collision-shake';
+                // Use the icon color for the border glow
+                const r = parseInt(iconColor.slice(1, 3), 16);
+                const g = parseInt(iconColor.slice(3, 5), 16);
+                const b = parseInt(iconColor.slice(5, 7), 16);
+                flash.style.setProperty('--flash-color', `rgba(${r}, ${g}, ${b}, 0.20)`);
                 document.body.appendChild(flash);
                 setTimeout(() => flash.remove(), 500);
             }, approachDur * 1000);
