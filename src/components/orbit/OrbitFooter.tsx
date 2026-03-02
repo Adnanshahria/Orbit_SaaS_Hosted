@@ -124,9 +124,9 @@ export function OrbitFooter() {
                 </div>
               )}
 
-              {/* ── Copyright Pill (Now inside Col 1) ── */}
-              <div className="pt-4 mt-auto">
-                <div className="inline-flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-3 text-muted-foreground/60 text-xs sm:text-sm rounded-full border border-border/40 px-5 py-2.5 w-full sm:w-auto">
+              {/* ── Copyright Pill (Now inside Col 1 - hidden on mobile) ── */}
+              <div className="pt-4 mt-auto hidden sm:flex">
+                <div className="inline-flex flex-wrap items-center justify-start gap-3 text-muted-foreground/60 text-sm rounded-full border border-border/40 px-5 py-2.5 w-auto">
                   <span>{footer.rights}</span>
                 </div>
               </div>
@@ -201,9 +201,9 @@ export function OrbitFooter() {
                   </div>
                 )}
 
-                {/* ── Social Icons (at bottom, aligned with copyright level) ── */}
+                {/* ── Social Icons (Desktop only - at bottom, aligned with copyright level) ── */}
                 {socials.length > 0 && (
-                  <div className="col-span-1 md:col-span-2 flex items-center justify-center md:justify-end mt-auto pt-10">
+                  <div className="hidden md:flex col-span-1 md:col-span-2 items-center justify-end mt-auto pt-10">
                     <div className="flex flex-wrap items-center gap-2.5 p-2 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm">
                       {socials.map((social: any) => {
                         const Icon = PLATFORM_ICONS[social.platform];
@@ -227,6 +227,37 @@ export function OrbitFooter() {
                 )}
               </div>
             )}
+
+            {/* ── Mobile Layout Only: Social Icons + Copyright ── */}
+            <div className="flex flex-col md:hidden col-span-2 sm:col-span-2 items-center justify-center mt-6 w-full space-y-4">
+              {socials.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2.5 p-2 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm">
+                  {socials.map((social: any) => {
+                    const Icon = PLATFORM_ICONS[social.platform];
+                    if (!Icon) return null;
+                    return (
+                      <a
+                        key={social.platform}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={social.platform}
+                        className="group relative w-9 h-9 rounded-xl bg-secondary/60 hover:bg-primary/10 border border-border/80 hover:border-primary/50 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                      >
+                        <div className="absolute inset-0 rounded-xl bg-primary/20 opacity-0 group-hover:opacity-100 blur transition-opacity duration-300 pointer-events-none" />
+                        <Icon className="relative w-4 h-4 z-10" strokeWidth={1.8} />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Copyright Pill (Mobile only - centered at very bottom) */}
+              <div className="inline-flex sm:hidden flex-wrap items-center justify-center gap-1.5 text-muted-foreground/60 text-xs rounded-full border border-border/40 px-5 py-2.5 w-full">
+                <span>{footer.rights}</span>
+              </div>
+            </div>
+
           </div> {/* End of Main Grid */}
         </div>
       </div>
