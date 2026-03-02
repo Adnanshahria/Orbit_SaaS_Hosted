@@ -115,17 +115,12 @@ export function Navbar() {
 
       const sections = ['hero', 'services', 'tech-stack', 'why-us', 'project', 'leadership', 'reviews', 'contact'];
       let current = 'hero';
-      const atBottom = window.scrollY > 100 && (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 50;
-      if (atBottom) {
-        current = 'contact';
-      } else {
-        for (const id of sections) {
-          const el = document.getElementById(id);
-          if (el) {
-            const rect = el.getBoundingClientRect();
-            if (rect.top <= 150) {
-              current = id;
-            }
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 150) {
+            current = id;
           }
         }
       }
