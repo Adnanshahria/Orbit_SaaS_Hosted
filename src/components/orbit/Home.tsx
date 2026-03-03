@@ -261,7 +261,7 @@ export function Home() {
             </AnimatePresence>
 
             {/* ORBIT SaaS title — letters materialize inside the ring */}
-            <div className="flex items-center justify-center flex-wrap relative z-10">
+            <div className="flex items-center justify-center relative z-10 whitespace-nowrap">
               {/* Materialized letters */}
               {letters.map((letter, i) => (
                 revealedCount > i && (
@@ -273,7 +273,7 @@ export function Home() {
                       duration: 0.8,
                       ease: [0.25, 0.46, 0.45, 0.94],
                     }}
-                    className="text-[clamp(2.5rem,16vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit pb-1"
+                    className="text-[clamp(2rem,11vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block will-change-transform animate-text-shimmer-orbit pb-1"
                   >
                     {letter}
                   </motion.span>
@@ -286,7 +286,7 @@ export function Home() {
                   initial={{ opacity: 0, scale: 0.85, x: -6 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="text-[clamp(2.5rem,16vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas pb-1"
+                  className="text-[clamp(2rem,11vw,4.5rem)] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-2 sm:ml-4 animate-text-shimmer-saas pb-1"
                 >
                   SaaS
                 </motion.span>

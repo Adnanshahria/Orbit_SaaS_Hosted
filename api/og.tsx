@@ -2,7 +2,7 @@ import { ImageResponse } from '@vercel/og';
 import { createClient } from '@libsql/client';
 
 export const config = {
-    runtime: 'edge',
+    runtime: 'nodejs',
 };
 
 const SITE_URL = 'https://orbitsaas.cloud';
