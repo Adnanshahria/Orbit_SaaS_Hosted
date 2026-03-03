@@ -1,8 +1,8 @@
 import { ImageResponse } from '@vercel/og';
-import { createClient } from '@libsql/client';
+import { createClient } from '@libsql/client/web';
 
 export const config = {
-    runtime: 'nodejs',
+    runtime: 'edge',
 };
 
 const SITE_URL = 'https://orbitsaas.cloud';
