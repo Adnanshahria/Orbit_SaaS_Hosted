@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader, SaveButton, TextField, ErrorAlert, ItemListEditor, LangToggle, JsonPanel } from '@/components/admin/EditorComponents';
-import { Upload, Trash2, X, Plus, Layers, Settings2, ChevronDown } from 'lucide-react';
+import { Upload, Trash2, X, Plus, Layers, Settings2, ChevronDown, HelpCircle, Search } from 'lucide-react';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { useContent } from '@/contexts/ContentContext';
 import { uploadToImgBB } from '@/lib/imgbb';
@@ -310,19 +310,46 @@ function ProjectEditor({ item, update, categories: availableCategories }: { item
 
                 {/* Shared SEO Section */}
                 <div className="mt-4 p-4 rounded-lg bg-secondary/30 border border-border">
-                    <h4 className="text-sm font-bold text-foreground mb-3">🔍 Shared SEO Settings</h4>
-                    {/* ... SEO inputs ... */}
-                    <div className="mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-foreground">🔍 Shared SEO Settings</h4>
+                            <div className="relative group">
+                                <button type="button" className="text-muted-foreground hover:text-primary transition-colors cursor-help">
+                                    <HelpCircle className="w-4 h-4" />
+                                </button>
+                                <div className="absolute left-0 bottom-full mb-2 w-72 p-3 rounded-lg bg-background border border-border shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 text-[11px] leading-relaxed text-muted-foreground">
+                                    <p className="font-bold text-foreground mb-1">How to use HTML Parser:</p>
+                                    <p>Paste a block of HTML meta tags and click <span className="text-primary font-bold">Analyze</span>. The system looks for:</p>
+                                    <ul className="list-disc ml-4 mt-1 space-y-0.5">
+                                        <li><code className="bg-secondary px-1 py-0.5 rounded">&lt;title&gt;...&lt;/title&gt;</code></li>
+                                        <li><code className="bg-secondary px-1 py-0.5 rounded">meta name="description"</code></li>
+                                        <li><code className="bg-secondary px-1 py-0.5 rounded">meta name="keywords"</code></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2 mb-4">
                         <textarea
-                            className="w-full bg-background/50 rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground border border-border/50 outline-none resize-y"
-                            rows={2}
-                            placeholder=""
-                            onChange={(e) => {
-                                const val = e.target.value;
-                                if (!val.trim()) return;
-                                const titleMatch = val.match(/<title>(.*?)<\/title>/) || val.match(/meta name="title" content="(.*?)"/);
-                                const descMatch = val.match(/meta name="description" content="(.*?)"/) || val.match(/meta property="og:description" content="(.*?)"/);
-                                const keyMatch = val.match(/meta name="keywords" content="(.*?)"/);
+                            id="seo-html-input"
+                            className="flex-1 bg-background/50 rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground border border-border/50 outline-none resize-y"
+                            rows={3}
+                            placeholder="Paste meta tags here (e.g. <meta name='description' content='...') and click Analyze"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const input = document.getElementById('seo-html-input') as HTMLTextAreaElement;
+                                const val = input?.value || '';
+                                if (!val.trim()) {
+                                    toast.error('Please paste some HTML meta tags first');
+                                    return;
+                                }
+
+                                const titleMatch = val.match(/<title>(.*?)<\/title>/i) || val.match(/meta\s+name=["']title["']\s+content=["'](.*?)["']/i);
+                                const descMatch = val.match(/meta\s+name=["']description["']\s+content=["'](.*?)["']/i) || val.match(/meta\s+property=["']og:description["']\s+content=["'](.*?)["']/i);
+                                const keyMatch = val.match(/meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
 
                                 const title = titleMatch ? titleMatch[1] : '';
                                 const description = descMatch ? descMatch[1] : '';
@@ -337,9 +364,17 @@ function ProjectEditor({ item, update, categories: availableCategories }: { item
                                             keywords: keywords.length > 0 ? keywords : item.seo.keywords
                                         }
                                     });
+                                    toast.success('SEO tags analyzed and applied!');
+                                    input.value = '';
+                                } else {
+                                    toast.error('Could not detect valid SEO tags. Check your HTML format.');
                                 }
                             }}
-                        />
+                            className="px-4 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all flex flex-col items-center justify-center gap-1 group whitespace-nowrap"
+                        >
+                            <Search className="w-4 h-4" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Analyze</span>
+                        </button>
                     </div>
 
                     <div className="space-y-3">
