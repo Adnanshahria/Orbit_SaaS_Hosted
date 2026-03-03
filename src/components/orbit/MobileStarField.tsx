@@ -4,8 +4,15 @@ import { useCollisionSound } from './CollisionSound';
 /**
  * MobileStarField — "3D Deep Space Flight" background.
  *
- * PERFORMANCE-OPTIMIZED for low-end devices:
- * ─ Adaptive star count: 20 on mobile, 40 on desktop (halved from 60).
+ * PERFORMANCE-OPTIMIZED for low-end devices (html.low-perf):
+ * ─ Stars: 5 mobile / 10 desktop (vs 20/40 normal).
+ * ─ Shooting stars: disabled. Icon comets: kept at 8s interval.
+ * ─ Comet collisions: KEPT, but at 12s intervals (vs 6s).
+ * ─ Galaxy element & extra nebula layers: removed.
+ * ─ Star rotation: slowed to 600s (vs 180s).
+ * ─ Counter-rotation layer: removed (single layer only).
+ *
+ * General optimizations (all devices):
  * ─ No boxShadow on stars (avoids per-frame paint).
  * ─ Rotating containers shrunk from 180vw → 150vw (less GPU rasterization).
  * ─ Shooting stars use useRef + direct DOM manipulation (zero React re-renders).
@@ -16,9 +23,10 @@ import { useCollisionSound } from './CollisionSound';
  */
 
 const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+const isLowPerf = typeof document !== 'undefined' && document.documentElement.classList.contains('low-perf');
 
-// Adaptive star count: fewer on mobile
-const NUM_STARS = isMobile ? 40 : 80;
+// Adaptive star count: reduced across the board, minimal on low-perf
+const NUM_STARS = isLowPerf ? (isMobile ? 5 : 10) : (isMobile ? 20 : 40);
 
 const generateStars = (count: number) => Array.from({ length: count }).map((_, i) => {
     const rawX = Math.random() * 100;
@@ -184,7 +192,7 @@ export function MobileStarField() {
         container.appendChild(el);
 
         setTimeout(() => { el.remove(); }, dur * 1000 + 100);
-        codeTimeoutRef.current = setTimeout(spawnCodeComet, 4000);
+        codeTimeoutRef.current = setTimeout(spawnCodeComet, isLowPerf ? 8000 : 4000);
     }, []);
 
     // ── Collision burst system ──
@@ -360,15 +368,18 @@ export function MobileStarField() {
                 setTimeout(() => flash.remove(), 500);
             }, approachDur * 1000);
         }
-        burstTimeoutRef.current = setTimeout(spawnCollision, 6000);
+        burstTimeoutRef.current = setTimeout(spawnCollision, isLowPerf ? 12000 : 6000);
     }, []);
 
     useEffect(() => {
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReduced) return;
-        timeoutRef.current = setTimeout(spawnStar, 800);
-        codeTimeoutRef.current = setTimeout(spawnCodeComet, 2000);
-        burstTimeoutRef.current = setTimeout(spawnCollision, 5000);
+        // Low-perf: skip shooting stars, keep icon comets at slower pace
+        if (!isLowPerf) {
+            timeoutRef.current = setTimeout(spawnStar, 800);
+        }
+        codeTimeoutRef.current = setTimeout(spawnCodeComet, isLowPerf ? 8000 : 2000);
+        burstTimeoutRef.current = setTimeout(spawnCollision, isLowPerf ? 8000 : 5000);
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             if (codeTimeoutRef.current) clearTimeout(codeTimeoutRef.current);
@@ -390,20 +401,23 @@ export function MobileStarField() {
             <div className="absolute inset-0"
                 style={{
                     background: 'radial-gradient(ellipse at 30% 70%, rgba(16, 185, 129, 0.08) 0%, rgba(4, 47, 46, 0.03) 50%, transparent 100%)',
-                    animation: 'nebulaBreath 15s ease-in-out infinite alternate',
+                    animation: isLowPerf ? 'none' : 'nebulaBreath 15s ease-in-out infinite alternate',
+                    opacity: isLowPerf ? 0.7 : undefined,
                     ['--neb-lo' as any]: '0.5',
                     ['--neb-hi' as any]: '1'
                 }}
             />
-            {/* Orange-Gold / Amber Cloud */}
-            <div className="absolute inset-0"
-                style={{
-                    background: 'radial-gradient(ellipse at 80% 30%, rgba(245, 158, 11, 0.06) 0%, rgba(120, 53, 15, 0.02) 60%, transparent 100%)',
-                    animation: 'nebulaBreath 12s ease-in-out 3s infinite alternate',
-                    ['--neb-lo' as any]: '0.4',
-                    ['--neb-hi' as any]: '0.9'
-                }}
-            />
+            {/* Orange-Gold / Amber Cloud — skip on low-perf */}
+            {!isLowPerf && (
+                <div className="absolute inset-0"
+                    style={{
+                        background: 'radial-gradient(ellipse at 80% 30%, rgba(245, 158, 11, 0.06) 0%, rgba(120, 53, 15, 0.02) 60%, transparent 100%)',
+                        animation: 'nebulaBreath 12s ease-in-out 3s infinite alternate',
+                        ['--neb-lo' as any]: '0.4',
+                        ['--neb-hi' as any]: '0.9'
+                    }}
+                />
+            )}
             {/* Ambient Cosmic Dust Diagonal (static, no animation) */}
             <div className="absolute inset-0"
                 style={{
@@ -411,44 +425,46 @@ export function MobileStarField() {
                 }}
             />
 
-            {/* ── 3. Distant Spiral Galaxy Element ── */}
-            <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vw] sm:w-[90vw] sm:h-[90vw] opacity-50">
-                {/* Galactic Core Glow */}
-                <div className="absolute inset-0 rounded-full"
-                    style={{
-                        background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(245,158,11,0.08) 10%, rgba(217,119,6,0.03) 30%, transparent 50%)',
-                        animation: 'nebulaBreath 10s ease-in-out infinite alternate',
-                        ['--neb-lo' as any]: '0.6',
-                        ['--neb-hi' as any]: '1'
-                    }}
-                />
-                {/* Spiral Disk Body */}
-                <div className="absolute inset-0 rounded-full"
-                    style={{
-                        background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, rgba(20,184,166,0.03) 40%, transparent 60%)',
-                        transform: 'scaleY(0.3) rotate(15deg)',
-                        animation: 'nebulaBreath 18s ease-in-out 2s infinite alternate',
-                        ['--neb-lo' as any]: '0.5',
-                        ['--neb-hi' as any]: '0.9'
-                    }}
-                />
-                {/* Second Spiral Arm */}
-                <div className="absolute inset-0 rounded-full"
-                    style={{
-                        background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.05) 0%, rgba(217,119,6,0.02) 30%, transparent 50%)',
-                        transform: 'scaleY(0.25) rotate(-20deg)',
-                        animation: 'nebulaBreath 14s ease-in-out 5s infinite alternate',
-                        ['--neb-lo' as any]: '0.4',
-                        ['--neb-hi' as any]: '0.8'
-                    }}
-                />
-            </div>
+            {/* ── 3. Distant Spiral Galaxy Element — skip on low-perf ── */}
+            {!isLowPerf && (
+                <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vw] sm:w-[90vw] sm:h-[90vw] opacity-50">
+                    {/* Galactic Core Glow */}
+                    <div className="absolute inset-0 rounded-full"
+                        style={{
+                            background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(245,158,11,0.08) 10%, rgba(217,119,6,0.03) 30%, transparent 50%)',
+                            animation: 'nebulaBreath 10s ease-in-out infinite alternate',
+                            ['--neb-lo' as any]: '0.6',
+                            ['--neb-hi' as any]: '1'
+                        }}
+                    />
+                    {/* Spiral Disk Body */}
+                    <div className="absolute inset-0 rounded-full"
+                        style={{
+                            background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.06) 0%, rgba(20,184,166,0.03) 40%, transparent 60%)',
+                            transform: 'scaleY(0.3) rotate(15deg)',
+                            animation: 'nebulaBreath 18s ease-in-out 2s infinite alternate',
+                            ['--neb-lo' as any]: '0.5',
+                            ['--neb-hi' as any]: '0.9'
+                        }}
+                    />
+                    {/* Second Spiral Arm */}
+                    <div className="absolute inset-0 rounded-full"
+                        style={{
+                            background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.05) 0%, rgba(217,119,6,0.02) 30%, transparent 50%)',
+                            transform: 'scaleY(0.25) rotate(-20deg)',
+                            animation: 'nebulaBreath 14s ease-in-out 5s infinite alternate',
+                            ['--neb-lo' as any]: '0.4',
+                            ['--neb-hi' as any]: '0.8'
+                        }}
+                    />
+                </div>
+            )}
 
             {/* ── 4. Floating 3D Zooming Stars ── */}
             {/* Layer 1: Forward Rotation (150vw container, down from 180vw) */}
             <div className="absolute top-1/2 left-1/2 w-[150vw] h-[150vw] star-layer-rotate"
                 style={{
-                    animation: 'starFieldRotate 180s linear infinite',
+                    animation: `starFieldRotate ${isLowPerf ? '600s' : '180s'} linear infinite`,
                     contain: 'layout style',
                 }}
             >
@@ -471,31 +487,33 @@ export function MobileStarField() {
                 ))}
             </div>
 
-            {/* Layer 2: Counter-Rotation */}
-            <div className="absolute top-1/2 left-1/2 w-[150vw] h-[150vw] star-layer-rotate-reverse"
-                style={{
-                    animation: 'starFieldRotateReverse 240s linear infinite',
-                    contain: 'layout style',
-                }}
-            >
-                {ZOOM_STARS_2.map((s) => (
-                    <div
-                        key={`z2-${s.id}`}
-                        className="absolute rounded-full"
-                        style={{
-                            left: `${s.x}%`, top: `${s.y}%`,
-                            width: `${s.size}px`, height: `${s.size}px`,
-                            background: s.color,
-                            ['--star-op' as any]: s.opacity,
-                            ['--tx' as any]: s.tx,
-                            ['--ty' as any]: s.ty,
-                            ['--star-scale' as any]: s.scale,
-                            animation: `starZoom ${s.dur}s ease-in ${s.delay}s infinite`,
-                            opacity: 0,
-                        }}
-                    />
-                ))}
-            </div>
+            {/* Layer 2: Counter-Rotation — skip on low-perf (single layer is enough) */}
+            {!isLowPerf && (
+                <div className="absolute top-1/2 left-1/2 w-[150vw] h-[150vw] star-layer-rotate-reverse"
+                    style={{
+                        animation: 'starFieldRotateReverse 240s linear infinite',
+                        contain: 'layout style',
+                    }}
+                >
+                    {ZOOM_STARS_2.map((s) => (
+                        <div
+                            key={`z2-${s.id}`}
+                            className="absolute rounded-full"
+                            style={{
+                                left: `${s.x}%`, top: `${s.y}%`,
+                                width: `${s.size}px`, height: `${s.size}px`,
+                                background: s.color,
+                                ['--star-op' as any]: s.opacity,
+                                ['--tx' as any]: s.tx,
+                                ['--ty' as any]: s.ty,
+                                ['--star-scale' as any]: s.scale,
+                                animation: `starZoom ${s.dur}s ease-in ${s.delay}s infinite`,
+                                opacity: 0,
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
 
             {/* ── 5. Dynamic Shooting Stars (DOM-direct, zero re-renders) ── */}
             <div ref={shootingContainerRef} className="absolute inset-0" />

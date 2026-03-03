@@ -89,6 +89,10 @@
     ],
     "rewrites": [
         {
+            "source": "/project/:path*",
+            "destination": "/api/og?project=:path*&mode=meta"
+        },
+        {
             "source": "/api/(.*)",
             "destination": "/api/$1"
         },

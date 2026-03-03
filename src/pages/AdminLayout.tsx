@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import {
     LayoutDashboard, Type, ShoppingCart, Users, FolderOpen,
     MessageCircle, Globe, Shield, LogOut, Menu, X,
@@ -78,6 +78,7 @@ export default function AdminLayout() {
 
     return (
         <div className="min-h-[100dvh] bg-background flex">
+            <Toaster position="top-right" theme="dark" richColors closeButton />
             <Helmet>
                 <title>Admin Panel | Orbit SaaS</title>
                 <meta name="robots" content="noindex, nofollow" />
