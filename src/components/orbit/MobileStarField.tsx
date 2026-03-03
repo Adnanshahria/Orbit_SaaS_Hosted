@@ -240,7 +240,10 @@ export function MobileStarField() {
     const createIncomingComet = (container: HTMLElement, fromX: number, fromY: number, toX: number, toY: number, color: string, dur: number, withIcon?: string) => {
         const dx = toX - fromX;
         const dy = toY - fromY;
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        // Adjust angle for screen aspect ratio because dx is in vw and dy is in vh
+        const pxDx = dx * window.innerWidth;
+        const pxDy = dy * window.innerHeight;
+        const angle = Math.atan2(pxDy, pxDx) * (180 / Math.PI);
         const comet = document.createElement('div');
         comet.style.cssText = `
             position:absolute;left:${fromX}%;top:${fromY}%;

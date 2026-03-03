@@ -72,13 +72,13 @@ export function useCollisionSound() {
 
         if (mutedRef.current) return;
 
-        // Only play when user is actively in the hero section (Home page)
+        // Relaxed visibility check: continue playing if hero is still physically nearby
         const hero = document.getElementById('hero');
-        if (!hero) return; // Not on the Home page (or hero hasn't rendered)
-
-        const rect = hero.getBoundingClientRect();
-        const ratio = Math.max(0, Math.min(1, -rect.top / (rect.height || 1)));
-        if (ratio >= 0.15) return; // user has scrolled past hero
+        if (hero) {
+            const rect = hero.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, -rect.top / (rect.height || 1)));
+            if (ratio >= 0.8) return; // user has scrolled mostly past hero
+        }
 
         try {
             const pool = audioPoolRef.current;
@@ -91,9 +91,14 @@ export function useCollisionSound() {
             audio.currentTime = 0;
             // Re-read volume from localStorage for real-time admin updates
             const savedVol = localStorage.getItem('orbit_sound_volume');
-            const base = savedVol !== null ? Math.max(0.01, Number(savedVol) / 100) : volumeRef.current;
+            // Boosted the base volume defaults slightly to ensure "dhurum" is heard
+            const base = savedVol !== null ? Math.max(0.3, Number(savedVol) / 100) : Math.max(0.4, volumeRef.current);
             audio.volume = Math.max(0, Math.min(1, base * (0.85 + Math.random() * 0.3))); // ±15% variation
-            audio.play().catch(() => { });
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch((e) => console.log('Collision Audio blocked:', e));
+            }
         } catch {
             // Silently fail
         }
