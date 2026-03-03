@@ -124,7 +124,15 @@ export function Navbar() {
           }
         }
       }
-      const nextSection = `#${current}`;
+      // If the footer is in view, clear active section so navbar doesn't highlight "Contact"
+      const footerEl = document.querySelector('footer');
+      if (footerEl) {
+        const footerRect = footerEl.getBoundingClientRect();
+        if (footerRect.top <= 300) {
+          current = '';
+        }
+      }
+      const nextSection = current ? `#${current}` : '';
       if (nextSection !== prevSection) {
         prevSection = nextSection;
         setActiveSection(nextSection);
