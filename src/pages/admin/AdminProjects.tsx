@@ -373,80 +373,139 @@ function ProjectEditor({ item, update, categories: availableCategories, onSave }
                 />
 
                 {/* Shared SEO Section */}
-                <div className="mt-4 p-4 rounded-lg bg-secondary/30 border border-border">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-foreground">🔍 Shared SEO Settings</h4>
-                            <div className="relative group">
-                                <button type="button" className="text-muted-foreground hover:text-primary transition-colors cursor-help">
-                                    <HelpCircle className="w-4 h-4" />
-                                </button>
-                                <div className="absolute left-0 bottom-full mb-2 w-72 p-3 rounded-lg bg-background border border-border shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 text-[11px] leading-relaxed text-muted-foreground">
-                                    <p className="font-bold text-foreground mb-1">How to use HTML Parser:</p>
-                                    <p>Paste a block of HTML meta tags and click <span className="text-primary font-bold">Analyze</span>. The system looks for:</p>
-                                    <ul className="list-disc ml-4 mt-1 space-y-0.5">
-                                        <li><code className="bg-secondary px-1 py-0.5 rounded">&lt;title&gt;...&lt;/title&gt;</code></li>
-                                        <li><code className="bg-secondary px-1 py-0.5 rounded">meta name="description"</code></li>
-                                        <li><code className="bg-secondary px-1 py-0.5 rounded">meta name="keywords"</code></li>
-                                    </ul>
+                {(() => {
+                    const [seoHelpOpen, setSeoHelpOpen] = useState(false);
+                    return (
+                        <div className="mt-4 p-4 rounded-lg bg-secondary/30 border border-border">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <h4 className="text-sm font-bold text-foreground">🔍 Shared SEO Settings</h4>
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSeoHelpOpen(!seoHelpOpen)}
+                                            className="p-1.5 rounded-lg bg-secondary hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                            title="Show SEO format guide"
+                                        >
+                                            <HelpCircle className="w-4 h-4" />
+                                        </button>
+                                        {seoHelpOpen && (
+                                            <div className="absolute left-0 top-full mt-2 w-[400px] p-4 rounded-xl bg-background border border-border shadow-2xl z-50">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <h4 className="text-sm font-bold text-foreground">SEO Input Guide</h4>
+                                                    <button onClick={() => setSeoHelpOpen(false)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-3 text-[11px] text-muted-foreground leading-relaxed">
+                                                    <div>
+                                                        <p className="font-bold text-foreground mb-1">✏️ Manual Input:</p>
+                                                        <ul className="list-disc ml-4 space-y-1">
+                                                            <li><strong>Meta Title</strong> — Under 60 characters. E.g: <code className="bg-secondary px-1 py-0.5 rounded text-primary">My Project | Orbit SaaS</code></li>
+                                                            <li><strong>Meta Description</strong> — Under 160 characters. Summarize the project in 1-2 sentences.</li>
+                                                            <li><strong>Keywords</strong> — Type a keyword and press Enter to add. Add 5-10 relevant terms.</li>
+                                                        </ul>
+                                                    </div>
+                                                    <div className="border-t border-border pt-3">
+                                                        <p className="font-bold text-foreground mb-1">📋 HTML Parser (Optional):</p>
+                                                        <p>Paste HTML meta tags into the textarea below and click <span className="text-primary font-bold">Analyze</span>. Supported tags:</p>
+                                                        <ul className="list-disc ml-4 mt-1 space-y-0.5">
+                                                            <li><code className="bg-secondary px-1 py-0.5 rounded">&lt;title&gt;...&lt;/title&gt;</code></li>
+                                                            <li><code className="bg-secondary px-1 py-0.5 rounded">meta name="description"</code></li>
+                                                            <li><code className="bg-secondary px-1 py-0.5 rounded">meta name="keywords"</code></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div className="border-t border-border pt-3">
+                                                        <p className="font-bold text-foreground mb-1">🔎 Result Preview:</p>
+                                                        <pre className="bg-secondary/50 rounded-lg p-2 text-[10px] font-mono overflow-auto whitespace-pre">{`<title>Your Meta Title</title>
+<meta name="description" content="Your description...">
+<meta name="keywords" content="keyword1, keyword2, ...">`}</pre>
+                                                        <p className="text-primary font-medium mt-1">These tags appear in Google search results and social shares.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
+
+                            {/* Manual Input Fields — Primary */}
+                            <div className="space-y-3 mb-4">
+                                <TextField label="Meta Title" value={item.seo?.title || ''} onChange={v => updateSeo('title', v)} lang="en" />
+                                <TextField label="Meta Description" value={item.seo?.description || ''} onChange={v => updateSeo('description', v)} multiline lang="en" />
+                                <TagsInput tags={item.seo?.keywords || []} onChange={t => updateSeo('keywords', t)} />
+                            </div>
+
+                            {/* HTML Parser — Optional, Collapsible */}
+                            {(() => {
+                                const [htmlParserOpen, setHtmlParserOpen] = useState(false);
+                                return (
+                                    <div className="rounded-lg border border-border/50 overflow-hidden">
+                                        <button
+                                            type="button"
+                                            onClick={() => setHtmlParserOpen(!htmlParserOpen)}
+                                            className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-secondary/30 transition-colors cursor-pointer text-left"
+                                        >
+                                            <span className="text-xs font-medium text-muted-foreground">📋 Import from HTML <span className="text-[10px] opacity-60">(optional)</span></span>
+                                            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${htmlParserOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {htmlParserOpen && (
+                                            <div className="px-4 pb-4 pt-2 border-t border-border/50">
+                                                <p className="text-[10px] text-muted-foreground mb-2">Paste HTML meta tags and click Analyze to auto-fill the fields above.</p>
+                                                <div className="flex gap-2">
+                                                    <textarea
+                                                        id="seo-html-input"
+                                                        className="flex-1 bg-background/50 rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground border border-border/50 outline-none resize-y"
+                                                        rows={3}
+                                                        placeholder={'<title>My Project</title>\n<meta name="description" content="...">\n<meta name="keywords" content="a, b, c">'}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const input = document.getElementById('seo-html-input') as HTMLTextAreaElement;
+                                                            const val = input?.value || '';
+                                                            if (!val.trim()) {
+                                                                toast.error('Please paste some HTML meta tags first');
+                                                                return;
+                                                            }
+
+                                                            const titleMatch = val.match(/<title>(.*?)<\/title>/i) || val.match(/meta\s+name=["']title["']\s+content=["'](.*?)["']/i);
+                                                            const descMatch = val.match(/meta\s+name=["']description["']\s+content=["'](.*?)["']/i) || val.match(/meta\s+property=["']og:description["']\s+content=["'](.*?)["']/i);
+                                                            const keyMatch = val.match(/meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
+
+                                                            const title = titleMatch ? titleMatch[1] : '';
+                                                            const description = descMatch ? descMatch[1] : '';
+                                                            const keywords = keyMatch ? keyMatch[1].split(',').map(s => s.trim()) : [];
+
+                                                            if (title || description || keywords.length > 0) {
+                                                                update({
+                                                                    ...item,
+                                                                    seo: {
+                                                                        title: title || item.seo.title,
+                                                                        description: description || item.seo.description,
+                                                                        keywords: keywords.length > 0 ? keywords : item.seo.keywords
+                                                                    }
+                                                                });
+                                                                toast.success('SEO tags analyzed and applied!');
+                                                                input.value = '';
+                                                            } else {
+                                                                toast.error('Could not detect valid SEO tags. Check your HTML format.');
+                                                            }
+                                                        }}
+                                                        className="px-4 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all flex flex-col items-center justify-center gap-1 group whitespace-nowrap"
+                                                    >
+                                                        <Search className="w-4 h-4" />
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Analyze</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </div>
-                    </div>
-
-                    <div className="flex gap-2 mb-4">
-                        <textarea
-                            id="seo-html-input"
-                            className="flex-1 bg-background/50 rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground border border-border/50 outline-none resize-y"
-                            rows={3}
-                            placeholder="Paste meta tags here (e.g. <meta name='description' content='...') and click Analyze"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => {
-                                const input = document.getElementById('seo-html-input') as HTMLTextAreaElement;
-                                const val = input?.value || '';
-                                if (!val.trim()) {
-                                    toast.error('Please paste some HTML meta tags first');
-                                    return;
-                                }
-
-                                const titleMatch = val.match(/<title>(.*?)<\/title>/i) || val.match(/meta\s+name=["']title["']\s+content=["'](.*?)["']/i);
-                                const descMatch = val.match(/meta\s+name=["']description["']\s+content=["'](.*?)["']/i) || val.match(/meta\s+property=["']og:description["']\s+content=["'](.*?)["']/i);
-                                const keyMatch = val.match(/meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
-
-                                const title = titleMatch ? titleMatch[1] : '';
-                                const description = descMatch ? descMatch[1] : '';
-                                const keywords = keyMatch ? keyMatch[1].split(',').map(s => s.trim()) : [];
-
-                                if (title || description || keywords.length > 0) {
-                                    update({
-                                        ...item,
-                                        seo: {
-                                            title: title || item.seo.title,
-                                            description: description || item.seo.description,
-                                            keywords: keywords.length > 0 ? keywords : item.seo.keywords
-                                        }
-                                    });
-                                    toast.success('SEO tags analyzed and applied!');
-                                    input.value = '';
-                                } else {
-                                    toast.error('Could not detect valid SEO tags. Check your HTML format.');
-                                }
-                            }}
-                            className="px-4 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all flex flex-col items-center justify-center gap-1 group whitespace-nowrap"
-                        >
-                            <Search className="w-4 h-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">Analyze</span>
-                        </button>
-                    </div>
-
-                    <div className="space-y-3">
-                        <TextField label="Meta Title" value={item.seo?.title || ''} onChange={v => updateSeo('title', v)} lang="en" />
-                        <TextField label="Meta Description" value={item.seo?.description || ''} onChange={v => updateSeo('description', v)} multiline lang="en" />
-                        <TagsInput tags={item.seo?.keywords || []} onChange={t => updateSeo('keywords', t)} />
-                    </div>
-                </div>
+                    );
+                })()}
             </div>
 
             {/* JSON Description Import */}
@@ -950,6 +1009,8 @@ export default function AdminProjects() {
             });
         }
 
+        // Sort by order before setting so admin list matches user-facing order
+        merged.sort((a, b) => a.order - b.order);
         setProjects(merged);
         setLoading(false);
     }, [content, contentLoading]);
@@ -1154,7 +1215,11 @@ export default function AdminProjects() {
 
                 <ItemListEditor
                     items={projects}
-                    setItems={setProjects}
+                    setItems={(reordered) => {
+                        // Sync the order field with the new array position
+                        const synced = reordered.map((p, i) => ({ ...p, order: i }));
+                        setProjects(synced);
+                    }}
                     newItem={DEFAULT_PROJECT}
                     addLabel="Add New Project"
                     getItemLabel={(item) => item.en.title || item.bn.title || ''}
