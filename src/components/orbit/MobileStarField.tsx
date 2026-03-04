@@ -6,8 +6,9 @@ import { useCollisionSound } from './CollisionSound';
  *
  * PERFORMANCE-OPTIMIZED for low-end devices (html.low-perf):
  * ─ Stars: 5 mobile / 10 desktop (vs 20/40 normal).
- * ─ Shooting stars: disabled. Icon comets: kept at 8s interval.
- * ─ Comet collisions: KEPT, but at 12s intervals (vs 6s).
+ * ─ Shooting stars: enabled at ~5s intervals (vs ~2s normal).
+ * ─ Icon comets: kept at 12s interval (vs 6s normal).
+ * ─ Comet collisions: KEPT, at 14s intervals (vs 6s normal).
  * ─ Galaxy element & extra nebula layers: removed.
  * ─ Star rotation: slowed to 600s (vs 180s).
  * ─ Counter-rotation layer: removed (single layer only).
@@ -62,20 +63,24 @@ const ZOOM_STARS_2 = generateStars(Math.floor(NUM_STARS / 2));
 export function MobileStarField() {
     const shootingContainerRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    // Track last spawn side for alternating direction
+    const lastStarSide = useRef<number>(0); // 0=top, 1=left, 2=right
 
     // Direct DOM shooting star spawner — zero React re-renders
     const spawnStar = useCallback(() => {
         const container = shootingContainerRef.current;
         if (!container) return;
 
-        const origin = Math.random();
+        // Alternate sides: top(0) → left(1) → right(2) → top...
+        const side = lastStarSide.current;
+        lastStarSide.current = (side + 1) % 3;
         let left: string, top: string, angle: number;
 
-        if (origin < 0.33) {
+        if (side === 0) {
             left = -10 + Math.random() * 120 + '%';
             top = '-10%';
             angle = 20 + Math.random() * 140;
-        } else if (origin < 0.66) {
+        } else if (side === 1) {
             left = '-10%';
             top = -10 + Math.random() * 80 + '%';
             angle = -20 + Math.random() * 80;
@@ -109,8 +114,12 @@ export function MobileStarField() {
         }, dur * 1000 + 100);
 
         // Schedule the next shooting star
-        const nextDelay = isMobile ? 1500 + Math.random() * 3500 : 800 + Math.random() * 3200;
-        timeoutRef.current = setTimeout(spawnStar, nextDelay);
+        const nextDelay = isLowPerf
+            ? 6000 + Math.random() * 4000   // low-perf: ~8-10s between shots
+            : isMobile
+                ? 5000 + Math.random() * 5000  // mobile: ~7.5s avg
+                : 5000 + Math.random() * 6000; // desktop: ~8s avg
+        // (self-scheduling removed — driven by sequencer)
     }, []);
 
     // Service icon comet spawner — launches every 4s
@@ -134,6 +143,7 @@ export function MobileStarField() {
         '<rect width="14" height="20" x="5" y="2" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 18h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
     ];
     const codeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    const lastCometSide = useRef<boolean>(false); // false=left, true=right
 
     const spawnCodeComet = useCallback(() => {
         const container = shootingContainerRef.current;
@@ -141,7 +151,9 @@ export function MobileStarField() {
 
         const svgPath = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
         const top = 5 + Math.random() * 70 + '%';
-        const fromLeft = Math.random() > 0.5;
+        // Alternate sides: left ↔ right
+        const fromLeft = !lastCometSide.current;
+        lastCometSide.current = fromLeft;
         const left = fromLeft ? '-5%' : '105%';
         const angle = fromLeft ? (25 + Math.random() * 35) : (125 + Math.random() * 35);
         const dur = 4 + Math.random() * 3;
@@ -192,7 +204,7 @@ export function MobileStarField() {
         container.appendChild(el);
 
         setTimeout(() => { el.remove(); }, dur * 1000 + 100);
-        codeTimeoutRef.current = setTimeout(spawnCodeComet, isLowPerf ? 8000 : 4000);
+        // (self-scheduling removed — driven by sequencer)
     }, []);
 
     // ── Collision burst system ──
@@ -206,10 +218,10 @@ export function MobileStarField() {
         const flash = document.createElement('div');
         flash.style.cssText = `
             position:absolute;left:${cx}%;top:${cy}%;
-            width:16px;height:16px;border-radius:50%;
+            width:28px;height:28px;border-radius:50%;
             background:${flashColor};
             transform:translate(-50%,-50%);
-            box-shadow:0 0 15px ${flashColor}, 0 0 30px ${flashColor}44;
+            box-shadow:0 0 25px ${flashColor}, 0 0 50px ${flashColor}88, 0 0 80px ${flashColor}44;
             animation:burstFlash 0.6s ease-out forwards;
         `;
         container.appendChild(flash);
@@ -220,7 +232,7 @@ export function MobileStarField() {
             const pRad = (pAngle * Math.PI) / 180;
             const px = Math.cos(pRad) * pDist;
             const py = Math.sin(pRad) * pDist;
-            const pSize = 2 + Math.random() * 4;
+            const pSize = 3 + Math.random() * 6;
             const pDur = 0.6 + Math.random() * 0.8;
             const pColor = particleColors[Math.floor(Math.random() * particleColors.length)];
             const p = document.createElement('div');
@@ -228,7 +240,7 @@ export function MobileStarField() {
                 position:absolute;left:${cx}%;top:${cy}%;
                 width:${pSize}px;height:${pSize}px;border-radius:50%;
                 background:${pColor};
-                box-shadow:0 0 6px ${pColor}, 0 0 10px ${pColor}44;
+                box-shadow:0 0 8px ${pColor}, 0 0 16px ${pColor}44;
                 --px:${px}px;--py:${py}px;
                 animation:burstParticle ${pDur}s ease-out forwards;
             `;
@@ -298,39 +310,66 @@ export function MobileStarField() {
         setTimeout(() => comet.remove(), dur * 1000 + 50);
     };
 
+    // Helper: project from collision center outward along an angle until off-screen
+    const projectOffScreen = (cx: number, cy: number, angleDeg: number): [number, number] => {
+        const rad = (angleDeg * Math.PI) / 180;
+        const cosA = Math.cos(rad);
+        const sinA = Math.sin(rad);
+        // March outward in small steps until we exit the 0–100 range on either axis
+        let t = 1;
+        while (t < 200) {
+            const x = cx + cosA * t;
+            const y = cy + sinA * t;
+            if (x < -10 || x > 110 || y < -10 || y > 110) return [x, y];
+            t += 2;
+        }
+        return [cx + cosA * 120, cy + sinA * 120]; // fallback: way off-screen
+    };
+
     const spawnCollision = useCallback(() => {
         const container = shootingContainerRef.current;
         if (!container) return;
+        // Collision center — random position across the viewport
         const cx = 10 + Math.random() * 80;
-        const cy = 10 + Math.random() * 60;
+        const cy = 10 + Math.random() * 70;
         const isSpecialVsSpecial = Math.random() > 0.5;
-        const approachDur = 1.2 + Math.random() * 0.6;
+        const approachDur = isMobile ? (1.4 + Math.random() * 0.5) : (1.2 + Math.random() * 0.6);
+
+        // Pick two exactly opposite angles so comets fly head-to-head
+        const a1 = Math.random() * 360;
+        const a2 = a1 + 180;
+
+        // Spawn both comets from OFF-SCREEN, flying inward to (cx, cy)
+        const [from1X, from1Y] = projectOffScreen(cx, cy, a1);
+        const [from2X, from2Y] = projectOffScreen(cx, cy, a2);
+
+        // Signal other components (chatbot popup) to hide during collision
+        const totalCollisionDur = (approachDur + 2) * 1000; // approach + burst + settle
+        window.dispatchEvent(new CustomEvent('orbit-collision-start', { detail: { duration: totalCollisionDur } }));
+        setTimeout(() => window.dispatchEvent(new Event('orbit-collision-end')), totalCollisionDur);
 
         if (isSpecialVsSpecial) {
             const color1 = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)];
             const color2 = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)];
             const icon1 = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
             const icon2 = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
-            const a1 = Math.random() * 360;
-            const a2 = a1 + 180; // Perfectly head-to-head (180° opposite)
-            const dist = 35 + Math.random() * 15;
-            const r1 = (a1 * Math.PI) / 180;
-            const r2 = (a2 * Math.PI) / 180;
-            createIncomingComet(container, cx + Math.cos(r1) * dist, cy + Math.sin(r1) * dist, cx, cy, color1, approachDur, icon1);
-            createIncomingComet(container, cx + Math.cos(r2) * dist, cy + Math.sin(r2) * dist, cx, cy, color2, approachDur, icon2);
+            createIncomingComet(container, from1X, from1Y, cx, cy, color1, approachDur, icon1);
+            createIncomingComet(container, from2X, from2Y, cx, cy, color2, approachDur, icon2);
             setTimeout(() => {
+                const burstCount = isMobile ? 12 : 18;
+                const burstSpread = isMobile ? 90 : 130;
                 const fireColors = ['#ff6b00', '#ff4500', '#ff8c00', '#ffd700', '#ff3300', '#ffaa00', color1, color2];
-                createBurst(container, cx, cy, fireColors, '#ff6b00', 14, 80);
+                createBurst(container, cx, cy, fireColors, '#ff6b00', burstCount, burstSpread);
                 playBoomRef.current();
-                // Collision vignette flash — overlay, no transforms on content
                 const flash = document.createElement('div');
                 flash.className = 'collision-shake';
                 flash.style.setProperty('--flash-color', `rgba(255, 107, 0, 0.20)`);
                 document.body.appendChild(flash);
                 setTimeout(() => flash.remove(), 500);
-                for (let i = 0; i < 6; i++) {
+                const emberCount = isMobile ? 4 : 6;
+                for (let i = 0; i < emberCount; i++) {
                     const eAngle = Math.random() * 360;
-                    const eDist = 20 + Math.random() * 40;
+                    const eDist = 30 + Math.random() * 60;
                     const eRad = (eAngle * Math.PI) / 180;
                     const ember = document.createElement('div');
                     ember.style.cssText = `
@@ -349,20 +388,15 @@ export function MobileStarField() {
         } else {
             const iconColor = ICON_COLORS[Math.floor(Math.random() * ICON_COLORS.length)];
             const icon = SERVICE_ICONS[Math.floor(Math.random() * SERVICE_ICONS.length)];
-            const a1 = Math.random() * 360;
-            const a2 = a1 + 180; // Perfectly head-to-head
-            const dist = 35 + Math.random() * 15;
-            const r1 = (a1 * Math.PI) / 180;
-            const r2 = (a2 * Math.PI) / 180;
-            createIncomingComet(container, cx + Math.cos(r1) * dist, cy + Math.sin(r1) * dist, cx, cy, '#ffffff', approachDur);
-            createIncomingComet(container, cx + Math.cos(r2) * dist, cy + Math.sin(r2) * dist, cx, cy, iconColor, approachDur, icon);
+            createIncomingComet(container, from1X, from1Y, cx, cy, '#ffffff', approachDur);
+            createIncomingComet(container, from2X, from2Y, cx, cy, iconColor, approachDur, icon);
             setTimeout(() => {
-                createBurst(container, cx, cy, [iconColor, '#ffffff', iconColor + 'cc'], iconColor, 10, 60);
+                const burstCount = isMobile ? 9 : 14;
+                const burstSpread = isMobile ? 70 : 100;
+                createBurst(container, cx, cy, [iconColor, '#ffffff', iconColor + 'cc'], iconColor, burstCount, burstSpread);
                 playBoomRef.current();
-                // Collision vignette flash — overlay, no transforms on content
                 const flash = document.createElement('div');
                 flash.className = 'collision-shake';
-                // Use the icon color for the border glow
                 const r = parseInt(iconColor.slice(1, 3), 16);
                 const g = parseInt(iconColor.slice(3, 5), 16);
                 const b = parseInt(iconColor.slice(5, 7), 16);
@@ -371,29 +405,54 @@ export function MobileStarField() {
                 setTimeout(() => flash.remove(), 500);
             }, approachDur * 1000);
         }
-        burstTimeoutRef.current = setTimeout(spawnCollision, isLowPerf ? 12000 : 6000);
+        // (self-scheduling removed — driven by sequencer)
     }, []);
+    // ── Single sequencer: only one comet type on screen at a time ──
+    // Pattern: star → pause → iconComet → pause → star → pause → collision → pause → repeat
+    const sequencerRef = useRef<ReturnType<typeof setTimeout>>();
+    const sequenceStep = useRef(0);
+
+    const runSequence = useCallback(() => {
+        const step = sequenceStep.current;
+        // Gap between events (time AFTER the comet finishes before next one starts)
+        const gap = isLowPerf ? 4000 : 3000;
+
+        // Sequence: 0=star, 1=iconComet, 2=star, 3=collision
+        if (step === 0 || step === 2) {
+            // Shooting star — visible for ~3s
+            spawnStar();
+            sequenceStep.current = (step + 1) % 4;
+            sequencerRef.current = setTimeout(runSequence, 3500 + gap);
+        } else if (step === 1) {
+            // Icon comet — visible for ~5s
+            spawnCodeComet();
+            sequenceStep.current = 2;
+            sequencerRef.current = setTimeout(runSequence, 6000 + gap);
+        } else {
+            // Collision — approach ~1.5s + burst ~1.5s = ~3s
+            spawnCollision();
+            sequenceStep.current = 0;
+            sequencerRef.current = setTimeout(runSequence, 4000 + gap);
+        }
+    }, [spawnStar, spawnCodeComet, spawnCollision]);
 
     useEffect(() => {
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (prefersReduced) return;
-        // Low-perf: skip shooting stars, keep icon comets at slower pace
-        if (!isLowPerf) {
-            timeoutRef.current = setTimeout(spawnStar, 800);
-        }
-        codeTimeoutRef.current = setTimeout(spawnCodeComet, isLowPerf ? 8000 : 2000);
-        burstTimeoutRef.current = setTimeout(spawnCollision, isLowPerf ? 8000 : 5000);
+        // Start the sequencer after a short initial delay
+        sequencerRef.current = setTimeout(runSequence, isLowPerf ? 2000 : 1000);
         return () => {
+            if (sequencerRef.current) clearTimeout(sequencerRef.current);
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             if (codeTimeoutRef.current) clearTimeout(codeTimeoutRef.current);
             if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current);
         };
-    }, [spawnStar, spawnCodeComet, spawnCollision]);
+    }, [runSequence]);
 
     return (
         <div
-            className="fixed inset-0 w-full h-[100dvh] pointer-events-none select-none overflow-hidden"
-            style={{ zIndex: -49, contain: 'strict' }}
+            className="fixed inset-0 w-full h-[100dvh] pointer-events-none select-none"
+            style={{ zIndex: -49, contain: 'layout style' }}
             aria-hidden
         >
             {/* ── 1. Deep Cosmic Void Base ── */}

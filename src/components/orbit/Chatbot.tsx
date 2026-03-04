@@ -127,6 +127,17 @@ export function Chatbot() {
     return () => window.removeEventListener('orbit-cta-open', handleRemoteDismiss);
   }, []);
 
+  // Hide the welcome popup during comet collisions, then let it reappear naturally
+  useEffect(() => {
+    const handleCollisionStart = () => setShowWelcomePopup(false);
+    window.addEventListener('orbit-collision-start', handleCollisionStart);
+    window.addEventListener('orbit-collision-end', handleCollisionStart); // keep hidden, idle timer will bring it back
+    return () => {
+      window.removeEventListener('orbit-collision-start', handleCollisionStart);
+      window.removeEventListener('orbit-collision-end', handleCollisionStart);
+    };
+  }, []);
+
   // Auto-hide the welcome popup after 8 seconds if ignored
   useEffect(() => {
     if (showWelcomePopup) {
