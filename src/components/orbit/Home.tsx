@@ -14,8 +14,20 @@ export function Home() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [isNewsletterFocused, setIsNewsletterFocused] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const mobileEmailBarRef = useRef<HTMLDivElement>(null);
   const [isInHero, setIsInHero] = useState(true);
+
+  useEffect(() => {
+    const handleChatbotState = (e: Event) => {
+      const customEvent = e as CustomEvent<{ isOpen: boolean }>;
+      if (customEvent.detail) {
+        setIsChatbotOpen(customEvent.detail.isOpen);
+      }
+    };
+    window.addEventListener('orbit-chatbot-state-change', handleChatbotState);
+    return () => window.removeEventListener('orbit-chatbot-state-change', handleChatbotState);
+  }, []);
 
   // Track scroll position to hide newsletter button
   useEffect(() => {
@@ -455,7 +467,7 @@ export function Home() {
       {
         isHeroLoaded && !isNewsletterFocused && (
           <div
-            className={`fixed bottom-[10dvh] sm:bottom-6 left-4 sm:left-6 z-[260] transition-all duration-500 ease-out ${(!isInHero || isCtaOpen) ? 'opacity-0 pointer-events-none translate-y-4 scale-90 invisible' : 'opacity-100 translate-y-0 scale-100 visible'}`}
+            className={`fixed bottom-[10dvh] sm:bottom-6 left-4 sm:left-6 z-[180] transition-all duration-500 ease-out ${(!isInHero || isCtaOpen || (isChatbotOpen && typeof window !== 'undefined' && window.innerWidth < 768)) ? 'opacity-0 pointer-events-none translate-y-4 scale-90 invisible' : 'opacity-100 translate-y-0 scale-100 visible'}`}
           >
             <button
               type="button"
