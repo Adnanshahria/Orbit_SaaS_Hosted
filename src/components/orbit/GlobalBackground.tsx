@@ -1,10 +1,10 @@
-import { MobileStarField } from './MobileStarField';
+import { StarfieldCanvas } from './StarfieldCanvas';
 
 export function GlobalBackground() {
     return (
         <>
-            {/* The new immersive 3D space flight & galaxy background is active for everyone */}
-            <MobileStarField />
+            {/* Canvas-based 3D space flight background — replaces div-based MobileStarField */}
+            <StarfieldCanvas />
         </>
     );
 }
