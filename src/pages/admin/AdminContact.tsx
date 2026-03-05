@@ -30,7 +30,7 @@ export default function AdminContact() {
                 <LangToggle lang={lang} setLang={setLang} />
             </div>
             <ErrorAlert message={error} />
-            <div className="space-y-4 bg-card rounded-xl p-6 border border-border">
+            <div className="space-y-4 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <TextField label="Title" value={title} onChange={setTitle} lang={lang} />
                 <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} multiline lang={lang} />
                 <TextField label="CTA Button Text" value={cta} onChange={setCta} lang={lang} />

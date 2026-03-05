@@ -37,8 +37,8 @@ async function handleLogin(req: VercelRequest, res: VercelResponse) {
 
     const { signToken } = await import('./lib/auth.js');
     const { code } = req.body;
-    const secretCode = process.env.ADMIN_ACCESS_CODE || 'orbit2025';
-
+    const secretCode = process.env.ADMIN_ACCESS_CODE;
+    if (!secretCode) return res.status(500).json({ error: 'ADMIN_ACCESS_CODE not configured' });
     if (!code) return res.status(400).json({ error: 'Access code required' });
     if (code !== secretCode) return res.status(401).json({ error: 'Invalid access code' });
 
@@ -258,7 +258,8 @@ async function handleSeed(req: VercelRequest, res: VercelResponse) {
     `);
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@orbitsaas.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'orbit2025';
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword) return res.status(500).json({ error: 'ADMIN_PASSWORD not configured' });
     const hash = await bcrypt.hash(adminPassword, 10);
 
     await db.execute({

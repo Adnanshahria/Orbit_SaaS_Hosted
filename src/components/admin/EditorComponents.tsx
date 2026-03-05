@@ -104,7 +104,7 @@ export function JsonPanel({
         <div className="bg-card rounded-xl border border-border overflow-hidden">
             <button
                 onClick={() => { setOpen(!open); if (!open) handleExport(); }}
-                className="w-full flex items-center justify-between px-6 py-4 hover:bg-secondary/30 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between px-4 py-3 md:px-6 md:py-4 hover:bg-secondary/30 transition-colors cursor-pointer"
             >
                 <div className="flex items-center gap-2.5">
                     <Braces className="w-5 h-5 text-primary" />
@@ -115,7 +115,7 @@ export function JsonPanel({
             </button>
 
             {open && (
-                <div className="px-6 pb-6 space-y-4 border-t border-border pt-4">
+                <div className="px-4 pb-4 md:px-6 md:pb-6 space-y-4 border-t border-border pt-4">
                     <p className="text-xs text-muted-foreground">
                         {description} <b>Importing fills the form</b> — you still need to click <b>"Save Changes"</b> to persist.
                     </p>
@@ -311,9 +311,9 @@ export function ColorField({
 /* ─── Section Header ─── */
 export function SectionHeader({ title, description }: { title: string; description: string }) {
     return (
-        <div className="mb-6">
-            <h1 className="font-display text-2xl font-bold text-foreground">{title}</h1>
-            <p className="text-muted-foreground text-sm mt-1">{description}</p>
+        <div className="mb-4 md:mb-6">
+            <h1 className="font-display text-xl md:text-2xl font-bold text-foreground">{title}</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">{description}</p>
         </div>
     );
 }

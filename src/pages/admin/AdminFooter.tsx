@@ -251,7 +251,7 @@ export default function AdminFooter() {
             <ErrorAlert message={error} />
 
             {/* ─── Brand & Tagline (EN + BN) ─── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-6 border border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary">🇬🇧 English</h3>
                     <TextField
@@ -309,7 +309,7 @@ export default function AdminFooter() {
             </div>
 
             {/* ─── Contact Info (EN + BN) ─── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-6 border border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="space-y-4">
                     <h3 className="font-semibold text-foreground flex items-center gap-2">📞 Contact Info (EN)</h3>
                     <TextField
@@ -367,7 +367,7 @@ export default function AdminFooter() {
             </div>
 
             {/* ─── Quick Links (Shared) ─── */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h3 className="font-semibold text-foreground flex items-center gap-2">🔗 Quick Links</h3>
@@ -419,7 +419,7 @@ export default function AdminFooter() {
             </div>
 
             {/* ─── Legal Links (Shared) ─── */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h3 className="font-semibold text-foreground flex items-center gap-2">⚖️ Legal Links</h3>
@@ -471,7 +471,7 @@ export default function AdminFooter() {
             </div>
 
             {/* ─── Social Media Links ─── */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <h3 className="font-semibold text-foreground mb-1">Social Media Links</h3>
                 <p className="text-xs text-muted-foreground mb-5">
                     Enter the URLs for your social accounts. Toggle each one to show/hide it on the public site.

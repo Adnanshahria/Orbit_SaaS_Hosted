@@ -47,7 +47,7 @@ export default function AdminStats() {
             </div>
             <ErrorAlert message={error} />
 
-            <div className="bg-card rounded-xl p-6 border border-border space-y-5">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border space-y-5">
                 <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
                     📊 Stats Values
                 </h3>

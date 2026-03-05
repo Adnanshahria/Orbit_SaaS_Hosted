@@ -331,7 +331,7 @@ export default function AdminLeadership() {
             <ErrorAlert message={error} />
 
             {/* Section titles (EN + BN side by side) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-6 border border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary">English Section Info</h3>
                     <TextField
@@ -409,7 +409,7 @@ export default function AdminLeadership() {
             </div>
 
             {/* Members list */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-foreground">
                         Team Members ({members.length})

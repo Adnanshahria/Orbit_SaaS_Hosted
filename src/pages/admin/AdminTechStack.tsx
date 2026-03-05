@@ -244,7 +244,7 @@ export default function AdminTechStack() {
             <ErrorAlert message={error} />
 
             {/* Section titles (side by side) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-6 border border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="space-y-4">
                     <h3 className="font-semibold text-primary text-sm uppercase tracking-wider">English Header</h3>
                     <TextField
@@ -300,7 +300,7 @@ export default function AdminTechStack() {
             </div>
 
             {/* Categories list */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <h3 className="font-semibold text-foreground mb-4">
                     Categories / Marquee Rows ({categories.length})
                 </h3>

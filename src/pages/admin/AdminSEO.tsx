@@ -20,7 +20,7 @@ export default function AdminSEO() {
         <div className="space-y-6">
             <SectionHeader title="SEO Settings" description="Manage search engine optimization metadata" />
             <ErrorAlert message={error} />
-            <div className="space-y-4 bg-card rounded-xl p-6 border border-border">
+            <div className="space-y-4 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <TextField label="Page Title" value={seoTitle} onChange={setSeoTitle} lang="en" />
                 <TextField label="Meta Description" value={seoDesc} onChange={setSeoDesc} multiline lang="en" />
                 <TextField label="Keywords (comma-separated)" value={seoKeywords} onChange={setSeoKeywords} lang="en" />

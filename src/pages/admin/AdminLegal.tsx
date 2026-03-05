@@ -149,7 +149,7 @@ export default function AdminLegal() {
             </div>
 
             {/* Page Title & Last Updated */}
-            <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-foreground mb-1.5">Page Title</label>
@@ -174,7 +174,7 @@ export default function AdminLegal() {
             </div>
 
             {/* Sections CRUD */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h3 className="font-semibold text-foreground">

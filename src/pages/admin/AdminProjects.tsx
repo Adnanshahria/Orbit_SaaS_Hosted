@@ -335,7 +335,7 @@ function ProjectEditor({ item, update, categories: availableCategories, onSave }
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <TextField label="Live Link" value={item.link || ''} onChange={v => update({ ...item, link: v })} />
-                    <TextField label="Video Preview URL" value={item.videoPreview || ''} onChange={v => update({ ...item, videoPreview: v })} />
+                    <TextField label="Video URL (YouTube / Direct)" value={item.videoPreview || ''} onChange={v => update({ ...item, videoPreview: v })} />
                 </div>
             </div>
 
@@ -468,7 +468,7 @@ function ProjectEditor({ item, update, categories: availableCategories, onSave }
                                     <span className="text-xs">Help</span>
                                 </button>
                                 {seoHelpOpen && (
-                                    <div className="absolute right-0 top-full mt-2 w-[400px] p-4 rounded-xl bg-background border border-border shadow-2xl z-50">
+                                    <div className="absolute right-0 top-full mt-2 w-[min(400px,calc(100vw-2rem))] p-4 rounded-xl bg-background border border-border shadow-2xl z-50">
                                         <div className="flex items-center justify-between mb-3">
                                             <h4 className="text-sm font-bold text-foreground">SEO Input Guide</h4>
                                             <button onClick={() => setSeoHelpOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -696,7 +696,7 @@ function ProjectEditor({ item, update, categories: availableCategories, onSave }
                                                 <HelpCircle className="w-4 h-4" />
                                             </button>
                                             {jsonDescHelp && (
-                                                <div className="absolute right-0 top-full mt-2 w-[420px] p-4 rounded-xl bg-background border border-border shadow-2xl z-50">
+                                                <div className="absolute right-0 top-full mt-2 w-[min(420px,calc(100vw-2rem))] p-4 rounded-xl bg-background border border-border shadow-2xl z-50">
                                                     <div className="flex items-center justify-between mb-3">
                                                         <h4 className="text-sm font-bold text-foreground">JSON Format Guide</h4>
                                                         <button onClick={() => setJsonDescHelp(false)} className="text-muted-foreground hover:text-foreground">
@@ -1281,7 +1281,7 @@ export default function AdminProjects() {
             </div>
 
             {/* Reorder Projects Section */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                         <GripVertical className="w-5 h-5 text-primary" /> Reorder Projects
@@ -1354,7 +1354,7 @@ export default function AdminProjects() {
             </div>
 
             {/* Projects List */}
-            <div className="bg-card rounded-xl p-6 border border-border">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-foreground">Projects Content Editor ({projects.length})</h3>
                 </div>

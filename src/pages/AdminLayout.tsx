@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { toast, Toaster } from 'sonner';
 import {
     LayoutDashboard, Type, ShoppingCart, Users, FolderOpen,
-    MessageCircle, Globe, Shield, LogOut, Menu, X,
+    MessageCircle, Globe, Shield, LogOut, Menu, PanelLeftClose, PanelLeft,
     Lightbulb, Phone, FileText, Cpu, CloudUpload, Loader2, Link as LinkIcon,
     Database, Mail, BarChart3, Star, Trash2, CheckCircle2, XCircle
 } from 'lucide-react';
@@ -59,7 +59,7 @@ function ProgressToast({ progress, label, color, doneMessage }: { progress: numb
 
 export default function AdminLayout() {
     const navigate = useNavigate();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
     const [publishing, setPublishing] = useState(false);
     const [deleting, setDeleting] = useState(false);
     // Read NDJSON stream and update toast with real progress
@@ -211,7 +211,7 @@ export default function AdminLayout() {
     };
 
     return (
-        <div className="min-h-[100dvh] bg-background flex">
+        <div className="min-h-[100dvh] bg-background flex overflow-x-hidden">
             <Toaster position="top-right" theme="dark" richColors closeButton />
             <Helmet>
                 <title>Admin Panel | Orbit SaaS</title>
@@ -223,14 +223,19 @@ export default function AdminLayout() {
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed lg:sticky top-0 left-0 z-50 h-[100dvh] w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+            <aside className={`fixed ${sidebarOpen ? 'lg:sticky' : ''} top-0 left-0 z-50 h-[100dvh] w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="px-4 py-3 border-b border-border flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <LayoutDashboard className="w-5 h-5 text-primary" />
                         <span className="font-display font-bold text-foreground">Admin Panel</span>
                     </div>
-                    <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground">
-                        <X className="w-5 h-5" />
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="p-2 -mr-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/80 active:bg-secondary transition-colors"
+                        aria-label="Collapse sidebar"
+                        title="Collapse sidebar"
+                    >
+                        <PanelLeftClose className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -289,19 +294,26 @@ export default function AdminLayout() {
             </aside>
 
             {/* Main content */}
-            <main className="flex-1 min-h-[100dvh]">
-                {/* Top bar (mobile) */}
-                <div className="lg:hidden sticky top-0 z-30 bg-card/90 backdrop-blur-xl border-b border-border px-4 py-3 flex items-center gap-3">
-                    <button onClick={() => setSidebarOpen(true)} className="text-foreground cursor-pointer">
-                        <Menu className="w-5 h-5" />
-                    </button>
-                    <span className="font-display font-bold text-foreground text-sm">Admin Panel</span>
-                </div>
+            <main className="flex-1 min-h-[100dvh] overflow-x-hidden">
+                {/* Top bar — shows when sidebar is closed */}
+                {!sidebarOpen && (
+                    <div className="sticky top-0 z-30 bg-card/90 backdrop-blur-xl border-b border-border px-3 py-2.5 flex items-center gap-3">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="p-1.5 rounded-lg text-foreground hover:bg-secondary/80 active:bg-secondary transition-colors"
+                            aria-label="Expand sidebar"
+                            title="Expand sidebar"
+                        >
+                            <PanelLeft className="w-5 h-5" />
+                        </button>
+                        <span className="font-display font-bold text-foreground text-sm">Admin Panel</span>
+                    </div>
+                )}
 
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="p-4 sm:p-6 lg:p-8 max-w-[1200px] mx-auto w-full"
+                    className="p-3 sm:p-5 lg:p-8 max-w-[1200px] mx-auto w-full"
                 >
                     <Outlet />
                 </motion.div>

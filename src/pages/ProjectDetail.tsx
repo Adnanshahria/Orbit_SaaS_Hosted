@@ -11,16 +11,28 @@ import { Helmet } from 'react-helmet-async';
 import { ensureAbsoluteUrl } from '@/lib/utils';
 import DOMPurify from 'dompurify';
 
-function ImageGallery({ images, title, onLightboxChange }: { images: string[]; title: string; onLightboxChange?: (open: boolean) => void }) {
+type MediaItem = { type: 'image'; url: string } | { type: 'video'; url: string };
+
+function ImageGallery({ images, title, videoUrl, onLightboxChange }: { images: string[]; title: string; videoUrl?: string; onLightboxChange?: (open: boolean) => void }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
     const [lightboxOpen, setLightboxOpen] = useState(false);
 
-    if (!images || images.length === 0) return null;
+    // Build mixed media array: images + video at position 1 (2nd slide)
+    const media: MediaItem[] = (() => {
+        const items: MediaItem[] = images.map(url => ({ type: 'image' as const, url }));
+        if (videoUrl) {
+            const pos = Math.min(1, items.length); // insert at position 1, or end if only 1 image
+            items.splice(pos, 0, { type: 'video' as const, url: videoUrl });
+        }
+        return items;
+    })();
+
+    if (media.length === 0) return null;
 
     const paginate = (newDirection: number) => {
         setDirection(newDirection);
-        setCurrentIndex((prev) => (prev + newDirection + images.length) % images.length);
+        setCurrentIndex((prev) => (prev + newDirection + media.length) % media.length);
     };
 
     const openLightbox = () => { setLightboxOpen(true); onLightboxChange?.(true); };
@@ -58,6 +70,36 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
         })
     };
 
+    const currentMedia = media[currentIndex];
+    const ytId = currentMedia.type === 'video' ? extractYouTubeId(currentMedia.url) : null;
+
+    const renderMediaSlide = (item: MediaItem, isLightbox = false) => {
+        if (item.type === 'video') {
+            const vid = extractYouTubeId(item.url);
+            if (vid) {
+                return (
+                    <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${vid}?rel=0&modestbranding=1`}
+                        title={title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className={isLightbox ? "w-full h-full" : "absolute inset-0 w-full h-full"}
+                        loading="lazy"
+                    />
+                );
+            }
+            return (
+                <video
+                    src={item.url}
+                    controls
+                    playsInline
+                    className={isLightbox ? "max-w-full max-h-full object-contain" : "absolute inset-0 w-full h-full object-contain bg-black"}
+                />
+            );
+        }
+        return null; // images handled by motion.img
+    };
+
     return (
         <>
             {/* Main Carousel */}
@@ -68,35 +110,39 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
                 className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8"
             >
                 <div className="relative w-full aspect-video bg-muted/10 rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_0_40px_rgba(108,92,231,0.1),0_8px_32px_rgba(0,0,0,0.4)] group">
-                    {/* Main Image */}
-                    <div className="absolute inset-0 cursor-pointer" onClick={openLightbox}>
-                        <AnimatePresence initial={false} custom={direction}>
-                            <motion.img
-                                key={currentIndex}
-                                src={images[currentIndex]}
-                                custom={direction}
-                                variants={variants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{
-                                    x: { type: "spring", stiffness: 300, damping: 30 },
-                                    opacity: { duration: 0.2 }
-                                }}
-                                drag="x"
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={1}
-                                onDragEnd={handleDragEnd}
-                                draggable="false"
-                                className="absolute inset-0 w-full h-full object-contain bg-black/5 touch-pan-y no-browser-trigger"
-                                alt={`${title} - slide ${currentIndex + 1}`}
-                            />
-                        </AnimatePresence>
+                    {/* Main Media */}
+                    <div className={`absolute inset-0 ${currentMedia.type === 'image' ? 'cursor-pointer' : ''}`} onClick={currentMedia.type === 'image' ? openLightbox : undefined}>
+                        {currentMedia.type === 'video' ? (
+                            renderMediaSlide(currentMedia)
+                        ) : (
+                            <AnimatePresence initial={false} custom={direction}>
+                                <motion.img
+                                    key={currentIndex}
+                                    src={currentMedia.url}
+                                    custom={direction}
+                                    variants={variants}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{
+                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                        opacity: { duration: 0.2 }
+                                    }}
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={1}
+                                    onDragEnd={handleDragEnd}
+                                    draggable="false"
+                                    className="absolute inset-0 w-full h-full object-contain bg-black/5 touch-pan-y no-browser-trigger"
+                                    alt={`${title} - slide ${currentIndex + 1}`}
+                                />
+                            </AnimatePresence>
+                        )}
                     </div>
                 </div>
 
                 {/* Premium Navigation & Dots Indicator */}
-                {images.length > 1 && (
+                {media.length > 1 && (
                     <div className="flex justify-center items-center gap-2 sm:gap-6 mt-8 relative z-10 px-4">
                         {/* Premium Backward Button */}
                         <motion.button
@@ -109,7 +155,7 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
                         </motion.button>
 
                         <div className="flex justify-center flex-wrap gap-2 max-w-[60%] sm:max-w-none">
-                            {images.map((_, idx) => (
+                            {media.map((item, idx) => (
                                 <motion.button
                                     key={idx}
                                     onClick={(e) => {
@@ -117,10 +163,15 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
                                         setDirection(idx > currentIndex ? 1 : -1);
                                         setCurrentIndex(idx);
                                     }}
-                                    className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 shrink-0 ${idx === currentIndex
-                                        ? 'bg-[#FFD700] w-5 sm:w-6 shadow-[0_0_12px_rgba(255,215,0,0.8)]'
-                                        : 'bg-white/20 hover:bg-white/40'
+                                    className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 shrink-0 ${idx === currentIndex
+                                        ? item.type === 'video'
+                                            ? 'bg-red-500 w-5 sm:w-6 shadow-[0_0_12px_rgba(239,68,68,0.8)]'
+                                            : 'bg-[#FFD700] w-5 sm:w-6 shadow-[0_0_12px_rgba(255,215,0,0.8)]'
+                                        : item.type === 'video'
+                                            ? 'w-2 sm:w-2.5 bg-red-500/30 hover:bg-red-500/50'
+                                            : 'w-2 sm:w-2.5 bg-white/20 hover:bg-white/40'
                                         }`}
+                                    title={item.type === 'video' ? 'Video' : `Image ${idx + 1}`}
                                 />
                             ))}
                         </div>
@@ -156,7 +207,7 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
                             <X className="w-8 h-8" />
                         </button>
 
-                        {images.length > 1 && (
+                        {media.length > 1 && (
                             <>
                                 <motion.button
                                     onClick={(e) => { e.stopPropagation(); paginate(-1); }}
@@ -177,22 +228,28 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
                             </>
                         )}
 
-                        <motion.img
-                            key={currentIndex}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.3 }}
-                            src={images[currentIndex]}
-                            alt="Fullscreen view"
-                            drag="x"
-                            dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={1}
-                            onDragEnd={handleDragEnd}
-                            draggable="false"
-                            className="max-w-full max-h-full md:max-w-[85vw] md:max-h-[85vh] object-contain select-none shadow-2xl touch-pan-y no-browser-trigger"
-                            onClick={(e) => e.stopPropagation()}
-                        />
+                        {currentMedia.type === 'video' ? (
+                            <div className="w-full max-w-[85vw] aspect-video" onClick={(e) => e.stopPropagation()}>
+                                {renderMediaSlide(currentMedia, true)}
+                            </div>
+                        ) : (
+                            <motion.img
+                                key={currentIndex}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.3 }}
+                                src={currentMedia.url}
+                                alt="Fullscreen view"
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={1}
+                                onDragEnd={handleDragEnd}
+                                draggable="false"
+                                className="max-w-full max-h-full md:max-w-[85vw] md:max-h-[85vh] object-contain select-none shadow-2xl touch-pan-y no-browser-trigger"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        )}
 
                         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 group">
                             {/* Premium Golden Gradient Border Wrapper */}
@@ -207,7 +264,7 @@ function ImageGallery({ images, title, onLightboxChange }: { images: string[]; t
                                     </button>
 
                                     <span className="text-base min-w-[3.5rem] text-center tracking-wider tabular-nums font-semibold">
-                                        {currentIndex + 1} <span className="text-[#FFD700] mx-0.5">/</span> {images.length}
+                                        {currentIndex + 1} <span className="text-[#FFD700] mx-0.5">/</span> {media.length}
                                     </span>
 
                                     <button
@@ -230,6 +287,21 @@ function stripHtml(html: string): string {
     if (!html) return '';
     return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
 }
+
+/** Extract YouTube video ID from various URL formats */
+function extractYouTubeId(url: string): string | null {
+    if (!url) return null;
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtu\.be\/)([\w-]{11})/,
+        /^([\w-]{11})$/,  // bare video ID
+    ];
+    for (const pat of patterns) {
+        const m = url.match(pat);
+        if (m) return m[1];
+    }
+    return null;
+}
+
 
 function CollapsibleCards({ blocks }: { blocks: string[] }) {
     // First card expanded, rest collapsed by default
@@ -441,8 +513,8 @@ export default function ProjectDetail() {
             </Helmet>
             {!lightboxOpen && <Navbar />}
             <main className="pt-20 relative z-10">
-                {/* Image Gallery */}
-                <ImageGallery images={allImages} title={project.title} onLightboxChange={setLightboxOpen} />
+                {/* Image + Video Gallery */}
+                <ImageGallery images={allImages} title={project.title} videoUrl={project.videoPreview} onLightboxChange={setLightboxOpen} />
 
                 {/* Two-Column Layout: Content + Sidebar */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16 flex flex-col lg:flex-row gap-10">

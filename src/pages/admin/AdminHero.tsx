@@ -49,7 +49,7 @@ export default function AdminHero() {
 
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Content */}
-                <div className="space-y-4 bg-card rounded-xl p-6 border border-border">
+                <div className="space-y-4 bg-card rounded-xl p-4 md:p-6 border border-border">
                     <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
                         📝 Content
                     </h3>
@@ -62,7 +62,7 @@ export default function AdminHero() {
                 </div>
 
                 {/* Colors */}
-                <div className="space-y-6 bg-card rounded-xl p-6 border border-border">
+                <div className="space-y-6 bg-card rounded-xl p-4 md:p-6 border border-border">
                     <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
                         🎨 Theme Customization
                     </h3>

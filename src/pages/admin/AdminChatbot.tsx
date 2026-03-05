@@ -29,14 +29,14 @@ export default function AdminChatbot() {
             <ErrorAlert message={error} />
 
             <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-4 bg-card rounded-xl p-6 border border-border h-fit">
+                <div className="space-y-4 bg-card rounded-xl p-4 md:p-6 border border-border h-fit">
                     <h3 className="font-semibold text-lg">General Settings</h3>
                     <TextField label="Bot Title" value={title} onChange={setTitle} lang={lang} />
                     <TextField label="Input Placeholder" value={placeholder} onChange={setPlaceholder} lang={lang} />
                     <TextField label="Greeting Message" value={greeting} onChange={setGreeting} multiline lang={lang} />
                 </div>
 
-                <div className="space-y-4 bg-card rounded-xl p-6 border border-border h-fit">
+                <div className="space-y-4 bg-card rounded-xl p-4 md:p-6 border border-border h-fit">
                     <h3 className="font-semibold text-lg">AI Behavior</h3>
                     <TextField
                         label="System Prompt (Instructions)"
@@ -49,7 +49,7 @@ export default function AdminChatbot() {
                 </div>
             </div>
 
-            <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border space-y-4">
                 <h3 className="font-semibold text-lg">Knowledge Base (Q&A)</h3>
                 <p className="text-sm text-muted-foreground">Add specific questions and answers to train the AI on your business details.</p>
 

@@ -88,7 +88,7 @@ export default function AdminReviews() {
             <ErrorAlert message={error} />
 
             {/* Section Header Fields */}
-            <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+            <div className="bg-card rounded-xl p-4 md:p-6 border border-border space-y-4">
                 <h3 className="font-semibold text-foreground flex items-center gap-2">📝 Section Header</h3>
                 <TextField label="Title" value={title} onChange={setTitle} lang={lang} />
                 <TextField label="Subtitle" value={subtitle} onChange={setSubtitle} lang={lang} />

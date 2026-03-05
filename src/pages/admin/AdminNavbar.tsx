@@ -33,7 +33,7 @@ export default function AdminNavbar() {
                 <LangToggle lang={lang} setLang={setLang} />
             </div>
             <ErrorAlert message={error} />
-            <div className="space-y-4 bg-card rounded-xl p-6 border border-border">
+            <div className="space-y-4 bg-card rounded-xl p-4 md:p-6 border border-border">
                 <TextField label="Services Link" value={services} onChange={setServices} lang={lang} />
                 <TextField label="Tech Stack Link" value={techStack} onChange={setTechStack} lang={lang} />
                 <TextField label="Why Us Link" value={whyUs} onChange={setWhyUs} lang={lang} />
