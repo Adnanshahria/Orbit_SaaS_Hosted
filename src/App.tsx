@@ -1,23 +1,22 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ContentProvider } from './contexts/ContentContext';
 import { Navbar } from './components/orbit/Navbar';
 import { Home } from './components/orbit/Home';
-import { StatsSection } from './components/orbit/StatsSection';
-import { ServicesSection } from './components/orbit/ServicesSection';
-import { TechStackSection } from './components/orbit/TechStackSection';
-import { WhyUsSection } from './components/orbit/WhyUsSection';
-import { ProjectsSection } from './components/orbit/ProjectsSection';
-import { LeadershipSection } from './components/orbit/LeadershipSection';
-import { ReviewsSection } from './components/orbit/ReviewsSection';
-import { ContactSection } from './components/orbit/ContactSection';
-import { OrbitFooter } from './components/orbit/OrbitFooter';
+const StatsSection = lazy(() => import('./components/orbit/StatsSection').then(m => ({ default: m.StatsSection })));
+const ServicesSection = lazy(() => import('./components/orbit/ServicesSection').then(m => ({ default: m.ServicesSection })));
+const TechStackSection = lazy(() => import('./components/orbit/TechStackSection').then(m => ({ default: m.TechStackSection })));
+const WhyUsSection = lazy(() => import('./components/orbit/WhyUsSection').then(m => ({ default: m.WhyUsSection })));
+const ProjectsSection = lazy(() => import('./components/orbit/ProjectsSection').then(m => ({ default: m.ProjectsSection })));
+const LeadershipSection = lazy(() => import('./components/orbit/LeadershipSection').then(m => ({ default: m.LeadershipSection })));
+const ReviewsSection = lazy(() => import('./components/orbit/ReviewsSection').then(m => ({ default: m.ReviewsSection })));
+const ContactSection = lazy(() => import('./components/orbit/ContactSection').then(m => ({ default: m.ContactSection })));
+const OrbitFooter = lazy(() => import('./components/orbit/OrbitFooter').then(m => ({ default: m.OrbitFooter })));
 // Chatbot is lazy-loaded below for performance
 import { StructuredData } from './components/seo/StructuredData';
 // LeadMagnetPopup is lazy-loaded below — only triggers after 15s or exit-intent
 import ScrollToTop from './components/ScrollToTop';
-
-import { lazy, Suspense, useEffect, useState } from 'react';
 
 // Lazy load admin pages
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
@@ -138,7 +137,7 @@ function PublicSite() {
         <main>
           <Home />
           {isLoaded && (
-            <>
+            <Suspense fallback={null}>
               <StatsSection />
               <ServicesSection />
               <TechStackSection />
@@ -147,10 +146,14 @@ function PublicSite() {
               <ReviewsSection />
               <LeadershipSection />
               <ContactSection />
-            </>
+            </Suspense>
           )}
         </main>
-        {isLoaded && <OrbitFooter />}
+        {isLoaded && (
+          <Suspense fallback={null}>
+            <OrbitFooter />
+          </Suspense>
+        )}
         {isLoaded && (
           <Suspense fallback={null}>
             <LeadMagnetPopup />

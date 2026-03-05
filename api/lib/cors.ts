@@ -10,7 +10,11 @@ const ALLOWED_ORIGINS = [
 
 export function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
     const origin = req.headers.origin || '';
-    if (ALLOWED_ORIGINS.includes(origin)) {
+
+    // Check if origin is allowed or is a localhost development origin
+    const isAllowed = ALLOWED_ORIGINS.includes(origin) || origin.startsWith('http://localhost:');
+
+    if (isAllowed) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     } else {
         // For non-browser requests (curl, Postman), set first allowed origin
@@ -23,7 +27,8 @@ export function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
 
 export function setCorsHeadersEdge(req: Request): Record<string, string> {
     const origin = req.headers.get('origin') || '';
-    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+    const isLocalhost = origin.startsWith('http://localhost:');
+    const allowedOrigin = (ALLOWED_ORIGINS.includes(origin) || isLocalhost) ? origin : ALLOWED_ORIGINS[0];
     return {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
