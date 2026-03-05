@@ -5,6 +5,20 @@ import { useLang } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 
+/** Parse **bold** markers into segments: { text, isBold }[] */
+function parseWordCards(str: string): { text: string; isBold: boolean }[] {
+  const parts: { text: string; isBold: boolean }[] = [];
+  const regex = /\*\*(.+?)\*\*/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = regex.exec(str)) !== null) {
+    if (m.index > last) parts.push({ text: str.slice(last, m.index), isBold: false });
+    parts.push({ text: m[1], isBold: true });
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) parts.push({ text: str.slice(last), isBold: false });
+  return parts.length ? parts : [{ text: str, isBold: false }];
+}
 
 /* ── Home component ───────────────────────────────────────────── */
 export function Home() {
@@ -76,9 +90,9 @@ export function Home() {
   };
 
 
-  // Staggered word animation for the subtitle (memoized to prevent re-splits)
+  // Parse subtitle with **bold** word-card markers
   const subtitle = t.hero.subtitle || '';
-  const words = useMemo(() => subtitle.split(' '), [subtitle]);
+  const subtitleSegments = useMemo(() => parseWordCards(subtitle), [subtitle]);
   const isLowPerf = useMemo(() => document.documentElement.classList.contains('low-perf'), []);
 
   // Always play the loading animation on every page load
@@ -325,7 +339,7 @@ export function Home() {
             </AnimatePresence>
           </div>
 
-          {/* Subtitle — word-by-word reveal */}
+          {/* Subtitle — word-by-word reveal with **bold** word cards */}
           <motion.p className="text-muted-foreground text-[13.5px] sm:text-base md:text-lg max-w-3xl mx-auto px-2 sm:px-0 mb-[3dvh] sm:mb-8 leading-relaxed flex flex-wrap justify-center gap-x-[0.35em] font-medium">
             {isLowPerf ? (
               <motion.span
@@ -333,23 +347,47 @@ export function Home() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, delay: baseDelay + 0.9 }}
               >
-                {subtitle}
+                {subtitleSegments.map((seg, si) =>
+                  seg.isBold
+                    ? <span key={si} className="word-card">{seg.text}</span>
+                    : <span key={si}>{seg.text}</span>
+                )}
               </motion.span>
             ) : (
-              words.map((word, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: baseDelay + 0.9 + i * 0.04,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))
+              (() => {
+                let wordIndex = 0;
+                return subtitleSegments.map((seg, si) => {
+                  if (seg.isBold) {
+                    const delay = baseDelay + 0.9 + wordIndex * 0.04;
+                    wordIndex += seg.text.split(' ').length;
+                    return (
+                      <motion.span
+                        key={`seg-${si}`}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="word-card"
+                      >
+                        {seg.text}
+                      </motion.span>
+                    );
+                  }
+                  return seg.text.split(' ').filter(Boolean).map((word, wi) => {
+                    const delay = baseDelay + 0.9 + wordIndex * 0.04;
+                    wordIndex++;
+                    return (
+                      <motion.span
+                        key={`w-${si}-${wi}`}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      >
+                        {word}
+                      </motion.span>
+                    );
+                  });
+                });
+              })()
             )}
           </motion.p>
 

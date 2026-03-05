@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useContent } from '@/contexts/ContentContext';
 import { toast } from 'sonner';
 import {
@@ -234,8 +234,42 @@ export function TextField({
     multiline?: boolean;
     lang?: string;
 }) {
+    const taRef = useRef<HTMLTextAreaElement>(null);
+    const [selToolbar, setSelToolbar] = useState<{ top: number; left: number; start: number; end: number } | null>(null);
+
+    // Check selection on mouse-up and key-up — much more reliable than onSelect
+    const checkSelection = useCallback(() => {
+        const ta = taRef.current;
+        if (!ta) return;
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        if (start === end || start === undefined) { setSelToolbar(null); return; }
+
+        // Position toolbar above the textarea
+        const rect = ta.getBoundingClientRect();
+        const top = rect.top - 44;
+        const left = rect.left + rect.width / 2;
+
+        setSelToolbar({ top, left, start, end });
+    }, []);
+
+    const wrapSelection = useCallback((prefix: string, suffix: string) => {
+        if (!selToolbar) return;
+        const { start, end } = selToolbar;
+        const selected = value.substring(start, end);
+        const before = value.substring(0, start);
+        const after = value.substring(end);
+        // Toggle: if already wrapped, unwrap
+        if (before.endsWith(prefix) && after.startsWith(suffix)) {
+            onChange(before.slice(0, -prefix.length) + selected + after.slice(suffix.length));
+        } else {
+            onChange(before + prefix + selected + suffix + after);
+        }
+        setSelToolbar(null);
+    }, [selToolbar, value, onChange]);
+
     return (
-        <div>
+        <div className="relative">
             <div className="flex items-center justify-between mb-1.5">
                 <label className="text-sm font-medium text-foreground block">{label}</label>
                 {lang && (
@@ -247,12 +281,44 @@ export function TextField({
                 )}
             </div>
             {multiline ? (
-                <textarea
-                    value={value}
-                    onChange={e => onChange(e.target.value)}
-                    rows={3}
-                    className="w-full bg-secondary rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 border border-border resize-y"
-                />
+                <div className="relative">
+                    <textarea
+                        ref={taRef}
+                        value={value}
+                        onChange={e => { onChange(e.target.value); setSelToolbar(null); }}
+                        onMouseUp={checkSelection}
+                        onKeyUp={checkSelection}
+                        onBlur={() => setTimeout(() => setSelToolbar(null), 250)}
+                        rows={3}
+                        className="w-full bg-secondary rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 border border-border resize-y"
+                    />
+                    {/* Floating Selection Toolbar */}
+                    {selToolbar && (
+                        <div
+                            className="fixed z-[9999] flex items-center gap-1 px-1.5 py-1 bg-[#1a1a2e] border border-primary/40 rounded-lg shadow-[0_4px_20px_rgba(16,185,129,0.15)]"
+                            style={{ top: selToolbar.top, left: selToolbar.left, transform: 'translateX(-50%)' }}
+                            onMouseDown={e => e.preventDefault()}
+                        >
+                            <button
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); wrapSelection('**', '**'); }}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold text-white hover:bg-primary/20 transition-colors cursor-pointer"
+                                title="Bold"
+                            >
+                                <span className="text-sm font-black">B</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+                            <button
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); wrapSelection('**', '**'); }}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-emerald-400 hover:bg-emerald-500/15 transition-colors cursor-pointer"
+                                title="Word Card"
+                            >
+                                <span className="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-bold">Card</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             ) : (
                 <input
                     type="text"

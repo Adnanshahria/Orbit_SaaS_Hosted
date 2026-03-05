@@ -920,3 +920,21 @@ img.no-browser-trigger {
   pointer-events: none !important;
   user-drag: none !important;
 }
+
+/* ── Word Cards: slim transparent pill badges for highlighted keywords ── */
+.word-card {
+  display: inline;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 1px 7px;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.08);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.word-card:hover {
+  background: rgba(16, 185, 129, 0.14);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.15);
+}
