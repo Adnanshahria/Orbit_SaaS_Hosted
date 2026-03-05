@@ -334,7 +334,7 @@ export function Home() {
                     ease: 'easeOut',
                     delay: isFirstVisit ? 0.15 : 0.5,
                   }}
-                  className="block mt-6 sm:mt-12 md:mt-16 text-[1.5rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4"
+                  className={`block mt-6 sm:mt-12 md:mt-16 text-[1.5rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4 ${lang === 'bn' ? 'font-bengali' : ''}`}
                   style={{ color: titleColor }}
                 >
                   {t.hero.title}

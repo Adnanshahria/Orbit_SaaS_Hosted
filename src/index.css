@@ -570,6 +570,10 @@ html.low-perf .hero-dice-cube {
     border-color: rgba(0, 0, 0, 0.12);
   }
 
+  .font-bengali {
+    font-family: 'Hind Siliguri', sans-serif !important;
+  }
+
   .dark .glass-effect:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
