@@ -229,7 +229,7 @@ export function StarfieldCanvas() {
                     playBoomRef.current();
                     const fl = document.createElement('div'); fl.className = 'collision-shake';
                     fl.style.setProperty('--flash-color', 'rgba(255,107,0,0.20)');
-                    document.body.appendChild(fl); setTimeout(() => fl.remove(), 500);
+                    document.body.appendChild(fl); setTimeout(() => fl.remove(), 800);
                 }, dur * 1000);
             } else {
                 const ic = COLORS[Math.floor(Math.random() * COLORS.length)];
@@ -247,14 +247,24 @@ export function StarfieldCanvas() {
                     const fl = document.createElement('div'); fl.className = 'collision-shake';
                     const rv = parseInt(ic.slice(1, 3), 16), gv = parseInt(ic.slice(3, 5), 16), bv = parseInt(ic.slice(5, 7), 16);
                     fl.style.setProperty('--flash-color', `rgba(${rv},${gv},${bv},0.20)`);
-                    document.body.appendChild(fl); setTimeout(() => fl.remove(), 500);
+                    document.body.appendChild(fl); setTimeout(() => fl.remove(), 800);
                 }, dur * 1000);
             }
         };
 
         // ── Render loop ──
         const render = (ts: number) => {
-            if (pausedRef.current) { lastTs = 0; rafRef.current = requestAnimationFrame(render); return; }
+            if (pausedRef.current) {
+                // If we have active visuals (flashes/particles/approaches), do one final clear to black to avoid stuck pixels
+                if (flashes.length > 0 || particles.length > 0 || approaches.length > 0) {
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, W, H);
+                }
+                lastTs = 0;
+                rafRef.current = requestAnimationFrame(render);
+                return;
+            }
             const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0.016;
             lastTs = ts; time += dt;
 
@@ -496,7 +506,7 @@ export function StarfieldCanvas() {
             obs = new IntersectionObserver(([e]) => {
                 if (document.hidden) return;
                 pausedRef.current = !e.isIntersecting;
-            }, { threshold: 0.05 });
+            }, { threshold: 0.01 });
             obs.observe(hero);
         }
         const onVis = () => {

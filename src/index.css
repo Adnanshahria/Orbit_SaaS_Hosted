@@ -299,10 +299,9 @@
 
 /* Post-collision border glow — dramatic lingering impact */
 @keyframes collisionFlashBig {
-  0% { opacity: 1; box-shadow: inset 0 0 100px 30px var(--flash-color, rgba(255, 80, 0, 0.30)), inset 0 0 200px 60px rgba(0, 0, 0, 0.25); }
-  30% { opacity: 0.85; box-shadow: inset 0 0 80px 25px var(--flash-color, rgba(255, 80, 0, 0.22)), inset 0 0 160px 40px rgba(0, 0, 0, 0.15); }
-  70% { opacity: 0.4; box-shadow: inset 0 0 50px 15px var(--flash-color, rgba(255, 80, 0, 0.10)), inset 0 0 100px 20px rgba(0, 0, 0, 0.08); }
-  100% { opacity: 0; box-shadow: inset 0 0 30px 5px var(--flash-color, rgba(255, 80, 0, 0.0)); }
+  0% { opacity: 1; box-shadow: inset 0 0 100px 30px var(--flash-color, rgba(255, 80, 0, 0.30)), inset 0 0 150px 40px rgba(0, 0, 0, 0.15); }
+  40% { opacity: 0.8; box-shadow: inset 0 0 80px 20px var(--flash-color, rgba(255, 80, 0, 0.20)), inset 0 0 100px 20px rgba(0, 0, 0, 0.1); }
+  100% { opacity: 0; box-shadow: inset 0 0 0px 0px transparent; }
 }
 
 .collision-shake {
@@ -339,7 +338,7 @@
 
 /* Starfield pause — freezes all child animations in their current frame */
 .starfield-paused,
-.starfield-paused * {
+.starfield-paused *:not(.collision-shake) {
   animation-play-state: paused !important;
 }
 /* Exception: let active comets/shooting stars finish their flight */
