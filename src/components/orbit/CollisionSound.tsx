@@ -84,11 +84,11 @@ function _fireBoom(volMul: number = 1) {
         }
         const ctx = _audioCtx;
         const savedVol = localStorage.getItem('orbit_sound_volume');
-        // Universal 20% Ceiling: 100% in admin = 0.20 absolute volume
+        // Universal 35% Ceiling: 100% in admin = 0.35 absolute volume
         const userVol = savedVol !== null ? Number(savedVol) / 100 : 1.0;
-        const base = userVol * 0.20;
+        const base = userVol * 0.35;
         const finalVol = Math.max(0, Math.min(1, base * (0.85 + Math.random() * 0.3) * volMul));
-        console.log(`[orbit-audio] Firing sound. Base: 0.20, User Setting: ${userVol.toFixed(2)}, Mul: ${volMul}, Absolute Vol: ${finalVol.toFixed(4)}`);
+        console.log(`[orbit-audio] Firing sound. Base: 0.35, User Setting: ${userVol.toFixed(2)}, Mul: ${volMul}, Absolute Vol: ${finalVol.toFixed(4)}`);
         const source = ctx.createBufferSource();
         source.buffer = _audioBuffer;
         const gain = ctx.createGain();
@@ -195,8 +195,8 @@ export function useCollisionSound() {
         mutedRef.current = localStorage.getItem('orbit_sound_muted') === 'true';
 
         const savedVol = localStorage.getItem('orbit_sound_volume');
-        const vol = savedVol !== null ? Number(savedVol) / 100 : 0.20;
-        volumeRef.current = vol > 0 ? vol : 0.20;
+        const vol = savedVol !== null ? Number(savedVol) / 100 : 0.35;
+        volumeRef.current = vol > 0 ? vol : 0.35;
 
         // Pre-process raw bytes (no AudioContext needed — no warnings)
         prepareRawBytes();
@@ -255,11 +255,11 @@ export function useCollisionSound() {
 
             // Re-read volume from localStorage for real-time admin updates
             const savedVol = localStorage.getItem('orbit_sound_volume');
-            // Universal 20% Ceiling
+            // Universal 35% Ceiling
             const userVol = savedVol !== null ? Number(savedVol) / 100 : 1.0;
-            const base = userVol * 0.20;
+            const base = userVol * 0.35;
             const finalVol = Math.max(0, Math.min(1, base * (0.85 + Math.random() * 0.3)));
-            console.log(`[orbit-audio] playSound. Base: 0.20, User Setting: ${userVol.toFixed(2)}, Absolute Vol: ${finalVol.toFixed(4)}`);
+            console.log(`[orbit-audio] playSound. Base: 0.35, User Setting: ${userVol.toFixed(2)}, Absolute Vol: ${finalVol.toFixed(4)}`);
 
             // Create a fresh source node (they are one-shot, this is by design)
             const source = ctx.createBufferSource();
