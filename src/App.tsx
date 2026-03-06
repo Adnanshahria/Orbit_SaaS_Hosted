@@ -133,7 +133,7 @@ function PublicSite() {
       <StructuredData />
       <GlobalBackground />
       <div className="min-h-[100dvh] text-foreground relative z-0">
-        <Navbar />
+        {isLoaded && <Navbar />}
         <main>
           <Home />
           {isLoaded && (
