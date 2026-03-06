@@ -139,35 +139,36 @@ function VisitorGateway({ children }: { children: React.ReactNode }) {
             className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-background/95 backdrop-blur-md"
           >
             <div className="flex flex-col items-center max-w-sm w-full px-6">
-              <div className="mb-10 text-center flex flex-col items-center justify-center">
-                <div className="relative w-20 h-20 mb-6 flex items-center justify-center">
-                  <OrbitIcon className="w-12 h-12 text-primary animate-[spin_8s_linear_infinite] absolute opacity-30" />
-                  <div className="w-16 h-16 rounded-full border-t-2 border-r-2 border-primary animate-[spin_3s_linear_infinite]" />
-                  <ShieldCheck className="w-8 h-8 text-primary absolute" />
+              <div className="mb-8 text-center flex flex-col items-center justify-center">
+                <div className="relative w-16 h-16 mb-4 flex items-center justify-center">
+                  <OrbitIcon className="w-10 h-10 text-primary animate-[spin_8s_linear_infinite] absolute opacity-30" />
+                  <div className="w-14 h-14 rounded-full border-t-2 border-r-2 border-primary animate-[spin_3s_linear_infinite]" />
+                  <ShieldCheck className="w-6 h-6 text-primary absolute" />
                 </div>
-                <h2 className="text-2xl font-bold font-playfair tracking-wider text-foreground uppercase">Initializing Orbit</h2>
-                <p className="text-sm text-muted-foreground mt-2">Checking secure connection...</p>
+                <h2 className="text-xl font-bold font-display tracking-widest text-foreground uppercase">Initializing Orbit</h2>
+                <p className="text-sm text-muted-foreground mt-1">Checking secure connection...</p>
               </div>
 
-              <div className="w-full bg-card/40 border border-border/50 rounded-xl p-6 shadow-2xl backdrop-blur-lg flex flex-col items-center">
+              <div className="w-full flex flex-col items-center">
                 {isDataLoading ? (
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin shrink-0" />
+                  <div className="flex items-center gap-4 w-full justify-center p-4">
+                    <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin shrink-0" />
                     <span className="text-sm font-medium animate-pulse text-muted-foreground">Loading Assets & Content...</span>
                   </div>
                 ) : (
                   <motion.button
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.8, y: 15 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
                     whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleEnter}
-                    className="w-full relative group overflow-hidden rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 transition-all duration-300 p-4 flex items-center gap-4 cursor-pointer"
+                    className="w-full max-w-[280px] relative group overflow-hidden rounded-lg border border-border/50 bg-card/20 hover:bg-card/40 transition-colors duration-300 p-4 flex items-center gap-4 cursor-pointer"
                   >
-                    <div className="w-6 h-6 rounded bg-background border border-border flex items-center justify-center shrink-0 group-hover:border-primary transition-colors">
-                      <Check className="w-4 h-4 text-transparent group-hover:text-primary transition-colors" />
+                    <div className="w-6 h-6 rounded border-2 border-muted-foreground/30 group-hover:border-primary group-hover:bg-primary/10 flex items-center justify-center shrink-0 transition-all">
+                      <Check className="w-4 h-4 text-transparent group-hover:text-primary transition-colors" strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-medium text-foreground tracking-wide group-hover:text-primary transition-colors text-left uppercase">I am not a robot</span>
+                    <span className="text-sm font-bold text-foreground tracking-wide group-hover:text-primary transition-colors text-left uppercase">I am not a robot</span>
                   </motion.button>
                 )}
               </div>
