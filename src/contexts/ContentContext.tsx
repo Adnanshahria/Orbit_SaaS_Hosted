@@ -94,6 +94,11 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
                 }, 500);
                 return true;
             }
+
+            if (res.status === 401) {
+                console.warn('[ContentContext] Unauthorized. Token might be expired.');
+                localStorage.removeItem('admin_token');
+            }
             return false;
         } catch {
             return false;

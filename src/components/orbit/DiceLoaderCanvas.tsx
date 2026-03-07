@@ -22,12 +22,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // Cube face data: vertex indices + letter + accent color
 const FACE_DATA: { vi: number[]; letter: string; accent: string }[] = [
-    { vi: [4, 5, 6, 7], letter: 'O', accent: '#10b981' },  // front +Z
-    { vi: [5, 1, 2, 6], letter: 'R', accent: '#14b8a6' },  // right +X
-    { vi: [1, 0, 3, 2], letter: 'B', accent: '#f59e0b' },  // back -Z
-    { vi: [0, 4, 7, 3], letter: 'I', accent: '#34d399' },  // left -X
-    { vi: [7, 6, 2, 3], letter: 'T', accent: '#f59e0b' },  // top +Y
-    { vi: [0, 1, 5, 4], letter: 'S', accent: '#10b981' },  // bottom -Y
+    { vi: [4, 5, 6, 7], letter: 'O', accent: '#f59e0b' },  // front +Z
+    { vi: [5, 1, 2, 6], letter: 'R', accent: '#d97706' },  // right +X
+    { vi: [1, 0, 3, 2], letter: 'B', accent: '#fcd34d' },  // back -Z
+    { vi: [0, 4, 7, 3], letter: 'I', accent: '#b45309' },  // left -X
+    { vi: [7, 6, 2, 3], letter: 'T', accent: '#fbbf24' },  // top +Y
+    { vi: [0, 1, 5, 4], letter: 'S', accent: '#f59e0b' },  // bottom -Y
 ];
 
 // Target rotations to show each face (with extra tumble spins)
@@ -142,8 +142,8 @@ export function DiceLoaderCanvas({ onStep, canvasSize = 240 }: Props) {
 
             // Ambient glow behind cube
             const grd = ctx.createRadialGradient(CX, CY, 0, CX, CY, S * 2.5);
-            grd.addColorStop(0, 'rgba(16,185,129,0.12)');
-            grd.addColorStop(0.5, 'rgba(245,158,11,0.06)');
+            grd.addColorStop(0, 'rgba(245,158,11,0.12)');
+            grd.addColorStop(0.5, 'rgba(217,119,6,0.06)');
             grd.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grd;
             ctx.fillRect(0, 0, canvasSize, canvasSize);
@@ -199,7 +199,7 @@ export function DiceLoaderCanvas({ onStep, canvasSize = 240 }: Props) {
             ctx.save();
             ctx.translate(CX, CY);
             ctx.rotate(haloAngle);
-            ctx.strokeStyle = 'rgba(16,185,129,0.08)';
+            ctx.strokeStyle = 'rgba(245,158,11,0.08)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.ellipse(0, 0, S * 2.2, S * 1.8, 0, 0, PI * 2);

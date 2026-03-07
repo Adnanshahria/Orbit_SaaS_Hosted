@@ -26,8 +26,8 @@ export default function PrivacyPolicy() {
     return (
         <>
             <Helmet>
-                <title>{title} | ORBIT SaaS</title>
-                <meta name="description" content={`${title} for ORBIT SaaS — how we collect, use, and protect your data.`} />
+                <title data-rh="true">{title} | ORBIT SaaS</title>
+                <meta data-rh="true" name="description" content={`${title} for ORBIT SaaS — how we collect, use, and protect your data.`} />
             </Helmet>
 
             <div className="min-h-[100dvh] bg-background text-foreground">

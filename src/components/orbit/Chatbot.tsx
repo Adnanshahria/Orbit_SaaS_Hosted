@@ -911,7 +911,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 {/* Text Content */}
                 <div className="flex flex-col items-start pr-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-0 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-                    <span className="text-emerald-400">ORBIT </span><span className="text-amber-500">AI</span>
+                    <span className="text-amber-500">ORBIT </span><span className="text-amber-500">AI</span>
                   </p>
                   <span className="text-[12px] font-medium text-white/90 tracking-wide whitespace-nowrap drop-shadow-md transition-all duration-300">
                     {chatLang === 'bn' ? popupMessage.bn : popupMessage.en}
@@ -998,7 +998,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
             {/* Header */}
             <div className="shrink-0 px-5 py-3.5 bg-primary/20 border-b border-border flex items-center justify-between relative">
               <div>
-                <h4 className="font-display font-semibold text-foreground text-sm leading-tight">
+                <h4 className="font-semibold text-foreground text-sm leading-tight">
                   {chatContentMemo.title}
                 </h4>
                 <div className="flex items-center gap-1.5 mt-0.5">
@@ -1083,7 +1083,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   <div className="space-y-4 py-2">
                     <div className="flex gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
-                        <Bot className="w-4 h-4 text-emerald-400" />
+                        <Bot className="w-4 h-4 text-amber-500" />
                       </div>
                       <div className="bg-[#0f111a] border-[0.5px] border-primary/40 rounded-xl rounded-tl-none px-3 py-2 text-xs text-[#f8f9fa] max-w-[85%] shadow-lg leading-relaxed">
                         <p className="font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-amber-400 uppercase tracking-widest text-[10px]">
@@ -1121,7 +1121,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                       <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
                         {isAssistant && (
                           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
-                            <Bot className="w-4 h-4 text-emerald-400" />
+                            <Bot className="w-4 h-4 text-amber-500" />
                           </div>
                         )}
                         <div className={`rounded-xl px-3 py-2 text-xs max-w-[85%] shadow-lg border-[0.5px] ${msg.role === 'user'
@@ -1153,7 +1153,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                   <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div className="flex gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
-                        <Bot className="w-4 h-4 text-emerald-400" />
+                        <Bot className="w-4 h-4 text-amber-500" />
                       </div>
                       <div className="bg-[#0f111a] rounded-xl rounded-tl-none px-4 py-3 text-sm text-[#f8f9fa] shadow-xl max-w-[90%] border-[0.5px] border-primary/40 bg-gradient-to-br from-[#0f111a] to-emerald-500/5">
                         <p className="mb-3 text-xs leading-relaxed font-medium">
@@ -1191,7 +1191,7 @@ FOLLOW-UP: You MUST ALWAYS end EVERY reply with exactly 1 suggested action on it
                 {isLoading && (
                   <div className="flex gap-2">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border-[0.5px] border-primary/30 shadow-sm">
-                      <Bot className="w-4 h-4 text-emerald-400" />
+                      <Bot className="w-4 h-4 text-amber-500" />
                     </div>
                     <div className="bg-[#0f111a] border-[0.5px] border-primary/40 rounded-xl rounded-tl-none px-4 py-3 shadow-lg flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-white" style={{ animation: 'dotBounce 1.4s ease-in-out infinite' }} />

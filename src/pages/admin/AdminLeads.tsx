@@ -72,7 +72,7 @@ export default function AdminLeads() {
                 toast.success('Lead deleted');
                 setLeads(leads.filter(l => l.id !== id));
 
-                // Trigger Vercel cache rebuild so chatbot AI context stays fresh
+                // Trigger cache rebuild so chatbot AI context stays fresh
                 fetch(`${API_BASE}/api/admin?action=cache`, {
                     method: 'POST',
                     headers: {

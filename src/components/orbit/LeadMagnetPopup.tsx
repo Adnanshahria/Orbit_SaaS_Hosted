@@ -89,7 +89,7 @@ export function LeadMagnetPopup() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute inset-0 bg-background/80 leadmagnet-overlay-blur"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
                         onClick={handleClose}
                     />
                     <motion.div
@@ -124,7 +124,7 @@ export function LeadMagnetPopup() {
                                 <Rocket className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-primary relative z-10" />
                             </div>
 
-                            <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
+                            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
                                 {lang === 'bn' ? 'ওয়েটলিস্টে যুক্ত হোন' : 'Join The Waitlist'}
                             </h2>
                             <p className="text-muted-foreground text-xs sm:text-sm lg:text-base mb-5 sm:mb-6 lg:mb-8 leading-relaxed px-2 md:px-10">

@@ -2,6 +2,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MessageCircle, Mail } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
+import { parseRichText } from '@/lib/utils';
 
 export function ContactSection() {
   const { t } = useLang();
@@ -37,7 +38,7 @@ export function ContactSection() {
             transition={{ type: 'spring', stiffness: 70, damping: 16 }}
           >
             <motion.h2
-              className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4"
+              className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full border-[0.5px] border-[#8B5A2B]/50 bg-[#8B5A2B]/10 text-[#FFE5B4] text-xl sm:text-3xl lg:text-4xl font-display italic tracking-wide mb-3 sm:mb-4 shadow-[0_4px_20px_rgba(139,90,43,0.15)]"
               initial={{ opacity: 0, scale: 0.97 }}
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -45,12 +46,33 @@ export function ContactSection() {
               {t.contact.title}
             </motion.h2>
             <motion.p
-              className="text-muted-foreground text-base sm:text-lg mb-6 sm:mb-8"
+              className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2 mb-6 sm:mb-8"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              {t.contact.subtitle}
+              {parseRichText(t.contact.subtitle).map((seg, i) => {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color && !seg.greenCard) {
+                  return seg.text.split(' ').filter(Boolean).map((word, wi) => (
+                    <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
+                  ));
+                }
+                const cls = [
+                  seg.bold && !seg.color ? 'font-bold text-white' : '',
+                  seg.bold && seg.color ? 'font-bold' : '',
+                  seg.card ? 'word-card' : '',
+                  seg.whiteCard ? 'word-card-white' : '',
+                  seg.greenCard ? 'word-card-green' : '',
+                  seg.color === 'green' ? '!text-emerald-400' : '',
+                  seg.color === 'gold' ? '!text-amber-500' : '',
+                  seg.color === 'white' ? '!text-white' : '',
+                ].filter(Boolean).join(' ');
+                return (
+                  <span key={`s-${i}`} className={`${cls} inline-block align-middle`}>
+                    {seg.text}
+                  </span>
+                );
+              })}
             </motion.p>
 
             {/* CTA Dropdown */}

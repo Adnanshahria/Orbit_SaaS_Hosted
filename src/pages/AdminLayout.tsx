@@ -7,7 +7,7 @@ import {
     LayoutDashboard, Type, ShoppingCart, Users, FolderOpen,
     MessageCircle, Globe, Shield, LogOut, Menu, PanelLeftClose, PanelLeft,
     Lightbulb, Phone, FileText, Cpu, CloudUpload, Loader2, Link as LinkIcon,
-    Database, Mail, BarChart3, Star, Trash2, CheckCircle2, XCircle
+    Database, Mail, BarChart3, Star, Trash2, CheckCircle2, XCircle, Bell
 } from 'lucide-react';
 
 const navItems = [
@@ -27,6 +27,7 @@ const navItems = [
     { label: 'Navbar', path: '/admin/navbar', icon: Globe },
     { label: 'SEO', path: '/admin/seo', icon: Shield },
     { label: 'Leads', path: '/admin/leads', icon: Mail },
+    { label: 'Notifications', path: '/admin/notifications', icon: Bell },
     { label: 'Backup', path: '/admin/backup', icon: Database },
 ];
 
@@ -219,23 +220,27 @@ export default function AdminLayout() {
             </Helmet>
             {/* Mobile overlay */}
             {sidebarOpen && (
-                <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+                <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
             )}
 
             {/* Sidebar */}
-            <aside className={`fixed ${sidebarOpen ? 'lg:sticky' : ''} top-0 left-0 z-50 h-[100dvh] w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed top-0 left-0 z-50 h-[100dvh] w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="px-4 py-3 border-b border-border flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <LayoutDashboard className="w-5 h-5 text-primary" />
                         <span className="font-display font-bold text-foreground">Admin Panel</span>
                     </div>
                     <button
-                        onClick={() => setSidebarOpen(false)}
-                        className="p-2 -mr-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/80 active:bg-secondary transition-colors"
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setSidebarOpen(false);
+                        }}
+                        className="p-2 -mr-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/80 active:bg-secondary transition-colors lg:hidden relative z-50 flex items-center justify-center cursor-pointer"
                         aria-label="Collapse sidebar"
                         title="Collapse sidebar"
                     >
-                        <PanelLeftClose className="w-5 h-5" />
+                        <PanelLeftClose className="w-6 h-6" />
                     </button>
                 </div>
 
@@ -244,7 +249,9 @@ export default function AdminLayout() {
                         <NavLink
                             key={item.path}
                             to={item.path}
-                            onClick={() => setSidebarOpen(false)}
+                            onClick={() => {
+                                if (window.innerWidth < 1024) setSidebarOpen(false);
+                            }}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
                                     ? 'bg-primary/10 text-primary'
@@ -294,26 +301,31 @@ export default function AdminLayout() {
             </aside>
 
             {/* Main content */}
-            <main className="flex-1 min-h-[100dvh] overflow-x-hidden">
-                {/* Top bar — shows when sidebar is closed */}
-                {!sidebarOpen && (
-                    <div className="sticky top-0 z-30 bg-card/90 backdrop-blur-xl border-b border-border px-3 py-2.5 flex items-center gap-3">
+            <main className="flex-1 min-h-[100dvh] w-full lg:pl-64 flex flex-col relative z-10">
+                {/* Mobile Top Bar (Fixed) */}
+                <div className="sticky top-0 left-0 w-full z-30 bg-card/95 backdrop-blur-xl border-b border-border px-4 py-3 flex items-center justify-between lg:hidden shadow-sm">
+                    <div className="flex items-center gap-3 relative z-10">
                         <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="p-1.5 rounded-lg text-foreground hover:bg-secondary/80 active:bg-secondary transition-colors"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSidebarOpen(true);
+                            }}
+                            className="p-2 -ml-2 rounded-lg text-foreground bg-secondary/30 hover:bg-secondary/80 active:bg-secondary transition-colors relative z-20 cursor-pointer flex items-center justify-center pointer-events-auto"
                             aria-label="Expand sidebar"
                             title="Expand sidebar"
                         >
-                            <PanelLeft className="w-5 h-5" />
+                            <Menu className="w-6 h-6 pointer-events-none" />
                         </button>
-                        <span className="font-display font-bold text-foreground text-sm">Admin Panel</span>
+                        <span className="font-display font-bold text-foreground text-lg pointer-events-none">Admin Panel</span>
                     </div>
-                )}
+                </div>
 
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="p-3 sm:p-5 lg:p-8 max-w-[1200px] mx-auto w-full"
+                    className="p-4 sm:p-5 lg:p-8 max-w-[1200px] mx-auto w-full relative z-0 flex-1"
                 >
                     <Outlet />
                 </motion.div>

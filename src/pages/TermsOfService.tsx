@@ -28,8 +28,8 @@ export default function TermsOfService() {
     return (
         <>
             <Helmet>
-                <title>{title} | ORBIT SaaS</title>
-                <meta name="description" content={`${title} for ORBIT SaaS — the terms and conditions governing your use of our website and services.`} />
+                <title data-rh="true">{title} | ORBIT SaaS</title>
+                <meta data-rh="true" name="description" content={`${title} for ORBIT SaaS — the terms and conditions governing your use of our website and services.`} />
             </Helmet>
 
             <div className="min-h-[100dvh] bg-background text-foreground">
