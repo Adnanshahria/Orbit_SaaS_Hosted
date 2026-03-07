@@ -52,7 +52,7 @@ export function ContactSection() {
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               {parseRichText(t.contact.subtitle).map((seg, i) => {
-                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color && !seg.greenCard) {
                   return seg.text.split(' ').filter(Boolean).map((word, wi) => (
                     <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
                   ));

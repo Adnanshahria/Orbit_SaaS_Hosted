@@ -127,7 +127,7 @@ export function ServicesSection() {
               {(() => {
                 let wordIndex = 0;
                 return parseRichText(t.services.subtitle).map((seg, i) => {
-                  if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                  if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color && !seg.greenCard) {
                     return seg.text.split(' ').filter(Boolean).map((word) => {
                       const wi = wordIndex++;
                       return (

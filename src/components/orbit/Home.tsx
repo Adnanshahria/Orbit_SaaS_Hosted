@@ -39,7 +39,7 @@ export type RichSegment = {
   color?: 'green' | 'gold' | 'white';
 };
 
-function parseSubtitleSegments(str: string): RichSegment[] {
+function parseSubtitleSegments(str: string, inherited: Partial<RichSegment> = {}): RichSegment[] {
   if (!str) return [];
   const parts: RichSegment[] = [];
 
@@ -48,28 +48,53 @@ function parseSubtitleSegments(str: string): RichSegment[] {
   let m: RegExpExecArray | null;
 
   while ((m = regex.exec(str)) !== null) {
-    if (m.index > last) parts.push({ text: str.slice(last, m.index), bold: false, card: false, whiteCard: false });
+    if (m.index > last) {
+      parts.push({
+        text: str.slice(last, m.index),
+        bold: !!inherited.bold,
+        card: !!inherited.card,
+        whiteCard: !!inherited.whiteCard,
+        greenCard: !!inherited.greenCard,
+        color: inherited.color
+      });
+    }
 
-    if (m[1] !== undefined) parts.push({ text: m[1], bold: true, card: true, whiteCard: false }); // **[[ ]]**
-    else if (m[2] !== undefined) parts.push({ text: m[2], bold: true, card: false, whiteCard: true }); // **{{ }}**
-    else if (m[3] !== undefined) parts.push({ text: m[3], bold: true, card: false, whiteCard: false, greenCard: true }); // **== ==**
-    else if (m[4] !== undefined) parts.push({ text: m[4], bold: true, card: false, whiteCard: false, color: 'green' }); // **<< >>**
-    else if (m[5] !== undefined) parts.push({ text: m[5], bold: true, card: false, whiteCard: false, color: 'gold' }); // **(( ))**
-    else if (m[6] !== undefined) parts.push({ text: m[6], bold: true, card: false, whiteCard: false, color: 'white' }); // **|| ||**
-    else if (m[7] !== undefined) parts.push({ text: m[7], bold: true, card: false, whiteCard: false }); // ** **
+    const content = m[1] || m[2] || m[3] || m[4] || m[5] || m[6] || m[7] || m[8] || m[9] || m[10] || m[11] || m[12] || m[13];
+    const nextInherited: Partial<RichSegment> = { ...inherited };
 
-    else if (m[8] !== undefined) parts.push({ text: m[8], bold: false, card: true, whiteCard: false }); // [[ ]]
-    else if (m[9] !== undefined) parts.push({ text: m[9], bold: false, card: false, whiteCard: true }); // {{ }}
-    else if (m[10] !== undefined) parts.push({ text: m[10], bold: false, card: false, whiteCard: false, greenCard: true }); // == ==
-    else if (m[11] !== undefined) parts.push({ text: m[11], bold: false, card: false, whiteCard: false, color: 'green' }); // << >>
-    else if (m[12] !== undefined) parts.push({ text: m[12], bold: false, card: false, whiteCard: false, color: 'gold' }); // (( ))
-    else if (m[13] !== undefined) parts.push({ text: m[13], bold: false, card: false, whiteCard: false, color: 'white' }); // || ||
+    if (m[1] !== undefined) { nextInherited.bold = true; nextInherited.card = true; }
+    else if (m[2] !== undefined) { nextInherited.bold = true; nextInherited.whiteCard = true; }
+    else if (m[3] !== undefined) { nextInherited.bold = true; nextInherited.greenCard = true; }
+    else if (m[4] !== undefined) { nextInherited.bold = true; nextInherited.color = 'green'; }
+    else if (m[5] !== undefined) { nextInherited.bold = true; nextInherited.color = 'gold'; }
+    else if (m[6] !== undefined) { nextInherited.bold = true; nextInherited.color = 'white'; }
+    else if (m[7] !== undefined) { nextInherited.bold = true; }
+    else if (m[8] !== undefined) { nextInherited.card = true; }
+    else if (m[9] !== undefined) { nextInherited.whiteCard = true; }
+    else if (m[10] !== undefined) { nextInherited.greenCard = true; }
+    else if (m[11] !== undefined) { nextInherited.color = 'green'; }
+    else if (m[12] !== undefined) { nextInherited.color = 'gold'; }
+    else if (m[13] !== undefined) { nextInherited.color = 'white'; }
+
+    // Recursively parse the content in case it has more markers
+    const inner = parseSubtitleSegments(content, nextInherited);
+    parts.push(...inner);
 
     last = m.index + m[0].length;
   }
 
-  if (last < str.length) parts.push({ text: str.slice(last), bold: false, card: false, whiteCard: false });
-  return parts.length ? parts : [{ text: str, bold: false, card: false, whiteCard: false }];
+  if (last < str.length) {
+    parts.push({
+      text: str.slice(last),
+      bold: !!inherited.bold,
+      card: !!inherited.card,
+      whiteCard: !!inherited.whiteCard,
+      greenCard: !!inherited.greenCard,
+      color: inherited.color
+    });
+  }
+
+  return parts;
 }
 
 /* ── Home component ───────────────────────────────────────────── */
@@ -438,7 +463,7 @@ export function Home() {
 
                 let wordIndex = 0;
                 return subtitleSegments.map((seg, si) => {
-                  if (seg.bold || seg.card || seg.whiteCard) {
+                  if (seg.bold || seg.card || seg.whiteCard || seg.greenCard || seg.color) {
                     const wordsInSeg = seg.text.split(' ').length;
                     const pastMid = wordIndex >= midPoint;
                     const delay = (isHeroLoaded ? 0.05 : baseDelay + 0.9) + wordIndex * 0.04 + (pastMid ? midPause : 0);

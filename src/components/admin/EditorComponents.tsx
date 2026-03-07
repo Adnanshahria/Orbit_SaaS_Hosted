@@ -31,6 +31,7 @@ export function SaveButton({ onClick, saving, saved, className = '' }: { onClick
         <button
             onClick={onClick}
             disabled={saving}
+            title="Save section changes"
             className={`px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-2 transition-all cursor-pointer ${className} ${saved
                 ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                 : 'bg-primary text-primary-foreground hover:opacity-90'
@@ -269,8 +270,23 @@ export function TextField({
         setSelToolbar(null);
     }, [selToolbar, onChange]);
 
+    const stripMarkers = useCallback(() => {
+        const ta = taRef.current;
+        if (!selToolbar || !ta) return;
+        const { start, end } = selToolbar;
+        const currentValue = ta.value;
+        const before = currentValue.substring(0, start);
+        const selected = currentValue.substring(start, end);
+        const after = currentValue.substring(end);
+
+        // Remove all known markers from selection
+        const cleaned = selected.replace(/\*\*|\[\[|\]\]|\{\{|\}\}|\=\=|\<\<|\>\>|\(\(|\)\)|\|\|/g, '');
+        onChange(before + cleaned + after);
+        setSelToolbar(null);
+    }, [selToolbar, onChange]);
+
     // Check if value has any rich markers for preview
-    const hasRichMarkers = multiline && (/\*\*/.test(value) || /\[\[/.test(value) || /\{\{/.test(value));
+    const hasRichMarkers = multiline && (/\*\*/.test(value) || /\[\[/.test(value) || /\{\{/.test(value) || /==/.test(value) || /<</.test(value) || /\(\(/.test(value) || /\|\|/.test(value));
 
     return (
         <div className="relative">
@@ -298,88 +314,69 @@ export function TextField({
                     />
                     {/* Floating Selection Toolbar */}
                     {selToolbar && (
-                        <div
-                            className="fixed z-[9999] flex items-center gap-1 px-1.5 py-1 bg-[#1a1a2e] border border-primary/40 rounded-lg shadow-[0_4px_20px_rgba(16,185,129,0.15)] flex-wrap max-w-sm justify-center"
-                            style={{ top: selToolbar.top, left: selToolbar.left, transform: 'translateX(-50%)' }}
-                            onMouseDown={e => e.preventDefault()}
-                        >
-                            {/* Bold Only */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**', '**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold Only">
-                                <span className="text-sm font-black">B</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
+                        <div className="flex flex-col gap-1 p-1 bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden min-w-[340px]">
+                            {/* Row 1: Text Styles */}
+                            <div className="grid grid-cols-6 gap-0.5 border-b border-white/5 pb-1">
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('<<', '>>'); }} className="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-emerald-500/10 group transition-all" title="Green Normal">
+                                    <span className="text-[10px] font-medium text-emerald-400 group-hover:scale-110 transition-transform">Green</span>
+                                </button>
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**<<', '>>**'); }} className="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-emerald-500/10 group transition-all" title="Green Bold">
+                                    <div className="flex items-center gap-0.5">
+                                        <span className="text-[10px] font-black text-white">B</span>
+                                        <span className="text-[10px] font-bold text-emerald-400">Green</span>
+                                    </div>
+                                </button>
 
-                            {/* Green Text */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('<<', '>>'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer" title="Green Text">
-                                <span className="text-[10px] font-bold">Green Text</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('((', '))'); }} className="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-amber-500/10 group transition-all" title="Gold Normal">
+                                    <span className="text-[10px] font-medium text-amber-500 group-hover:scale-110 transition-transform">Gold</span>
+                                </button>
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**((', '))**'); }} className="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-amber-500/10 group transition-all" title="Gold Bold">
+                                    <div className="flex items-center gap-0.5">
+                                        <span className="text-[10px] font-black text-white">B</span>
+                                        <span className="text-[10px] font-bold text-amber-500">Gold</span>
+                                    </div>
+                                </button>
 
-                            {/* Bold + Green Text */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**<<', '>>**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer" title="Bold + Green Text">
-                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="text-[10px] font-bold text-emerald-400">Green</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('||', '||'); }} className="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-white/10 group transition-all" title="White Normal">
+                                    <span className="text-[10px] font-medium text-white group-hover:scale-110 transition-transform">White</span>
+                                </button>
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**||', '||**'); }} className="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-white/10 group transition-all" title="White Bold">
+                                    <div className="flex items-center gap-0.5">
+                                        <span className="text-[10px] font-black text-white">B</span>
+                                        <span className="text-[10px] font-bold text-white">White</span>
+                                    </div>
+                                </button>
+                            </div>
 
-                            {/* Gold Text */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('((', '))'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer" title="Gold Text">
-                                <span className="text-[10px] font-bold">Gold Text</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Bold + Gold Text */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**((', '))**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer" title="Bold + Gold Text">
-                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="text-[10px] font-bold text-amber-500">Gold</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* White Text */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('||', '||'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-white hover:bg-white/10 transition-colors cursor-pointer" title="White Text">
-                                <span className="text-[10px] font-bold">White Text</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Bold + White Text */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**||', '||**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + White Text">
-                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="text-[10px] font-bold text-white">White</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Gold Card */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('[[', ']]'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer" title="Gold Card">
-                                <span className="px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-[10px] font-bold">Gold Card</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Bold + Gold Card */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**[[', ']]**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + Gold Card">
-                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="px-1 py-0.5 rounded border border-amber-500/30 bg-amber-500/20 text-[10px] font-bold text-amber-500">Gold Card</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Green Card */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('==', '=='); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer" title="Green Card">
-                                <span className="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-bold">Green Card</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Bold + Green Card */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**==', '==**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + Green Card">
-                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="px-1 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/20 text-[10px] font-bold text-emerald-400">Green Card</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* White Card */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('{{', '}}'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-white hover:bg-white/10 transition-colors cursor-pointer" title="White Card">
-                                <span className="px-1.5 py-0.5 rounded border border-white/30 bg-white/10 text-[10px] font-bold text-white">White Card</span>
-                            </button>
-                            <div className="w-px h-4 bg-white/10" />
-
-                            {/* Bold + White Card */}
-                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**{{', '}}**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + White Card">
-                                <span className="text-sm font-black inline-block text-white">B</span><span className="text-[9px] text-white">+</span><span className="px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-bold text-white">White Card</span>
-                            </button>
-
+                            {/* Row 2: Cards & Save */}
+                            <div className="grid grid-cols-5 gap-0.5 pt-1 items-center">
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('{{', '}}'); }} className="flex items-center justify-center p-1.5 rounded-lg hover:bg-white/10 group transition-all" title="White Card">
+                                    <div className="px-2 py-0.5 rounded border border-white/20 bg-white/5 text-[9px] font-bold text-white group-hover:bg-white/20 transition-colors">White Card</div>
+                                </button>
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('==', '=='); }} className="flex items-center justify-center p-1.5 rounded-lg hover:bg-emerald-500/10 group transition-all" title="Green Card">
+                                    <div className="px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/5 text-[9px] font-bold text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">Green Card</div>
+                                </button>
+                                <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('[[', ']]'); }} className="flex items-center justify-center p-1.5 rounded-lg hover:bg-amber-500/10 group transition-all" title="Gold Card">
+                                    <div className="px-2 py-0.5 rounded border border-amber-500/20 bg-amber-500/5 text-[9px] font-bold text-amber-500 group-hover:bg-amber-500/20 transition-colors">Gold Card</div>
+                                </button>
+                                <button type="button" onMouseDown={e => { e.preventDefault(); stripMarkers(); }} className="flex items-center justify-center p-1.5 rounded-lg hover:bg-red-500/10 group transition-all" title="Clear Formatting">
+                                    <span className="text-[9px] font-bold text-red-400 group-hover:scale-105 transition-transform italic">Clean</span>
+                                </button>
+                                <div className="flex items-center justify-center px-1">
+                                    <button
+                                        type="button"
+                                        onMouseDown={e => {
+                                            e.preventDefault();
+                                            // Trigger the global save button logic (handled by EditorComponents SaveButton)
+                                            const saveBtn = document.querySelector('button[title="Save section changes"]') as HTMLButtonElement;
+                                            if (saveBtn) saveBtn.click();
+                                        }}
+                                        className="w-full bg-primary/20 hover:bg-primary/40 border border-primary/50 text-primary rounded px-2 py-1 text-[10px] font-black uppercase tracking-tighter transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)] active:scale-95"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                     {/* Live Preview */}
@@ -387,7 +384,7 @@ export function TextField({
                         <div className="mt-2 px-3 py-2 rounded-lg bg-background/50 border border-border/50 text-sm text-muted-foreground leading-relaxed flex flex-wrap gap-x-[0.3em]">
                             <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-bold w-full mb-1">Preview</span>
                             {parseRichSegments(value).map((seg, i) => {
-                                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) return <span key={i}>{seg.text}</span>;
+                                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color && !seg.greenCard) return <span key={i}>{seg.text}</span>;
 
                                 const classes = [
                                     seg.bold && !seg.color ? 'font-bold text-white' : '',

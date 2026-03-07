@@ -128,7 +128,7 @@ export function WhyUsSection() {
               className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2"
             >
               {parseRichText(t.whyUs.subtitle).map((seg, i) => {
-                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color && !seg.greenCard) {
                   return seg.text.split(' ').filter(Boolean).map((word, wi) => (
                     <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
                   ));

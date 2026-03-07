@@ -102,7 +102,7 @@ export function TechStackSection() {
             <h2 className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full border-[0.5px] border-[#8B5A2B]/50 bg-[#8B5A2B]/10 text-[#FFE5B4] text-3xl sm:text-4xl lg:text-5xl font-display italic tracking-wide mb-4 shadow-[0_4px_20px_rgba(139,90,43,0.15)]">{t.techStack.title}</h2>
             <p className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed">
               {parseRichText(t.techStack.subtitle).map((seg, i) => {
-                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color && !seg.greenCard) {
                   return seg.text.split(' ').filter(Boolean).map((word, wi) => (
                     <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
                   ));
