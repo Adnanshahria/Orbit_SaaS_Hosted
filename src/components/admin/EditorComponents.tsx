@@ -220,24 +220,7 @@ export function AIEnhanceButton({
     );
 }
 
-/** Parse rich markers into segments for preview rendering */
-function parseRichSegments(str: string): { text: string; bold: boolean; card: boolean; whiteCard: boolean }[] {
-    const parts: { text: string; bold: boolean; card: boolean; whiteCard: boolean }[] = [];
-    const regex = /\*\*\[\[(.+?)\]\]\*\*|\*\*\{\{(.+?)\}\}\*\*|\*\*(.+?)\*\*|\[\[(.+?)\]\]|\{\{(.+?)\}\}/g;
-    let last = 0;
-    let m: RegExpExecArray | null;
-    while ((m = regex.exec(str)) !== null) {
-        if (m.index > last) parts.push({ text: str.slice(last, m.index), bold: false, card: false, whiteCard: false });
-        if (m[1] !== undefined) parts.push({ text: m[1], bold: true, card: true, whiteCard: false });
-        else if (m[2] !== undefined) parts.push({ text: m[2], bold: true, card: false, whiteCard: true });
-        else if (m[3] !== undefined) parts.push({ text: m[3], bold: true, card: false, whiteCard: false });
-        else if (m[4] !== undefined) parts.push({ text: m[4], bold: false, card: true, whiteCard: false });
-        else if (m[5] !== undefined) parts.push({ text: m[5], bold: false, card: false, whiteCard: true });
-        last = m.index + m[0].length;
-    }
-    if (last < str.length) parts.push({ text: str.slice(last), bold: false, card: false, whiteCard: false });
-    return parts;
-}
+import { parseRichText as parseRichSegments } from '@/lib/utils';
 
 /* ─── Text Field ─── */
 export function TextField({
@@ -316,53 +299,87 @@ export function TextField({
                     {/* Floating Selection Toolbar */}
                     {selToolbar && (
                         <div
-                            className="fixed z-[9999] flex items-center gap-1 px-1.5 py-1 bg-[#1a1a2e] border border-primary/40 rounded-lg shadow-[0_4px_20px_rgba(16,185,129,0.15)]"
+                            className="fixed z-[9999] flex items-center gap-1 px-1.5 py-1 bg-[#1a1a2e] border border-primary/40 rounded-lg shadow-[0_4px_20px_rgba(16,185,129,0.15)] flex-wrap max-w-sm justify-center"
                             style={{ top: selToolbar.top, left: selToolbar.left, transform: 'translateX(-50%)' }}
                             onMouseDown={e => e.preventDefault()}
                         >
                             {/* Bold Only */}
-                            <button
-                                type="button"
-                                onMouseDown={e => { e.preventDefault(); wrapSelection('**', '**'); }}
-                                className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer"
-                                title="Bold Only"
-                            >
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**', '**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold Only">
                                 <span className="text-sm font-black">B</span>
                             </button>
                             <div className="w-px h-4 bg-white/10" />
-                            {/* Card Only */}
-                            <button
-                                type="button"
-                                onMouseDown={e => { e.preventDefault(); wrapSelection('[[', ']]'); }}
-                                className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer"
-                                title="Card Only"
-                            >
-                                <span className="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-bold">Card</span>
+
+                            {/* Green Text */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('<<', '>>'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer" title="Green Text">
+                                <span className="text-[10px] font-bold">Green Text</span>
                             </button>
                             <div className="w-px h-4 bg-white/10" />
+
+                            {/* Bold + Green Text */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**<<', '>>**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer" title="Bold + Green Text">
+                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="text-[10px] font-bold text-emerald-400">Green</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Gold Text */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('((', '))'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer" title="Gold Text">
+                                <span className="text-[10px] font-bold">Gold Text</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Bold + Gold Text */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**((', '))**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer" title="Bold + Gold Text">
+                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="text-[10px] font-bold text-amber-500">Gold</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* White Text */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('||', '||'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-white hover:bg-white/10 transition-colors cursor-pointer" title="White Text">
+                                <span className="text-[10px] font-bold">White Text</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Bold + White Text */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**||', '||**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + White Text">
+                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="text-[10px] font-bold text-white">White</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Gold Card */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('[[', ']]'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer" title="Gold Card">
+                                <span className="px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-[10px] font-bold">Gold Card</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Bold + Gold Card */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**[[', ']]**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + Gold Card">
+                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="px-1 py-0.5 rounded border border-amber-500/30 bg-amber-500/20 text-[10px] font-bold text-amber-500">Gold Card</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Green Card */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('==', '=='); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors cursor-pointer" title="Green Card">
+                                <span className="px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-bold">Green Card</span>
+                            </button>
+                            <div className="w-px h-4 bg-white/10" />
+
                             {/* Bold + Green Card */}
-                            <button
-                                type="button"
-                                onMouseDown={e => { e.preventDefault(); wrapSelection('**[[', ']]**'); }}
-                                className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-amber-400 hover:bg-amber-500/10 transition-colors cursor-pointer"
-                                title="Bold + Green Card"
-                            >
-                                <span className="text-sm font-black">B</span>
-                                <span className="text-[9px]">+</span>
-                                <span className="px-1 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/20 text-[10px] font-bold text-emerald-400">Green</span>
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**==', '==**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + Green Card">
+                                <span className="text-sm font-black text-white">B</span><span className="text-[9px] text-white">+</span><span className="px-1 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/20 text-[10px] font-bold text-emerald-400">Green Card</span>
                             </button>
                             <div className="w-px h-4 bg-white/10" />
-                            {/* Bold + White Card */}
-                            <button
-                                type="button"
-                                onMouseDown={e => { e.preventDefault(); wrapSelection('**{{', '}}**'); }}
-                                className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer"
-                                title="Bold + White Card"
-                            >
-                                <span className="text-sm font-black">B</span>
-                                <span className="text-[9px]">+</span>
-                                <span className="px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-bold text-white">White</span>
+
+                            {/* White Card */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('{{', '}}'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-white hover:bg-white/10 transition-colors cursor-pointer" title="White Card">
+                                <span className="px-1.5 py-0.5 rounded border border-white/30 bg-white/10 text-[10px] font-bold text-white">White Card</span>
                             </button>
+                            <div className="w-px h-4 bg-white/10" />
+
+                            {/* Bold + White Card */}
+                            <button type="button" onMouseDown={e => { e.preventDefault(); wrapSelection('**{{', '}}**'); }} className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-white hover:bg-white/10 transition-colors cursor-pointer" title="Bold + White Card">
+                                <span className="text-sm font-black inline-block text-white">B</span><span className="text-[9px] text-white">+</span><span className="px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-bold text-white">White Card</span>
+                            </button>
+
                         </div>
                     )}
                     {/* Live Preview */}
@@ -370,12 +387,20 @@ export function TextField({
                         <div className="mt-2 px-3 py-2 rounded-lg bg-background/50 border border-border/50 text-sm text-muted-foreground leading-relaxed flex flex-wrap gap-x-[0.3em]">
                             <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50 font-bold w-full mb-1">Preview</span>
                             {parseRichSegments(value).map((seg, i) => {
-                                if (!seg.bold && !seg.card && !seg.whiteCard) return <span key={i}>{seg.text}</span>;
+                                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) return <span key={i}>{seg.text}</span>;
+
                                 const classes = [
-                                    seg.bold ? 'font-bold text-foreground' : '',
+                                    seg.bold && !seg.color ? 'font-bold text-white' : '',
+                                    seg.bold && seg.color ? 'font-bold' : '',
                                     seg.card ? 'word-card' : '',
                                     seg.whiteCard ? 'word-card-white' : '',
+                                    seg.greenCard ? 'word-card-green' : '',
+                                    seg.color === 'green' ? '!text-emerald-400' : '',
+                                    seg.color === 'gold' ? '!text-amber-500' : '',
+                                    seg.color === 'white' ? '!text-white' : '',
+                                    (!seg.color && !seg.card && !seg.whiteCard && seg.bold && !seg.greenCard) ? 'text-foreground' : ''
                                 ].filter(Boolean).join(' ');
+
                                 return <span key={i} className={classes}>{seg.text}</span>;
                             })}
                         </div>

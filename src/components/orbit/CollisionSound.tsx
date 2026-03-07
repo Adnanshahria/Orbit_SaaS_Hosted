@@ -8,10 +8,9 @@ import { BOOM_DATA_URL } from './boomDataUrl';
  * stored in localStorage ('orbit_sound_muted').
  * Sound only plays while the hero section is visible.
  *
- * Uses AudioContext + AudioBufferSourceNode (NOT HTMLAudioElement) for
- * reliable playback on mobile browsers. Mobile browsers block
- * HTMLAudioElement.play() outside user gestures, but Web Audio API only
- * needs AudioContext.resume() once during any user gesture.
+ * IMPORTANT: AudioContext is NOT created until the first real user gesture
+ * (click/touch/keydown). This avoids Chrome's "AudioContext was not allowed
+ * to start" console warnings entirely.
  */
 
 // ── Shared singleton so multiple hook instances reuse one context ──
@@ -20,49 +19,189 @@ let _audioBuffer: AudioBuffer | null = null;
 let _bufferLoading = false;
 let _unlocked = false;
 
-function getAudioCtx(): AudioContext {
+// Pre-processed raw bytes from the base64 data-URL (no AudioContext needed)
+let _rawBytes: ArrayBuffer | null = null;
+
+export function getAudioCtx(): AudioContext {
     if (!_audioCtx) {
         _audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     return _audioCtx;
 }
 
-/** Decode the base64 data-URL into an AudioBuffer (once). */
-async function ensureBuffer(): Promise<AudioBuffer | null> {
+/**
+ * Pre-process the base64 data-URL into a raw ArrayBuffer.
+ * This does NOT require an AudioContext, so it's safe to call on mount.
+ */
+function prepareRawBytes(): ArrayBuffer {
+    if (_rawBytes) return _rawBytes;
+    const base64 = BOOM_DATA_URL.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    _rawBytes = bytes.buffer;
+    return _rawBytes;
+}
+
+/** Decode raw bytes into an AudioBuffer. Requires AudioContext to exist. */
+async function decodeBuffer(): Promise<AudioBuffer | null> {
     if (_audioBuffer) return _audioBuffer;
-    if (_bufferLoading) return null; // already in progress
+    if (_bufferLoading) return null;
+    if (!_audioCtx) return null;
     _bufferLoading = true;
     try {
-        const ctx = getAudioCtx();
-        // Strip the data-URL header to get raw base64
-        const base64 = BOOM_DATA_URL.split(',')[1];
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        _audioBuffer = await ctx.decodeAudioData(bytes.buffer);
+        const raw = prepareRawBytes();
+        // decodeAudioData detaches the buffer, so we need a copy
+        const copy = raw.slice(0);
+        _audioBuffer = await _audioCtx.decodeAudioData(copy);
     } catch {
         _bufferLoading = false;
     }
     return _audioBuffer;
 }
 
+// ── Queued audio for dice-loader fireball ──────────────────────────
+//
+// Chrome blocks ALL audio without a real user activation gesture.
+// Only click, touchstart, touchend, mousedown, pointerup, keydown count.
+//
+// Strategy:
+//  1. warmUpAudio() — pre-processes the base64 data (no AudioContext needed).
+//  2. playBoomDirect() — plays immediately if unlocked, else QUEUES it
+//     so it fires on the very first real gesture.
+
+const ACTIVATION_EVENTS = ['click', 'touchstart', 'touchend', 'mousedown', 'pointerup', 'keydown'] as const;
+let _pendingBoom = false;
+let _activationListenerAdded = false;
+
+/** Play the boom using the shared AudioContext singletons. */
+function _fireBoom(volMul: number = 1) {
+    console.log('[orbit-audio] _fireBoom called. Buffer:', !!_audioBuffer, 'Ctx:', !!_audioCtx, 'Mul:', volMul);
+    try {
+        if (!_audioBuffer || !_audioCtx) {
+            console.warn('[orbit-audio] Cannot fire: context or buffer missing.');
+            return;
+        }
+        const ctx = _audioCtx;
+        const savedVol = localStorage.getItem('orbit_sound_volume');
+        // Universal 35% Ceiling: 100% in admin = 0.35 absolute volume
+        const userVol = savedVol !== null ? Number(savedVol) / 100 : 1.0;
+        const base = userVol * 0.35;
+        const finalVol = Math.max(0, Math.min(1, base * (0.85 + Math.random() * 0.3) * volMul));
+        console.log(`[orbit-audio] Firing sound. Base: 0.35, User Setting: ${userVol.toFixed(2)}, Mul: ${volMul}, Absolute Vol: ${finalVol.toFixed(4)}`);
+        const source = ctx.createBufferSource();
+        source.buffer = _audioBuffer;
+        const gain = ctx.createGain();
+        gain.gain.value = finalVol;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        source.start(0);
+        console.log('[orbit-audio] Boom played successfully!');
+    } catch (e) {
+        console.error('[orbit-audio] Error during playback:', e);
+    }
+}
+
+/** Real activation handler — creates AudioContext, decodes buffer, flushes queue. */
+function _onFirstActivation(e: Event) {
+    console.log(`[orbit-audio] First activation triggered by: ${e.type}`);
+    // Create AudioContext inside a real gesture — no warnings!
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') {
+        console.log('[orbit-audio] Resuming context...');
+        ctx.resume().catch(err => console.error('[orbit-audio] Resume failed:', err));
+    } else {
+        console.log('[orbit-audio] Context already running.');
+    }
+    _unlocked = true;
+
+    // Decode buffer if not done yet, then flush pending boom
+    if (!_audioBuffer) {
+        console.log('[orbit-audio] Decoding buffer on first activation...');
+        decodeBuffer().then(() => {
+            console.log('[orbit-audio] Decode complete. Pending boom?', _pendingBoom);
+            if (_pendingBoom) {
+                _pendingBoom = false;
+                _fireBoom();
+            }
+        });
+    } else if (_pendingBoom) {
+        console.log('[orbit-audio] Buffer ready, flushing pending boom immediately.');
+        _pendingBoom = false;
+        _fireBoom();
+    } else {
+        console.log('[orbit-audio] Activation logic ran, but no boom pending.');
+    }
+    ACTIVATION_EVENTS.forEach(ev => document.removeEventListener(ev, _onFirstActivation, { capture: true }));
+}
+
+function _ensureActivationListeners() {
+    if (_activationListenerAdded) return;
+    console.log('[orbit-audio] Registering activation listeners on document (capture phase).');
+    _activationListenerAdded = true;
+    if (_audioCtx && _audioCtx.state === 'running') {
+        console.log('[orbit-audio] Context already running, not registering listeners.');
+        _unlocked = true;
+        return;
+    }
+    // Bind to document in CAPTURE phase so we catch the event before any
+    // React component can call e.stopPropagation()
+    ACTIVATION_EVENTS.forEach(e =>
+        document.addEventListener(e, _onFirstActivation, { once: true, capture: true, passive: true })
+    );
+}
+
+/** Call on canvas mount to pre-process the audio data (no AudioContext created). */
+export function warmUpAudio() {
+    console.log('[orbit-audio] warmUpAudio: preparing raw bytes.');
+    prepareRawBytes();
+    _ensureActivationListeners();
+}
+
+/** Play boom immediately if unlocked, else queue for first real gesture. */
+export function playBoomDirect(volMul: number = 1) {
+    console.log('[orbit-audio] playBoomDirect requested. Mul:', volMul);
+    if (localStorage.getItem('orbit_sound_muted') === 'true') {
+        console.log('[orbit-audio] Skipped: explicitly muted in localStorage.');
+        return;
+    }
+
+    // Already unlocked — play right now
+    if (_unlocked && _audioCtx) {
+        console.log('[orbit-audio] Already unlocked. Triggering play...');
+        if (_audioBuffer) {
+            _fireBoom(volMul);
+        } else {
+            console.log('[orbit-audio] Waiting for decode...');
+            decodeBuffer().then(() => _fireBoom(volMul));
+        }
+        return;
+    }
+
+    // Audio still locked — queue the boom for the first real gesture
+    console.log('[orbit-audio] Context locked. QUEUING boom for first gesture.');
+    _pendingBoom = true;
+    _ensureActivationListeners();
+}
+
+
 export function useCollisionSound() {
     const mutedRef = useRef(false);
-    const volumeRef = useRef(0.50);
+    const volumeRef = useRef(0.15);
     const chatbotOpenRef = useRef(false);
 
-    // Load mute preference & decode audio buffer on mount
+    // Load mute preference & pre-process audio on mount
     useEffect(() => {
         mutedRef.current = localStorage.getItem('orbit_sound_muted') === 'true';
 
         const savedVol = localStorage.getItem('orbit_sound_volume');
-        const vol = savedVol !== null ? Number(savedVol) / 100 : 0.50;
-        volumeRef.current = vol > 0 ? vol : 0.50;
+        const vol = savedVol !== null ? Number(savedVol) / 100 : 0.35;
+        volumeRef.current = vol > 0 ? vol : 0.35;
 
-        // Start decoding in background (doesn't need user gesture)
-        ensureBuffer();
+        // Pre-process raw bytes (no AudioContext needed — no warnings)
+        prepareRawBytes();
 
-        // Resume AudioContext on first user gesture (required on mobile)
+        // Create AudioContext + decode buffer on first real user gesture
         const unlock = () => {
             if (_unlocked) return;
             const ctx = getAudioCtx();
@@ -70,18 +209,19 @@ export function useCollisionSound() {
                 ctx.resume().catch(() => { });
             }
             _unlocked = true;
-            window.removeEventListener('touchstart', unlock);
-            window.removeEventListener('click', unlock);
+            // Decode buffer now that we have a context
+            if (!_audioBuffer) decodeBuffer();
+            ACTIVATION_EVENTS.forEach(evt => document.removeEventListener(evt, unlock, { capture: true }));
         };
-        // If context is already running (desktop), mark unlocked
+        // If context already exists and is running, mark unlocked
         if (_audioCtx && _audioCtx.state === 'running') _unlocked = true;
 
-        window.addEventListener('touchstart', unlock, { once: true, passive: true });
-        window.addEventListener('click', unlock, { once: true });
+        ACTIVATION_EVENTS.forEach(evt =>
+            document.addEventListener(evt, unlock, { once: true, capture: true, passive: true })
+        );
 
         return () => {
-            window.removeEventListener('touchstart', unlock);
-            window.removeEventListener('click', unlock);
+            ACTIVATION_EVENTS.forEach(evt => document.removeEventListener(evt, unlock, { capture: true }));
         };
     }, []);
 
@@ -115,8 +255,11 @@ export function useCollisionSound() {
 
             // Re-read volume from localStorage for real-time admin updates
             const savedVol = localStorage.getItem('orbit_sound_volume');
-            const base = savedVol !== null ? Math.max(0.3, Number(savedVol) / 100) : Math.max(0.50, volumeRef.current);
+            // Universal 35% Ceiling
+            const userVol = savedVol !== null ? Number(savedVol) / 100 : 1.0;
+            const base = userVol * 0.35;
             const finalVol = Math.max(0, Math.min(1, base * (0.85 + Math.random() * 0.3)));
+            console.log(`[orbit-audio] playSound. Base: 0.35, User Setting: ${userVol.toFixed(2)}, Absolute Vol: ${finalVol.toFixed(4)}`);
 
             // Create a fresh source node (they are one-shot, this is by design)
             const source = ctx.createBufferSource();
@@ -154,7 +297,7 @@ export function useCollisionSound() {
 
         // If buffer isn't loaded yet, load it and play once ready
         if (!_audioBuffer) {
-            ensureBuffer().then(() => {
+            decodeBuffer().then(() => {
                 if (_audioBuffer && _audioCtx && _audioCtx.state === 'running') {
                     playSound();
                 }

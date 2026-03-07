@@ -491,25 +491,25 @@ export default function ProjectDetail() {
             <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-neon-cyan/8 rounded-full blur-[130px] translate-y-1/4 -translate-x-1/4 pointer-events-none z-0" />
             <div className="fixed top-1/2 left-1/2 w-[400px] h-[400px] bg-neon-pink/5 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0" />
             <Helmet>
-                <title>{seoTitle}</title>
-                <meta name="description" content={seoDesc} />
-                <meta name="keywords" content={seoKeywords} />
-                <link rel="canonical" href={currentUrl} />
+                <title data-rh="true">{seoTitle}</title>
+                <meta data-rh="true" name="description" content={seoDesc} />
+                <meta data-rh="true" name="keywords" content={seoKeywords} />
+                <link data-rh="true" rel="canonical" href={currentUrl} />
 
                 {/* OpenGraph / Facebook */}
-                <meta property="og:type" content="article" />
-                <meta property="og:title" content={seoTitle} />
-                <meta property="og:description" content={seoDesc} />
-                <meta property="og:image" content={ogImage} />
-                <meta property="og:url" content={currentUrl} />
-                <meta property="og:site_name" content="ORBIT SaaS" />
+                <meta data-rh="true" property="og:type" content="article" />
+                <meta data-rh="true" property="og:title" content={seoTitle} />
+                <meta data-rh="true" property="og:description" content={seoDesc} />
+                <meta data-rh="true" property="og:image" content={ogImage} />
+                <meta data-rh="true" property="og:url" content={currentUrl} />
+                <meta data-rh="true" property="og:site_name" content="ORBIT SaaS" />
 
                 {/* Twitter */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content={seoTitle} />
-                <meta name="twitter:description" content={seoDesc} />
-                <meta name="twitter:image" content={ogImage} />
-                <meta name="twitter:image:alt" content={seoTitle} />
+                <meta data-rh="true" name="twitter:card" content="summary_large_image" />
+                <meta data-rh="true" name="twitter:title" content={seoTitle} />
+                <meta data-rh="true" name="twitter:description" content={seoDesc} />
+                <meta data-rh="true" name="twitter:image" content={ogImage} />
+                <meta data-rh="true" name="twitter:image:alt" content={seoTitle} />
             </Helmet>
             {!lightboxOpen && <Navbar />}
             <main className="pt-20 relative z-10">

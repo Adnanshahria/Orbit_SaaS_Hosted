@@ -81,8 +81,8 @@ export default function ProjectsPage() {
     return (
         <div className="min-h-[100dvh] bg-background text-foreground">
             <Helmet>
-                <title>All Projects | ORBIT SaaS</title>
-                <meta name="description" content="Browse all projects built by ORBIT SaaS — web apps, AI solutions, mobile apps, and more." />
+                <title data-rh="true">All Projects | ORBIT SaaS</title>
+                <meta data-rh="true" name="description" content="Browse all projects built by ORBIT SaaS — web apps, AI solutions, mobile apps, and more." />
             </Helmet>
             <Navbar />
             <main className="pt-24 pb-20">
@@ -90,10 +90,10 @@ export default function ProjectsPage() {
 
 
 
-                    <div className="max-w-7xl mx-auto relative" ref={ref}>
+                    <div className="max-w-none mx-auto relative" ref={ref}>
 
                         {/* Big Container Card */}
-                        <div className="rounded-2xl sm:rounded-3xl border-2 border-neon-purple/30 bg-white/[0.02] backdrop-blur-xl px-4 sm:px-8 md:px-14 py-6 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+                        <div className="px-4 sm:px-8 md:px-14 py-6 sm:py-10">
 
                             {/* Header */}
                             <motion.div

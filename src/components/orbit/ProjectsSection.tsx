@@ -12,7 +12,7 @@ import { ProjectCard } from './ProjectCard';
 
 const DEFAULT_CATEGORIES = ['SaaS', 'eCommerce', 'Enterprise', 'Education', 'Portfolio'];
 
-import { ensureAbsoluteUrl } from '@/lib/utils';
+import { ensureAbsoluteUrl, parseRichText } from '@/lib/utils';
 
 const INITIAL_SHOW = 3;
 
@@ -71,15 +71,16 @@ export function ProjectsSection() {
 
 
 
-      <div className="w-full mx-auto relative" ref={ref}>
+      <motion.div layout className="w-full mx-auto relative" ref={ref}>
         {/* Big Container Card */}
-        <div className="relative rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-5 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+        <div className="relative px-4 sm:px-14 py-5 sm:py-10">
           {/* View All / Mobile Nav Button */}
           <Link
             to="/project"
-            className="absolute top-5 right-5 sm:top-8 sm:right-8 inline-flex items-center justify-center gap-2 rounded-xl bg-neon-emerald/20 text-neon-emerald font-semibold text-sm border border-neon-emerald/30 hover:bg-neon-emerald/30 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(108,92,231,0.3)] hover:gap-3 w-10 h-10 sm:w-auto sm:h-auto sm:px-5 sm:py-2.5 animate-pulse-slow sm:animate-none"
+            className="absolute top-5 right-5 sm:top-8 sm:right-12 inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-[#8B5A2B]/5 backdrop-blur-md border border-[#8B5A2B]/30 text-[#FFE5B4] font-display italic text-sm transition-all duration-500 hover:bg-[#8B5A2B]/10 hover:border-[#8B5A2B]/50 hover:gap-4 hover:shadow-[0_0_20px_rgba(139,90,43,0.15)] group"
           >
-            <span className="hidden sm:inline">View All</span> <ArrowRight className="w-4 h-4" />
+            <span>View All</span>
+            <ArrowRight className="w-4 h-4 text-[#8B5A2B] transition-transform duration-500 group-hover:translate-x-1" />
           </Link>
           {/* Header */}
           <motion.div
@@ -88,36 +89,67 @@ export function ProjectsSection() {
             transition={{ duration: 0.6 }}
             className="text-center mb-6 sm:mb-10"
           >
-            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h2 className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full border-[0.5px] border-[#8B5A2B]/50 bg-[#8B5A2B]/10 text-[#FFE5B4] text-3xl sm:text-4xl font-display italic tracking-wide mb-4 shadow-[0_4px_20px_rgba(139,90,43,0.15)]">
               {sectionTitle}
             </h2>
-            <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              {sectionSubtitle}
+            <p className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2">
+              {parseRichText(sectionSubtitle).map((seg, i) => {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                  return seg.text.split(' ').filter(Boolean).map((word, wi) => (
+                    <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
+                  ));
+                }
+                const cls = [
+                  seg.bold && !seg.color ? 'font-bold text-white' : '',
+                  seg.bold && seg.color ? 'font-bold' : '',
+                  seg.card ? 'word-card' : '',
+                  seg.whiteCard ? 'word-card-white' : '',
+                  seg.greenCard ? 'word-card-green' : '',
+                  seg.color === 'green' ? '!text-emerald-400' : '',
+                  seg.color === 'gold' ? '!text-amber-500' : '',
+                  seg.color === 'white' ? '!text-white' : '',
+                ].filter(Boolean).join(' ');
+                return (
+                  <span key={`s-${i}`} className={`${cls} inline-block align-middle`}>
+                    {seg.text}
+                  </span>
+                );
+              })}
             </p>
           </motion.div>
 
           {/* Projects Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item: any, idx: number) => {
-              const routeId = item._id || item._originalIndex;
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
+              {items.map((item: any, idx: number) => {
+                const routeId = item._id || item._originalIndex;
 
-              return (
-                <div key={routeId}>
-                  <ProjectCard
-                    item={item}
-                    routeId={routeId}
-                    isHovered={hoveredProject === item._originalIndex}
-                    onMouseEnter={() => setHoveredProject(item._originalIndex)}
-                    onMouseLeave={() => setHoveredProject(null)}
-                  />
-                </div>
-              );
-            })}
-          </div>
+                return (
+                  <motion.div
+                    key={routeId}
+                    layout
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    transition={{ duration: 0.4, type: "spring", bounce: 0.2 }}
+                  >
+                    <ProjectCard
+                      item={item}
+                      routeId={routeId}
+                      isHovered={hoveredProject === item._originalIndex}
+                      onMouseEnter={() => setHoveredProject(item._originalIndex)}
+                      onMouseLeave={() => setHoveredProject(null)}
+                    />
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Expand / Collapse Button */}
           {canExpand && (
             <motion.div
+              layout
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -138,7 +170,7 @@ export function ProjectsSection() {
                   {expanded ? 'Show Less' : 'Explore More ✦'}
                 </span>
                 {expanded ? (
-                  <ChevronUp className="w-4 h-4 text-emerald-400 transition-transform group-hover:-translate-y-0.5" />
+                  <ChevronUp className="w-4 h-4 text-amber-500 transition-transform group-hover:-translate-y-0.5" />
                 ) : (
                   <ChevronDown className="w-4 h-4 text-amber-400 transition-transform group-hover:translate-y-0.5" />
                 )}
@@ -146,7 +178,7 @@ export function ProjectsSection() {
             </motion.div>
           )}
         </div>{/* End Container Card */}
-      </div>
+      </motion.div>
     </section >
   );
 }

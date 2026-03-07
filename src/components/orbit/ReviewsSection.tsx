@@ -108,7 +108,7 @@ export function ReviewsSection() {
         <section id="reviews" className="py-10 sm:py-20 px-3 sm:px-6 lg:px-8 relative scroll-mt-12" ref={ref} style={{ contain: 'none' }}>
             <div className="w-full mx-auto relative">
                 {/* Big Container Card */}
-                <div className="relative rounded-2xl sm:rounded-3xl premium-card bg-white/[0.02] backdrop-blur-xl px-4 sm:px-14 py-6 sm:py-10 shadow-[0_0_40px_rgba(108,92,231,0.08)]">
+                <div className="px-4 sm:px-14 py-6 sm:py-10">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -116,7 +116,7 @@ export function ReviewsSection() {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-8 sm:mb-10"
                     >
-                        <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-3xl sm:text-4xl font-bold text-foreground mb-4">
+                        <h2 className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full border-[0.5px] border-[#8B5A2B]/50 bg-[#8B5A2B]/10 text-[#FFE5B4] text-3xl sm:text-4xl font-display italic tracking-wide mb-4 shadow-[0_4px_20px_rgba(139,90,43,0.15)]">
                             {title}
                         </h2>
                         <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
@@ -149,14 +149,17 @@ export function ReviewsSection() {
                                         aria-hidden={i >= displayItems.length ? true : undefined}
                                     >
                                         <div
-                                            className={`h-full rounded-xl premium-card-sub bg-white/[0.03] backdrop-blur-xl p-4 flex flex-col transition-shadow duration-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] ${projectRoute ? 'cursor-pointer' : ''}`}
+                                            className={`h-full p-5 flex flex-col transition-all duration-500 group relative ${projectRoute ? 'cursor-pointer' : ''}`}
                                             onClick={() => {
                                                 if (hasDragged.current) return;
                                                 if (projectRoute) navigate(projectRoute);
                                             }}
                                         >
+                                            {/* Huge background quote mark */}
+                                            <span className="absolute top-2 right-4 text-7xl font-serif text-[#FFE5B4]/5 pointer-events-none z-0">"</span>
+
                                             {/* Top row: Stars + Project Badge */}
-                                            <div className="flex items-center justify-between mb-2.5">
+                                            <div className="flex items-center justify-between mb-4 relative z-10">
                                                 <div className="flex gap-0.5">
                                                     {Array.from({ length: 5 }).map((_, si) => (
                                                         <Star key={si} className={`w-3.5 h-3.5 ${si < (review.rating || 5) ? 'text-amber-400 fill-amber-400' : 'text-white/10'}`} />
@@ -171,20 +174,20 @@ export function ReviewsSection() {
                                                         }}
                                                     >
                                                         <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">{projectName}</span>
-                                                        {projectRoute && <ArrowRight className="w-2.5 h-2.5 text-emerald-400" />}
+                                                        {projectRoute && <ArrowRight className="w-2.5 h-2.5 text-amber-500" />}
                                                     </span>
                                                 )}
                                             </div>
 
                                             {/* Review Text */}
-                                            <p className="text-muted-foreground text-xs leading-relaxed mb-3 flex-grow line-clamp-4">
+                                            <p className="text-[#FFE5B4]/80 text-sm leading-relaxed mb-6 flex-grow line-clamp-4 italic font-garamond text-lg relative z-10">
                                                 "{review.text}"
                                             </p>
 
                                             {/* Reviewer Info */}
-                                            <div className="pt-2.5 border-t border-white/[0.06]">
-                                                <span className="font-bold text-foreground text-xs block">{review.name}</span>
-                                                <span className="text-muted-foreground text-[11px]">{review.role}</span>
+                                            <div className="pt-4 border-t border-[#8B5A2B]/10 relative z-10 group-hover:border-[#8B5A2B]/40 transition-colors duration-500">
+                                                <span className="font-display font-normal text-[#FFE5B4] text-base block tracking-wide">{review.name}</span>
+                                                <span className="text-[#B5A642] text-[10px] uppercase tracking-widest font-semibold mt-1 block">{review.role}</span>
                                             </div>
                                         </div>
                                     </div>

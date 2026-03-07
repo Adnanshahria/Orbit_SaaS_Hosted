@@ -25,6 +25,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+.wrangler
 
 # Build cache
 *.tsbuildinfo
@@ -42,5 +43,9 @@ dist-ssr
 temp/
 bun.lockb
 
+# Local env (Cloudflare)
+.dev.vars
+
 # Unused/Garbage files
 Garbage/
+

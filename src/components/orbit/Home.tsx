@@ -1,5 +1,28 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronDown, Send, Loader2, Mail, MessageCircle } from 'lucide-react';
+import { ArrowRight, ChevronDown, Send, Loader2, Mail, MessageCircle, Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud, Cpu, Monitor, Wifi, Camera, Music, Heart, Star, Target, Briefcase, Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette, Brain, Wrench } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+// ─── Custom Icons ───
+const Bullseye = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    {/* Outer circle (broken at top-right) */}
+    <path d="M16.5 4A9.5 9.5 0 1 0 20 7.5" />
+    {/* Inner circle (broken at top-right) */}
+    <path d="M14 8a4.5 4.5 0 1 0 2 2" />
+    {/* Arrow shaft — from center outward to top-right */}
+    <line x1="11" y1="13" x2="20" y2="4" />
+    {/* Solid arrowhead pointing OUTWARD (at top-right) */}
+    <path d="M14 2h8v8Z" fill="currentColor" stroke="currentColor" />
+  </svg>
+);
+
+// ─── Icon Map for dynamic tagline icons (synced with admin panel) ───
+const TAGLINE_ICON_MAP: Record<string, LucideIcon | any> = {
+  Globe, Bot, Zap, Smartphone, ShoppingCart, Rocket, Code, Database, Shield, Cloud,
+  Cpu, Monitor, Wifi, Mail, Camera, Music, Heart, Star, Target, Briefcase,
+  Award, BookOpen, Users, BarChart3, Sparkles, Layers, Settings2, Eye, Palette, Brain, Wrench,
+  Bullseye
+};
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
@@ -7,20 +30,44 @@ import { CometDiceLoaderCanvas } from './CometDiceLoaderCanvas';
 
 
 /** Parse rich markers: **bold**, [[green-card]], **[[bold+green]]**, {{white-card}}, **{{bold+white}}** */
-function parseSubtitleSegments(str: string): { text: string; bold: boolean; card: boolean; whiteCard: boolean }[] {
-  const parts: { text: string; bold: boolean; card: boolean; whiteCard: boolean }[] = [];
-  const regex = /\*\*\[\[(.+?)\]\]\*\*|\*\*\{\{(.+?)\}\}\*\*|\*\*(.+?)\*\*|\[\[(.+?)\]\]|\{\{(.+?)\}\}/g;
+export type RichSegment = {
+  text: string;
+  bold: boolean;
+  card: boolean;
+  whiteCard: boolean;
+  greenCard?: boolean;
+  color?: 'green' | 'gold' | 'white';
+};
+
+function parseSubtitleSegments(str: string): RichSegment[] {
+  if (!str) return [];
+  const parts: RichSegment[] = [];
+
+  const regex = /\*\*\[\[(.+?)\]\]\*\*|\*\*\{\{(.+?)\}\}\*\*|\*\*\=\=(.+?)\=\=\*\*|\*\*\<\<(.+?)\>\>\*\*|\*\*\(\((.+?)\)\)\*\*|\*\*\|\|(.+?)\|\|\*\*|\*\*(.+?)\*\*|\[\[(.+?)\]\]|\{\{(.+?)\}\}|\=\=(.+?)\=\=|\<\<(.+?)\>\>|\(\((.+?)\)\)|\|\|(.+?)\|\|/g;
   let last = 0;
   let m: RegExpExecArray | null;
+
   while ((m = regex.exec(str)) !== null) {
     if (m.index > last) parts.push({ text: str.slice(last, m.index), bold: false, card: false, whiteCard: false });
-    if (m[1] !== undefined) parts.push({ text: m[1], bold: true, card: true, whiteCard: false });
-    else if (m[2] !== undefined) parts.push({ text: m[2], bold: true, card: false, whiteCard: true });
-    else if (m[3] !== undefined) parts.push({ text: m[3], bold: true, card: false, whiteCard: false });
-    else if (m[4] !== undefined) parts.push({ text: m[4], bold: false, card: true, whiteCard: false });
-    else if (m[5] !== undefined) parts.push({ text: m[5], bold: false, card: false, whiteCard: true });
+
+    if (m[1] !== undefined) parts.push({ text: m[1], bold: true, card: true, whiteCard: false }); // **[[ ]]**
+    else if (m[2] !== undefined) parts.push({ text: m[2], bold: true, card: false, whiteCard: true }); // **{{ }}**
+    else if (m[3] !== undefined) parts.push({ text: m[3], bold: true, card: false, whiteCard: false, greenCard: true }); // **== ==**
+    else if (m[4] !== undefined) parts.push({ text: m[4], bold: true, card: false, whiteCard: false, color: 'green' }); // **<< >>**
+    else if (m[5] !== undefined) parts.push({ text: m[5], bold: true, card: false, whiteCard: false, color: 'gold' }); // **(( ))**
+    else if (m[6] !== undefined) parts.push({ text: m[6], bold: true, card: false, whiteCard: false, color: 'white' }); // **|| ||**
+    else if (m[7] !== undefined) parts.push({ text: m[7], bold: true, card: false, whiteCard: false }); // ** **
+
+    else if (m[8] !== undefined) parts.push({ text: m[8], bold: false, card: true, whiteCard: false }); // [[ ]]
+    else if (m[9] !== undefined) parts.push({ text: m[9], bold: false, card: false, whiteCard: true }); // {{ }}
+    else if (m[10] !== undefined) parts.push({ text: m[10], bold: false, card: false, whiteCard: false, greenCard: true }); // == ==
+    else if (m[11] !== undefined) parts.push({ text: m[11], bold: false, card: false, whiteCard: false, color: 'green' }); // << >>
+    else if (m[12] !== undefined) parts.push({ text: m[12], bold: false, card: false, whiteCard: false, color: 'gold' }); // (( ))
+    else if (m[13] !== undefined) parts.push({ text: m[13], bold: false, card: false, whiteCard: false, color: 'white' }); // || ||
+
     last = m.index + m[0].length;
   }
+
   if (last < str.length) parts.push({ text: str.slice(last), bold: false, card: false, whiteCard: false });
   return parts.length ? parts : [{ text: str, bold: false, card: false, whiteCard: false }];
 }
@@ -104,11 +151,11 @@ export function Home() {
   const isFirstVisit = true;
   const baseDelay = 8.5; // Stretched to fit the new 10s canvas sequence
 
-  // Theme Customization: Forcing Emerald & Gold for this redesign
-  const taglineColor = '#10b981'; // Emerald
-  const titleColor = '#f59e0b';   // Amber/Gold
-  const ctaGradientStart = '#10b981';
-  const ctaGradientEnd = '#14b8a6';
+  // Theme Customization: Metallic Hierarchy
+  const taglineColor = 'var(--metallic-pale)'; // Champagne for the subtle top tag
+  const titleColor = 'var(--metallic-gold)';   // Pure Gold for the hero text
+  const ctaGradientStart = 'var(--metallic-amber)';
+  const ctaGradientEnd = 'var(--metallic-bronze)';
 
   // Dynamic WhatsApp URL from admin settings
   const whatsappNumber = (t.contact as any).whatsapp || '';
@@ -180,13 +227,7 @@ export function Home() {
     return () => clearTimeout(fallback);
   }, [isFirstVisit, handleLoaderComplete]);
 
-  // Force exactly the screen height ONCE to prevent shrinking when mobile keyboard opens
-  const [heroHeight, setHeroHeight] = useState('100vh');
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setHeroHeight(`${window.innerHeight}px`);
-    }
-  }, []);
+  // heroHeight removed — using min-h-[100dvh] in className instead
 
   // Rigorous body scroll lock when newsletter is focused to prevent browser from auto-scrolling hero content upwards
   useEffect(() => {
@@ -218,25 +259,29 @@ export function Home() {
     <section
       ref={sectionRef}
       id="hero"
-      className={`relative flex items-center justify-center overflow-x-hidden transition-all duration-1000 ease-in-out ${loaderComplete
-        ? 'pt-0 pb-12 sm:pt-6 sm:pb-0'
-        : 'pt-0 pb-12 sm:pt-6 sm:pb-0'
+      className={`relative flex flex-col items-center justify-center overflow-x-hidden transition-all duration-1000 ease-in-out min-h-[100dvh] pb-28 sm:pb-8 ${loaderComplete
+        ? 'pt-0 sm:pt-6'
+        : 'pt-0 sm:pt-6'
         }`}
-      style={{ minHeight: heroHeight }}
     >
 
       <div
         className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto lg:-mt-12"
         style={{ contain: 'none' }}
       >
-        <div className={`px-4 sm:px-14 py-8 sm:py-10 flex flex-col justify-between items-center transition-all duration-700 ease-in-out ${loaderComplete ? 'min-h-0' : 'min-h-[350px]'} sm:min-h-0`}>
+        <div className={`px-4 sm:px-14 py-8 sm:py-10 flex flex-col justify-center items-center gap-4 sm:gap-6 transition-all duration-700 ease-in-out ${loaderComplete ? 'min-h-0' : 'min-h-[350px]'} sm:min-h-0`}>
           {/* Badge — slides down with spring */}
           {t.hero.tagline && (() => {
             const line1 = t.hero.tagline;
             const line2 = (t.hero as any).tagline2 || '';
+            const fullTagline = line2 ? `${line1} ${line2}` : line1;
+            const icon1Name = (t.hero as any).taglineIcon1 || 'Bullseye';
+            const icon2Name = (t.hero as any).taglineIcon2 || 'Rocket';
+            const Icon1 = TAGLINE_ICON_MAP[icon1Name] || Target;
+            const Icon2 = TAGLINE_ICON_MAP[icon2Name] || Rocket;
             return (
               <>
-                {/* Desktop: single pill (combines both if tagline2 exists) */}
+                {/* Desktop: single pill with animated SVG icons */}
                 <motion.div
                   initial={{ opacity: 0, y: -12, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -244,64 +289,26 @@ export function Home() {
                   className="hidden sm:inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-sm font-playfair italic font-bold mb-12 -mt-4 tracking-wide w-auto max-w-[95%] md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
                   style={{ color: taglineColor }}
                 >
-                  <span className="w-2.5 h-2.5 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]" />
-                  {line2 ? `${line1} ${line2}` : line1}
+                  <Icon1 className="w-4 h-4 shrink-0 tagline-icon-spin text-[#10b981]" />
+                  {fullTagline}
+                  <Icon2 className="w-4 h-4 shrink-0 tagline-icon-float text-[#10b981]" />
                 </motion.div>
 
-                {/* Mobile: two overlapping rectangles, offset like chain links */}
+                {/* Mobile: single pill with animated SVG icons */}
                 <motion.div
                   initial={{ opacity: 0, y: -12, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
-                  className="flex sm:hidden flex-col items-center w-full max-w-[95%] mx-auto mb-10 -mt-6 font-playfair italic font-bold text-[14px] tracking-wide relative"
+                  className="flex sm:hidden items-center justify-center gap-2 px-4 py-2 rounded-full backdrop-blur-md shadow-lg font-playfair italic font-bold text-[13px] tracking-wide mx-auto mb-6"
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1.5px solid rgba(16, 185, 129, 0.6)',
+                    color: 'var(--metallic-pale)',
+                  }}
                 >
-                  {/* Fusion Glow Effect (behind intersection) - Moved down to overlap */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: baseDelay + 0.8, duration: 0.8 }}
-                    viewport={{ once: true }}
-                    className="absolute top-[20px] left-[52%] -translate-x-1/2 w-48 h-10 bg-gradient-to-r from-emerald-500/60 to-amber-500/60 blur-xl z-[8] mix-blend-screen pointer-events-none"
-                  />
-
-                  {/* Row 1 — slightly left, pill shaped box */}
-                  <motion.div
-                    initial={{ opacity: 0.2, x: -75 }}
-                    animate={{ opacity: 1, x: -40 }}
-                    transition={{ type: "spring", stiffness: 120, damping: 15, delay: baseDelay + 0.4 }}
-                    viewport={{ once: true }}
-                    className="relative z-[9] flex items-center justify-center gap-2 px-4 py-1.5 backdrop-blur-md shadow-lg rounded-full"
-                    style={{
-                      background: 'rgba(16, 185, 129, 0.12)',
-                      border: '1.5px solid rgba(16, 185, 129, 0.6)',
-                      color: taglineColor,
-                    }}
-                  >
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="w-2 h-2 rounded-full animate-pulse bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] shrink-0" />
-                      <span>{line1}</span>
-                    </div>
-                  </motion.div>
-                  {/* Row 2 — slightly right, pill shaped box */}
-                  {line2 && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 65 }}
-                      animate={{ opacity: 1, x: 40 }}
-                      transition={{ type: "spring", stiffness: 120, damping: 15, delay: baseDelay + 0.6 }}
-                      viewport={{ once: true }}
-                      className="relative z-[5] flex items-center justify-center gap-2 px-6 py-1.5 backdrop-blur-md shadow-lg rounded-full"
-                      style={{
-                        marginTop: '0px',
-                        background: 'rgba(245, 158, 11, 0.12)',
-                        border: '1.5px solid rgba(245, 158, 11, 0.6)',
-                        color: '#f59e0b',
-                      }}
-                    >
-                      <div className="flex items-center gap-2 text-sm">
-                        <span>{line2}</span>
-                      </div>
-                    </motion.div>
-                  )}
+                  <Icon1 className="w-3.5 h-3.5 shrink-0 tagline-icon-spin text-[#10b981]" />
+                  <span>{fullTagline}</span>
+                  <Icon2 className="w-3.5 h-3.5 shrink-0 tagline-icon-float text-[#10b981]" />
                 </motion.div>
               </>
             );
@@ -324,25 +331,32 @@ export function Home() {
             <div className="flex items-center justify-center relative z-10 whitespace-nowrap min-w-[280px]">
 
               {/* O-R-B-I-T container — Flex ensures natural typographic spacing */}
-              <div className="flex relative items-center justify-center gap-[0.02em]">
-                {letters.map((letter, i) => (
-                  <motion.span
-                    key={letter}
-                    ref={(el) => { letterRefs.current[i] = el; }}
-                    initial={{ opacity: 0, filter: 'blur(10px)' }}
-                    animate={{
-                      opacity: revealedLetters[i] ? 1 : 0,
-                      filter: revealedLetters[i] ? 'blur(0px)' : 'blur(10px)'
-                    }}
-                    transition={{
-                      duration: 0.4,
-                      ease: "easeOut",
-                    }}
-                    className="text-[clamp(3.2rem,13vw,5.5rem)] lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block animate-text-shimmer-orbit will-change-[opacity,filter]"
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
+              <div className="flex relative items-baseline justify-center gap-[0.02em]">
+                {letters.map((letter, i) => {
+                  const isFirstLetter = i === 0;
+                  const fontSizeClass = isFirstLetter
+                    ? "text-[clamp(3.8rem,15vw,6rem)] lg:text-[7rem] xl:text-[8rem]"
+                    : "text-[clamp(2.5rem,10vw,4.5rem)] lg:text-[5rem] xl:text-[6rem]";
+
+                  return (
+                    <motion.span
+                      key={letter}
+                      ref={(el) => { letterRefs.current[i] = el; }}
+                      initial={{ opacity: 0, filter: 'blur(10px)' }}
+                      animate={{
+                        opacity: revealedLetters[i] ? 1 : 0,
+                        filter: revealedLetters[i] ? 'none' : 'blur(10px)'
+                      }}
+                      transition={{
+                        duration: 0.4,
+                        ease: "easeOut",
+                      }}
+                      className={`${fontSizeClass} font-abril tracking-tight inline-block animate-text-shimmer-orbit`}
+                    >
+                      {letter}
+                    </motion.span>
+                  );
+                })}
               </div>
 
               <motion.span
@@ -350,12 +364,26 @@ export function Home() {
                 initial={{ opacity: 0, filter: 'blur(8px)' }}
                 animate={{
                   opacity: saasRevealed ? 1 : 0,
-                  filter: saasRevealed ? 'blur(0px)' : 'blur(8px)'
+                  filter: saasRevealed ? 'none' : 'blur(8px)'
                 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="text-[clamp(3.2rem,13vw,5.5rem)] lg:text-[6.5rem] xl:text-[7.5rem] font-poppins font-black tracking-tight inline-block ml-4 animate-text-shimmer-saas will-change-[opacity,filter]"
+                className="font-abril tracking-tight inline-block ml-4"
               >
-                SaaS
+                {['S', 'a', 'a', 'S'].map((char, i) => {
+                  const isLarge = i === 0 || i === 3; // First and last S
+
+                  // 'S' uses the large size.
+                  // 'a' needs to be sized up so its x-height matches the cap-height of 'RBIT' (which uses xl:text-[6rem]).
+                  // vertical-align is used instead of relative/transform so WebKit's background clip doesn't break
+                  const fontSizeClass = isLarge
+                    ? "text-[clamp(3.8rem,15vw,6rem)] lg:text-[7rem] xl:text-[8rem]"
+                    : "text-[clamp(3.3rem,13vw,5.8rem)] lg:text-[6.5rem] xl:text-[7.8rem] align-[0.05em]";
+
+                  return (
+                    <span key={i} className={`${fontSizeClass} inline-block animate-text-shimmer-saas`}>
+                      {char}
+                    </span>
+                  );
+                })}
               </motion.span>
             </div>
           </div>
@@ -368,7 +396,7 @@ export function Home() {
                 initial={{ opacity: 0, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, filter: 'blur(10px)', transition: { duration: 0.3 } }}
-                className={`${isInHero ? 'animate-title-breath' : ''} mt-1 sm:mt-2 md:mt-4 text-[1.5rem] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4 flex flex-wrap justify-center gap-x-[0.25em] gap-y-2 ${lang === 'bn' ? 'font-bengali font-bold' : ''}`}
+                className={`${isInHero ? 'animate-title-breath' : ''} text-[clamp(1.15rem,4.5vw,1.5rem)] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-garamond italic font-medium tracking-normal px-1 sm:px-4 flex flex-wrap justify-center gap-x-[0.25em] gap-y-2 ${lang === 'bn' ? 'font-bengali font-bold' : ''}`}
                 style={{ color: titleColor }}
               >
                 {t.hero.title.split(' ').filter(Boolean).map((word: string, wi: number) => {
@@ -398,7 +426,7 @@ export function Home() {
             initial={{ opacity: 0, filter: 'blur(10px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}
             exit={{ opacity: 0, filter: 'blur(10px)', transition: { duration: 0.3 } }}
-            className="text-muted-foreground text-[12.5px] sm:text-base md:text-lg lg:text-xl w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 mt-4 sm:mt-6 mb-4 sm:mb-6 leading-[1.6] flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-3 font-medium tracking-wide italic"
+            className="text-muted-foreground text-[12.5px] sm:text-base md:text-lg lg:text-xl w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 mt-4 sm:mt-6 mb-4 sm:mb-6 leading-[1.6] flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-3 tracking-wide italic"
           >
             {(
               (() => {
@@ -416,9 +444,14 @@ export function Home() {
                     const delay = (isHeroLoaded ? 0.05 : baseDelay + 0.9) + wordIndex * 0.04 + (pastMid ? midPause : 0);
                     wordIndex += wordsInSeg;
                     const cls = [
-                      seg.bold ? 'font-bold text-white' : '',
+                      seg.bold && !seg.color ? 'font-bold text-white' : '',
+                      seg.bold && seg.color ? 'font-bold' : '',
                       seg.card ? 'word-card' : '',
                       seg.whiteCard ? 'word-card-white' : '',
+                      seg.greenCard ? 'word-card-green' : '',
+                      seg.color === 'green' ? '!text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]' : '',
+                      seg.color === 'gold' ? '!text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]' : '',
+                      seg.color === 'white' ? '!text-white' : '',
                     ].filter(Boolean).join(' ');
                     return (
                       <motion.span
@@ -477,8 +510,8 @@ export function Home() {
               whileHover={{ scale: 1.04, boxShadow: `0 8px 30px ${ctaGradientStart}44` }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-1.5 sm:py-2.5 rounded-full font-bold text-primary-foreground shadow-lg gentle-animation cursor-pointer justify-center text-sm sm:text-base border-[0.5px] border-amber-400/60"
-              style={{ background: `linear-gradient(to right, ${ctaGradientStart}, ${ctaGradientEnd})` }}
+              className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-1.5 sm:py-2.5 rounded-full font-bold text-black shadow-[0_0_20px_rgba(245,158,11,0.2)] gentle-animation cursor-pointer justify-center text-sm sm:text-base border border-[#FFE5B4]/40"
+              style={{ background: `linear-gradient(to right, var(--metallic-gold), var(--metallic-amber))` }}
             >
               {t.hero.cta}
               <div className="ml-1.5 flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 border border-white/10 shadow-inner group-hover:bg-white/30 transition-colors">
@@ -537,7 +570,7 @@ export function Home() {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-            className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-1.5 sm:py-2.5 rounded-full font-bold glass-effect text-foreground cursor-pointer justify-center text-sm sm:text-base border-[0.5px] border-amber-400/60"
+            className="inline-flex items-center gap-1.5 px-4 sm:px-8 py-1.5 sm:py-2.5 rounded-full font-bold bg-[#8B5A2B]/10 hover:bg-[#8B5A2B]/20 text-[#FFE5B4] cursor-pointer justify-center text-sm sm:text-base border border-[#8B5A2B]/40 hover:border-[#F59E0B]/60 shadow-lg"
           >
             {t.hero.learnMore}
           </motion.a>
@@ -617,7 +650,7 @@ export function Home() {
                 </button>
               </form>
               {status === 'success' && (
-                <p className="text-emerald-400 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
+                <p className="text-amber-500 text-xs mt-3 text-center animate-in fade-in slide-in-from-bottom-2 font-medium">
                   {lang === 'bn' ? 'স্বাগতম!' : 'Welcome to the waitlist!'}
                 </p>
               )}
@@ -638,7 +671,7 @@ export function Home() {
           <ChevronDown className="w-6 h-6 text-muted-foreground opacity-50" />
         </motion.div>
       </motion.div>
-    </section>
+    </section >
   );
 }
 
