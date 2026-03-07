@@ -124,12 +124,6 @@
   animation: textShimmerSweep 4s linear infinite reverse;
   filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.4));
 }
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: textShimmerSweep 4s linear infinite;
-}
 
 /* ── Metallic Gold Shimmer ── */
 @keyframes gold-shimmer {
@@ -152,30 +146,6 @@
   background-clip: text;
   animation: gold-shimmer 6s linear infinite;
   filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.2));
-}
-  background-size: 300% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: textShimmerSweep 4s linear infinite;
-  will-change: background-position;
-  display: inline-block;
-}
-
-.animate-text-shimmer-saas {
-  background: linear-gradient(to right,
-      var(--neon-emerald) 30%,
-      var(--foreground) 40%,
-      var(--neon-amber) 45%,
-      var(--neon-emerald) 55%,
-      var(--neon-emerald) 100%);
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: textShimmerSweep 5s linear infinite;
-  will-change: background-position;
-  display: inline-block;
 }
 
 @keyframes borderGradient {
@@ -891,7 +861,13 @@ html.hide-scrollbar::-webkit-scrollbar {
     font-size: 2rem;
     font-weight: 600;
     line-height: 1.2;
-    @apply premium-gold-shimmer;
+    background: linear-gradient(135deg, #B8860B 0%, #FFD700 25%, #FFFFFF 50%, #FFD700 75%, #B8860B 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gold-shimmer 6s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.2));
     display: inline-block;
   }
 
@@ -901,7 +877,13 @@ html.hide-scrollbar::-webkit-scrollbar {
     font-size: 1.5rem;
     font-weight: 600;
     line-height: 1.3;
-    @apply premium-gold-shimmer;
+    background: linear-gradient(135deg, #B8860B 0%, #FFD700 25%, #FFFFFF 50%, #FFD700 75%, #B8860B 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gold-shimmer 6s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.2));
     display: inline-block;
   }
 
