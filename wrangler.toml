@@ -1,4 +1,4 @@
-name = "orbitsaas-cloudflare"
+name = "os-test"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -11,7 +11,7 @@ compatibility_flags = ["nodejs_compat"]
 
 # Environment-specific overrides
 [env.production]
-name = "orbitsaas-cloudflare"
+name = "os-test"
 
 [env.preview]
-name = "orbitsaas-cloudflare-preview"
+name = "os-test-preview"

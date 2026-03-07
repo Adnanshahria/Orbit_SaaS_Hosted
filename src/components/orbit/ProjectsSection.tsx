@@ -12,7 +12,7 @@ import { ProjectCard } from './ProjectCard';
 
 const DEFAULT_CATEGORIES = ['SaaS', 'eCommerce', 'Enterprise', 'Education', 'Portfolio'];
 
-import { ensureAbsoluteUrl } from '@/lib/utils';
+import { ensureAbsoluteUrl, parseRichText } from '@/lib/utils';
 
 const INITIAL_SHOW = 3;
 
@@ -92,8 +92,29 @@ export function ProjectsSection() {
             <h2 className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full border-[0.5px] border-[#8B5A2B]/50 bg-[#8B5A2B]/10 text-[#FFE5B4] text-3xl sm:text-4xl font-display italic tracking-wide mb-4 shadow-[0_4px_20px_rgba(139,90,43,0.15)]">
               {sectionTitle}
             </h2>
-            <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              {sectionSubtitle}
+            <p className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2">
+              {parseRichText(sectionSubtitle).map((seg, i) => {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                  return seg.text.split(' ').filter(Boolean).map((word, wi) => (
+                    <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
+                  ));
+                }
+                const cls = [
+                  seg.bold && !seg.color ? 'font-bold text-white' : '',
+                  seg.bold && seg.color ? 'font-bold' : '',
+                  seg.card ? 'word-card' : '',
+                  seg.whiteCard ? 'word-card-white' : '',
+                  seg.greenCard ? 'word-card-green' : '',
+                  seg.color === 'green' ? '!text-emerald-400' : '',
+                  seg.color === 'gold' ? '!text-amber-500' : '',
+                  seg.color === 'white' ? '!text-white' : '',
+                ].filter(Boolean).join(' ');
+                return (
+                  <span key={`s-${i}`} className={`${cls} inline-block align-middle`}>
+                    {seg.text}
+                  </span>
+                );
+              })}
             </p>
           </motion.div>
 

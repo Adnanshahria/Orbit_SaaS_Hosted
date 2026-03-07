@@ -127,7 +127,7 @@ export function ServicesSection() {
               {(() => {
                 let wordIndex = 0;
                 return parseRichText(t.services.subtitle).map((seg, i) => {
-                  if (!seg.bold && !seg.card && !seg.whiteCard) {
+                  if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
                     return seg.text.split(' ').filter(Boolean).map((word) => {
                       const wi = wordIndex++;
                       return (
@@ -145,9 +145,14 @@ export function ServicesSection() {
                   }
                   const wi = wordIndex++;
                   const cls = [
-                    seg.bold ? 'font-bold text-white' : '',
+                    seg.bold && !seg.color ? 'font-bold text-white' : '',
+                    seg.bold && seg.color ? 'font-bold' : '',
                     seg.card ? 'word-card' : '',
                     seg.whiteCard ? 'word-card-white' : '',
+                    seg.greenCard ? 'word-card-green' : '',
+                    seg.color === 'green' ? '!text-emerald-400' : '',
+                    seg.color === 'gold' ? '!text-amber-500' : '',
+                    seg.color === 'white' ? '!text-white' : '',
                   ].filter(Boolean).join(' ');
                   return (
                     <motion.span

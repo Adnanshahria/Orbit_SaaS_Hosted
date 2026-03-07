@@ -72,14 +72,12 @@ export function OrbitFooter() {
 
       <div className="relative z-10 w-full px-4 sm:px-8 lg:px-12">
 
-        {/* ─── Contained Footer Card ─── */}
-        <div className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-6 sm:p-12">
-
-          {/* ─── Main Grid ─── */}
+        {/* ─── Main Grid ─── */}
+        <div className="w-full">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-[8fr_7fr_9fr] gap-5 md:gap-5">
 
             {/* ── Col 1: Brand + Contact Info (full width on mobile) ── */}
-            <div className="col-span-2 sm:col-span-2 md:col-span-1 flex flex-col md:h-[380px] space-y-4 rounded-2xl border border-border/40 p-6">
+            <div className="col-span-2 sm:col-span-2 md:col-span-1 flex flex-col md:h-[380px] space-y-4 rounded-2xl border border-amber-500/40 p-6">
               {/* Brand */}
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -101,7 +99,7 @@ export function OrbitFooter() {
                   <p className="text-muted-foreground/80 max-w-xs text-sm leading-relaxed">
                     {footer.tagline}
                   </p>
-                  <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/40 to-transparent w-full opacity-60" />
+                  <div className="h-px bg-gradient-to-r from-emerald-500 via-emerald-500/40 to-transparent w-full opacity-60" />
                 </div>
               )}
 
@@ -117,7 +115,7 @@ export function OrbitFooter() {
                         <Mail className="w-3.5 h-3.5 text-primary/60 group-hover:text-primary" strokeWidth={1.8} />
                         <span>{email}</span>
                       </a>
-                      <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/40 to-transparent w-full opacity-60" />
+                      <div className="h-px bg-gradient-to-r from-emerald-500 via-emerald-500/40 to-transparent w-full opacity-60" />
                     </div>
                   )}
                   {phone && (
@@ -129,7 +127,7 @@ export function OrbitFooter() {
                         <Phone className="w-3.5 h-3.5 text-primary/60 group-hover:text-primary" strokeWidth={1.8} />
                         <span>{phone}</span>
                       </a>
-                      <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/40 to-transparent w-full opacity-60" />
+                      <div className="h-px bg-gradient-to-r from-emerald-500 via-emerald-500/40 to-transparent w-full opacity-60" />
                     </div>
                   )}
                   {location && (
@@ -153,7 +151,7 @@ export function OrbitFooter() {
 
             {/* ── Col 2: Services ── */}
             {serviceItems.length > 0 && (
-              <div className="col-span-1 md:col-span-1 flex flex-col md:h-[340px] rounded-2xl border border-border/40 p-6">
+              <div className="col-span-1 md:col-span-1 flex flex-col md:h-[340px] rounded-2xl border border-emerald-500/40 p-6">
                 <h4 className="w-fit text-xs font-semibold text-foreground uppercase tracking-wider mb-3 px-3 py-1 rounded-full border border-primary/30 bg-primary/5">
                   Services
                 </h4>
@@ -181,7 +179,7 @@ export function OrbitFooter() {
                 <div className="flex flex-col md:grid md:grid-cols-[5fr_4fr] gap-5 mb-5 md:mb-0">
                   {/* ── Col 3: Why Us ── */}
                   {whyUsItems.length > 0 && (
-                    <div className="col-span-1 md:col-span-1 flex flex-col md:h-[260px] rounded-2xl border border-border/40 p-6">
+                    <div className="col-span-1 md:col-span-1 flex flex-col md:h-[260px] rounded-2xl border border-amber-500/40 p-6">
                       <h4 className="w-fit text-xs font-semibold text-foreground uppercase tracking-wider mb-3 px-3 py-1 rounded-full border border-primary/30 bg-primary/5">
                         Why Us
                       </h4>
@@ -195,7 +193,7 @@ export function OrbitFooter() {
                               {item.title}
                             </a>
                             {idx < whyUsItems.length - 1 && (
-                              <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/40 to-transparent w-1/2 opacity-60" />
+                              <div className="h-px bg-gradient-to-r from-emerald-500 via-emerald-500/40 to-transparent w-1/2 opacity-60" />
                             )}
                           </li>
                         ))}
@@ -205,7 +203,7 @@ export function OrbitFooter() {
 
                   {/* ── Col 4: Legal ── */}
                   {legalLinks.length > 0 && (
-                    <div className="col-span-1 md:col-span-1 flex flex-col md:h-[140px] rounded-2xl border border-border/40 p-6">
+                    <div className="col-span-1 md:col-span-1 flex flex-col md:h-[140px] rounded-2xl border border-emerald-500/40 p-6">
                       <h4 className="w-fit text-xs font-semibold text-foreground uppercase tracking-wider mb-3 px-3 py-1 rounded-full border border-primary/30 bg-primary/5">
                         Legal
                       </h4>

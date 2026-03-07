@@ -30,20 +30,44 @@ import { CometDiceLoaderCanvas } from './CometDiceLoaderCanvas';
 
 
 /** Parse rich markers: **bold**, [[green-card]], **[[bold+green]]**, {{white-card}}, **{{bold+white}}** */
-function parseSubtitleSegments(str: string): { text: string; bold: boolean; card: boolean; whiteCard: boolean }[] {
-  const parts: { text: string; bold: boolean; card: boolean; whiteCard: boolean }[] = [];
-  const regex = /\*\*\[\[(.+?)\]\]\*\*|\*\*\{\{(.+?)\}\}\*\*|\*\*(.+?)\*\*|\[\[(.+?)\]\]|\{\{(.+?)\}\}/g;
+export type RichSegment = {
+  text: string;
+  bold: boolean;
+  card: boolean;
+  whiteCard: boolean;
+  greenCard?: boolean;
+  color?: 'green' | 'gold' | 'white';
+};
+
+function parseSubtitleSegments(str: string): RichSegment[] {
+  if (!str) return [];
+  const parts: RichSegment[] = [];
+
+  const regex = /\*\*\[\[(.+?)\]\]\*\*|\*\*\{\{(.+?)\}\}\*\*|\*\*\=\=(.+?)\=\=\*\*|\*\*\<\<(.+?)\>\>\*\*|\*\*\(\((.+?)\)\)\*\*|\*\*\|\|(.+?)\|\|\*\*|\*\*(.+?)\*\*|\[\[(.+?)\]\]|\{\{(.+?)\}\}|\=\=(.+?)\=\=|\<\<(.+?)\>\>|\(\((.+?)\)\)|\|\|(.+?)\|\|/g;
   let last = 0;
   let m: RegExpExecArray | null;
+
   while ((m = regex.exec(str)) !== null) {
     if (m.index > last) parts.push({ text: str.slice(last, m.index), bold: false, card: false, whiteCard: false });
-    if (m[1] !== undefined) parts.push({ text: m[1], bold: true, card: true, whiteCard: false });
-    else if (m[2] !== undefined) parts.push({ text: m[2], bold: true, card: false, whiteCard: true });
-    else if (m[3] !== undefined) parts.push({ text: m[3], bold: true, card: false, whiteCard: false });
-    else if (m[4] !== undefined) parts.push({ text: m[4], bold: false, card: true, whiteCard: false });
-    else if (m[5] !== undefined) parts.push({ text: m[5], bold: false, card: false, whiteCard: true });
+
+    if (m[1] !== undefined) parts.push({ text: m[1], bold: true, card: true, whiteCard: false }); // **[[ ]]**
+    else if (m[2] !== undefined) parts.push({ text: m[2], bold: true, card: false, whiteCard: true }); // **{{ }}**
+    else if (m[3] !== undefined) parts.push({ text: m[3], bold: true, card: false, whiteCard: false, greenCard: true }); // **== ==**
+    else if (m[4] !== undefined) parts.push({ text: m[4], bold: true, card: false, whiteCard: false, color: 'green' }); // **<< >>**
+    else if (m[5] !== undefined) parts.push({ text: m[5], bold: true, card: false, whiteCard: false, color: 'gold' }); // **(( ))**
+    else if (m[6] !== undefined) parts.push({ text: m[6], bold: true, card: false, whiteCard: false, color: 'white' }); // **|| ||**
+    else if (m[7] !== undefined) parts.push({ text: m[7], bold: true, card: false, whiteCard: false }); // ** **
+
+    else if (m[8] !== undefined) parts.push({ text: m[8], bold: false, card: true, whiteCard: false }); // [[ ]]
+    else if (m[9] !== undefined) parts.push({ text: m[9], bold: false, card: false, whiteCard: true }); // {{ }}
+    else if (m[10] !== undefined) parts.push({ text: m[10], bold: false, card: false, whiteCard: false, greenCard: true }); // == ==
+    else if (m[11] !== undefined) parts.push({ text: m[11], bold: false, card: false, whiteCard: false, color: 'green' }); // << >>
+    else if (m[12] !== undefined) parts.push({ text: m[12], bold: false, card: false, whiteCard: false, color: 'gold' }); // (( ))
+    else if (m[13] !== undefined) parts.push({ text: m[13], bold: false, card: false, whiteCard: false, color: 'white' }); // || ||
+
     last = m.index + m[0].length;
   }
+
   if (last < str.length) parts.push({ text: str.slice(last), bold: false, card: false, whiteCard: false });
   return parts.length ? parts : [{ text: str, bold: false, card: false, whiteCard: false }];
 }
@@ -265,9 +289,9 @@ export function Home() {
                   className="hidden sm:inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 backdrop-blur-md text-sm font-playfair italic font-bold mb-12 -mt-4 tracking-wide w-auto max-w-[95%] md:text-center shrink-0 min-w-0 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
                   style={{ color: taglineColor }}
                 >
-                  <Icon1 className="w-4 h-4 shrink-0 tagline-icon-spin" style={{ color: '#F59E0B' }} />
+                  <Icon1 className="w-4 h-4 shrink-0 tagline-icon-spin text-[#10b981]" />
                   {fullTagline}
-                  <Icon2 className="w-4 h-4 shrink-0 tagline-icon-float" style={{ color: '#F59E0B' }} />
+                  <Icon2 className="w-4 h-4 shrink-0 tagline-icon-float text-[#10b981]" />
                 </motion.div>
 
                 {/* Mobile: single pill with animated SVG icons */}
@@ -277,14 +301,14 @@ export function Home() {
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: baseDelay + 0.3 }}
                   className="flex sm:hidden items-center justify-center gap-2 px-4 py-2 rounded-full backdrop-blur-md shadow-lg font-playfair italic font-bold text-[13px] tracking-wide mx-auto mb-6"
                   style={{
-                    background: 'rgba(245, 158, 11, 0.12)',
-                    border: '1.5px solid rgba(245, 158, 11, 0.6)',
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1.5px solid rgba(16, 185, 129, 0.6)',
                     color: 'var(--metallic-pale)',
                   }}
                 >
-                  <Icon1 className="w-3.5 h-3.5 shrink-0 tagline-icon-spin" style={{ color: '#F59E0B' }} />
+                  <Icon1 className="w-3.5 h-3.5 shrink-0 tagline-icon-spin text-[#10b981]" />
                   <span>{fullTagline}</span>
-                  <Icon2 className="w-3.5 h-3.5 shrink-0 tagline-icon-float" style={{ color: '#F59E0B' }} />
+                  <Icon2 className="w-3.5 h-3.5 shrink-0 tagline-icon-float text-[#10b981]" />
                 </motion.div>
               </>
             );
@@ -321,13 +345,13 @@ export function Home() {
                       initial={{ opacity: 0, filter: 'blur(10px)' }}
                       animate={{
                         opacity: revealedLetters[i] ? 1 : 0,
-                        filter: revealedLetters[i] ? 'blur(0px)' : 'blur(10px)'
+                        filter: revealedLetters[i] ? 'none' : 'blur(10px)'
                       }}
                       transition={{
                         duration: 0.4,
                         ease: "easeOut",
                       }}
-                      className={`${fontSizeClass} font-abril tracking-tight inline-block animate-text-shimmer-orbit will-change-[opacity,filter]`}
+                      className={`${fontSizeClass} font-abril tracking-tight inline-block animate-text-shimmer-orbit`}
                     >
                       {letter}
                     </motion.span>
@@ -340,10 +364,9 @@ export function Home() {
                 initial={{ opacity: 0, filter: 'blur(8px)' }}
                 animate={{
                   opacity: saasRevealed ? 1 : 0,
-                  filter: saasRevealed ? 'blur(0px)' : 'blur(8px)'
+                  filter: saasRevealed ? 'none' : 'blur(8px)'
                 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="font-abril tracking-tight inline-block ml-4 animate-text-shimmer-saas will-change-[opacity,filter]"
+                className="font-abril tracking-tight inline-block ml-4"
               >
                 {['S', 'a', 'a', 'S'].map((char, i) => {
                   const isLarge = i === 0 || i === 3; // First and last S
@@ -356,7 +379,7 @@ export function Home() {
                     : "text-[clamp(3.3rem,13vw,5.8rem)] lg:text-[6.5rem] xl:text-[7.8rem] align-[0.05em]";
 
                   return (
-                    <span key={i} className={fontSizeClass}>
+                    <span key={i} className={`${fontSizeClass} inline-block animate-text-shimmer-saas`}>
                       {char}
                     </span>
                   );
@@ -421,9 +444,14 @@ export function Home() {
                     const delay = (isHeroLoaded ? 0.05 : baseDelay + 0.9) + wordIndex * 0.04 + (pastMid ? midPause : 0);
                     wordIndex += wordsInSeg;
                     const cls = [
-                      seg.bold ? 'font-bold text-white' : '',
+                      seg.bold && !seg.color ? 'font-bold text-white' : '',
+                      seg.bold && seg.color ? 'font-bold' : '',
                       seg.card ? 'word-card' : '',
                       seg.whiteCard ? 'word-card-white' : '',
+                      seg.greenCard ? 'word-card-green' : '',
+                      seg.color === 'green' ? '!text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]' : '',
+                      seg.color === 'gold' ? '!text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]' : '',
+                      seg.color === 'white' ? '!text-white' : '',
                     ].filter(Boolean).join(' ');
                     return (
                       <motion.span
@@ -643,7 +671,7 @@ export function Home() {
           <ChevronDown className="w-6 h-6 text-muted-foreground opacity-50" />
         </motion.div>
       </motion.div>
-    </section>
+    </section >
   );
 }
 

@@ -125,18 +125,23 @@ export function WhyUsSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.6, duration: 0.6, ease: 'easeOut' }}
-              className="text-muted-foreground text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2"
+              className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2"
             >
               {parseRichText(t.whyUs.subtitle).map((seg, i) => {
-                if (!seg.bold && !seg.card && !seg.whiteCard) {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
                   return seg.text.split(' ').filter(Boolean).map((word, wi) => (
                     <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
                   ));
                 }
                 const cls = [
-                  seg.bold ? 'font-bold text-white' : '',
+                  seg.bold && !seg.color ? 'font-bold text-white' : '',
+                  seg.bold && seg.color ? 'font-bold' : '',
                   seg.card ? 'word-card' : '',
                   seg.whiteCard ? 'word-card-white' : '',
+                  seg.greenCard ? 'word-card-green' : '',
+                  seg.color === 'green' ? '!text-emerald-400' : '',
+                  seg.color === 'gold' ? '!text-amber-500' : '',
+                  seg.color === 'white' ? '!text-white' : '',
                 ].filter(Boolean).join(' ');
                 return (
                   <span key={`s-${i}`} className={`${cls} inline-block align-middle`}>

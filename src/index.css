@@ -32,22 +32,22 @@
 @keyframes taglineIconFloat {
   0%, 100% {
     transform: translateY(0) rotate(-15deg);
-    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
   }
   50% {
     transform: translateY(-3px) rotate(-5deg);
-    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.7));
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.7));
   }
 }
 
 @keyframes taglineIconPulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.3));
+    filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.3));
   }
   50% {
     transform: scale(1.15);
-    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
   }
 }
 
@@ -134,14 +134,31 @@
   }
 }
 
+.animate-text-shimmer-emerald {
+  background: linear-gradient(
+    to right,
+    #059669 0%,
+    #10b981 25%,
+    #6ee7b7 50%,
+    #10b981 75%,
+    #059669 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmerSweep 4s linear infinite;
+  filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.4));
+}
+
 .animate-text-shimmer-orbit {
   background: linear-gradient(
     to right,
-    var(--neon-emerald) 0%,
-    var(--neon-amber) 25%,
+    #b45309 0%,
+    #f59e0b 25%,
     #f8f8ff 50%,
-    var(--neon-amber) 75%,
-    var(--neon-emerald) 100%
+    #f59e0b 75%,
+    #b45309 100%
   );
   background-size: 200% auto;
   color: transparent;
@@ -154,18 +171,18 @@
 .animate-text-shimmer-saas {
   background: linear-gradient(
     to right,
-    #f59e0b 0%,
-    #fbbf24 25%,
-    #f8f8ff 50%,
-    #fbbf24 75%,
-    #f59e0b 100%
+    #10b981 0%,
+    #f59e0b 25%,
+    #6ee7b7 50%,
+    #b45309 75%,
+    #10b981 100%
   );
   background-size: 200% auto;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
   animation: textShimmerSweep 4s linear infinite reverse;
-  filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.4));
+  filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.4));
 }
 
 /* ── Metallic Gold Shimmer ── */
@@ -1119,6 +1136,25 @@ img.no-browser-trigger {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
 }
 
+/* ── Green Word Cards: alternative style for high contrast keywords ── */
+.word-card-green {
+  display: inline;
+  color: #10b981;
+  text-shadow: 0 0 2px rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 6px;
+  padding: 1px 7px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.12), inset 0 0 5px rgba(16, 185, 129, 0.05);
+  transition: all 0.3s ease;
+}
+
+.word-card-green:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
 /* ── Less visible word cards on mobile ── */
 @media (max-width: 768px) {
   .word-card {
@@ -1130,6 +1166,12 @@ img.no-browser-trigger {
   .word-card-white {
     border-color: rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+  }
+
+  .word-card-green {
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.1);
     box-shadow: none;
   }
 }

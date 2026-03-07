@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useLang } from '@/contexts/LanguageContext';
+import { parseRichText } from '@/lib/utils';
 import { Cpu, Crown, Target, User } from 'lucide-react';
 
 const fallbackStyles = [
@@ -43,7 +44,30 @@ export function LeadershipSection() {
             className="text-center mb-5 sm:mb-8"
           >
             <h2 className="inline-block px-6 sm:px-8 py-1.5 sm:py-2 rounded-full border-[0.5px] border-[#8B5A2B]/50 bg-[#8B5A2B]/10 text-[#FFE5B4] text-2xl sm:text-3xl lg:text-4xl font-display italic tracking-wide mb-2 sm:mb-3 shadow-[0_4px_20px_rgba(139,90,43,0.15)]">{t.leadership.title}</h2>
-            <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">{t.leadership.subtitle}</p>
+            <p className="text-[#10b981] text-[12.5px] sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-2 tracking-wide italic leading-relaxed pt-2">
+              {parseRichText(t.leadership.subtitle).map((seg, i) => {
+                if (!seg.bold && !seg.card && !seg.whiteCard && !seg.color) {
+                  return seg.text.split(' ').filter(Boolean).map((word, wi) => (
+                    <span key={`w-${i}-${wi}`} className="inline-block align-middle">{word}</span>
+                  ));
+                }
+                const cls = [
+                  seg.bold && !seg.color ? 'font-bold text-white' : '',
+                  seg.bold && seg.color ? 'font-bold' : '',
+                  seg.card ? 'word-card' : '',
+                  seg.whiteCard ? 'word-card-white' : '',
+                  seg.greenCard ? 'word-card-green' : '',
+                  seg.color === 'green' ? '!text-emerald-400' : '',
+                  seg.color === 'gold' ? '!text-amber-500' : '',
+                  seg.color === 'white' ? '!text-white' : '',
+                ].filter(Boolean).join(' ');
+                return (
+                  <span key={`s-${i}`} className={`${cls} inline-block align-middle`}>
+                    {seg.text}
+                  </span>
+                );
+              })}
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
