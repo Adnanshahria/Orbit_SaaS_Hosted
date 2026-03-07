@@ -63,7 +63,7 @@ function MarqueeRow({
                   boxShadow: `0 0 6px ${category.color}50`,
                 }}
               />
-              <span className="font-display font-medium text-foreground/85 text-sm group-hover:text-foreground gentle-animation">
+              <span className="font-medium text-foreground/85 text-sm group-hover:text-foreground gentle-animation">
                 {item}
               </span>
             </div>
@@ -94,7 +94,7 @@ export function TechStackSection() {
             transition={{ duration: 0.7 }}
             className="text-center mb-8"
           >
-            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.techStack.title}</h2>
+            <h2 className="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">{t.techStack.title}</h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t.techStack.subtitle}</p>
           </motion.div>
 

@@ -87,7 +87,7 @@ export function StatsSection() {
                     >
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-emerald-500/5 to-amber-500/5 pointer-events-none" />
                         <div className="relative z-10">
-                            <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground font-poppins tabular-nums">
+                            <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground tabular-nums">
                                 <AnimatedCounter target={Number(stat.value) || 0} active={show} />
                                 <span className="text-primary">{stat.suffix || '+'}</span>
                             </span>

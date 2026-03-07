@@ -21,7 +21,7 @@ export default {
         bagel: ['Bagel Fat One', 'cursive'],
         poppins: ['Poppins', 'sans-serif'],
         abril: ['"Abril Fatface"', 'cursive'],
-        lobster: ['"Lobster Two"', 'cursive'],
+        garamond: ['"Cormorant Garamond"', 'serif'],
         playfair: ['"Playfair Display"', 'serif'],
       },
       colors: {

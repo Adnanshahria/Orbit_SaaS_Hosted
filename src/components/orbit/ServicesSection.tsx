@@ -63,7 +63,7 @@ function ServiceCard({
         >
           <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: accent }} />
         </div>
-        <h3 className="font-display text-[1rem] sm:text-[1.15rem] font-bold text-foreground leading-snug">
+        <h3 className="text-[1rem] sm:text-[1.15rem] font-bold text-foreground leading-snug">
           {item.title}
         </h3>
       </div>
@@ -111,7 +111,7 @@ export function ServicesSection() {
               initial={{ opacity: 0, y: -16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 tracking-tight text-foreground"
+              className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 tracking-tight text-foreground"
               style={titleColor ? { color: titleColor } : undefined}
             >
               {t.services.title}

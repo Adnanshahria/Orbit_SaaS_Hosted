@@ -361,7 +361,7 @@ export function Home() {
                 initial={{ opacity: 0, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, filter: 'blur(10px)', transition: { duration: 0.3 } }}
-                className={`${isInHero ? 'animate-title-breath' : ''} text-[clamp(1.15rem,4.5vw,1.5rem)] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-lobster tracking-normal px-1 sm:px-4 flex flex-wrap justify-center gap-x-[0.25em] gap-y-2 ${lang === 'bn' ? 'font-bengali font-bold' : ''}`}
+                className={`${isInHero ? 'animate-title-breath' : ''} text-[clamp(1.15rem,4.5vw,1.5rem)] leading-[1.2] sm:text-3xl md:text-4xl lg:text-[3rem] xl:text-5xl font-garamond italic font-medium tracking-normal px-1 sm:px-4 flex flex-wrap justify-center gap-x-[0.25em] gap-y-2 ${lang === 'bn' ? 'font-bengali font-bold' : ''}`}
                 style={{ color: titleColor }}
               >
                 {t.hero.title.split(' ').filter(Boolean).map((word: string, wi: number) => {
@@ -391,7 +391,7 @@ export function Home() {
             initial={{ opacity: 0, filter: 'blur(10px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}
             exit={{ opacity: 0, filter: 'blur(10px)', transition: { duration: 0.3 } }}
-            className="text-muted-foreground text-[12.5px] sm:text-base md:text-lg lg:text-xl w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 mt-4 sm:mt-6 mb-4 sm:mb-6 leading-[1.6] flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-3 font-medium tracking-wide italic"
+            className="text-muted-foreground text-[12.5px] sm:text-base md:text-lg lg:text-xl w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 mt-4 sm:mt-6 mb-4 sm:mb-6 leading-[1.6] flex flex-wrap justify-center gap-x-[0.4em] gap-y-[0.4rem] sm:gap-y-3 tracking-wide italic"
           >
             {(
               (() => {

@@ -53,7 +53,7 @@ function WhyUsCard({ item, index }: { item: any; index: number }) {
         >
           <CurrentIcon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: accent }} />
         </div>
-        <h3 className="font-display text-[1rem] sm:text-[1.15rem] font-bold text-foreground leading-snug">
+        <h3 className="text-[1rem] sm:text-[1.15rem] font-bold text-foreground leading-snug">
           {item.title}
         </h3>
       </div>

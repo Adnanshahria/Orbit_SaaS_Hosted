@@ -42,7 +42,7 @@ export function LeadershipSection() {
             transition={{ type: 'spring', stiffness: 80, damping: 20 }}
             className="text-center mb-5 sm:mb-8"
           >
-            <h2 className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-3">{t.leadership.title}</h2>
+            <h2 className="inline-block px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border border-neon-emerald/25 bg-neon-emerald/5 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-3">{t.leadership.title}</h2>
             <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">{t.leadership.subtitle}</p>
           </motion.div>
 
@@ -78,7 +78,7 @@ export function LeadershipSection() {
                     )}
                     <div className="absolute inset-0 rounded-full border border-white/10 pointer-events-none" />
                   </motion.div>
-                  <h3 className="font-display text-sm sm:text-xl lg:text-2xl font-bold text-foreground mb-0.5 sm:mb-1.5 leading-tight">{member.name}</h3>
+                  <h3 className="text-sm sm:text-xl lg:text-2xl font-bold text-foreground mb-0.5 sm:mb-1.5 leading-tight">{member.name}</h3>
                   <p className="text-neon-amber text-[10px] sm:text-sm lg:text-base font-bold tracking-wide uppercase">{member.role}</p>
                 </div>
               );
@@ -94,7 +94,7 @@ export function LeadershipSection() {
               className="mt-12 sm:mt-16 max-w-4xl mx-auto"
             >
               <div className="glass-effect rounded-2xl sm:rounded-[2rem] p-6 sm:p-10 text-center bg-card/40 backdrop-blur-md transition-colors duration-500 premium-card">
-                <p className="text-lg sm:text-2xl lg:text-3xl font-display font-medium text-foreground leading-relaxed italic relative z-10">
+                <p className="text-lg sm:text-2xl lg:text-3xl font-medium text-foreground leading-relaxed italic relative z-10">
                   <span className="text-primary/40 text-4xl leading-none absolute -top-4 -left-2 sm:-left-6">"</span>
                   {tagline}
                   <span className="text-primary/40 text-4xl leading-none absolute -bottom-4 -right-2 sm:-right-6">"</span>
