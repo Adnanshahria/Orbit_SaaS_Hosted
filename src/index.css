@@ -836,6 +836,11 @@ html.hide-scrollbar::-webkit-scrollbar {
     font-size: 2rem;
     font-weight: 600;
     line-height: 1.2;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #B8860B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block; /* Required for background-clip on some elements */
   }
 
   h3 {
@@ -844,6 +849,11 @@ html.hide-scrollbar::-webkit-scrollbar {
     font-size: 1.5rem;
     font-weight: 600;
     line-height: 1.3;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #B8860B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
   }
 
   p {
